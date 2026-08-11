@@ -11,7 +11,6 @@ import SwiftUI
 struct TotalSpendCard: View {
     @Environment(LayoutStore.self) private var layout
     @Environment(WidgetDataStore.self) private var dataStore
-    @Environment(AppContainer.self) private var container
     @Environment(\.colorScheme) private var colorScheme
     @Namespace private var pickerNamespace
 
@@ -37,23 +36,7 @@ struct TotalSpendCard: View {
     }
 
     private var total: TotalSpend {
-        // Accounts that live only on other Macs (synced, no card here) count toward the total and
-        // get their own legend slice ("claude@ab12cd34") — the number should be the whole truth
-        // even when a login isn't set up on this machine.
-        var aggregatedProviders = providers
-        var aggregatedSnapshots = dataStore.snapshots
-        for entry in dataStore.remoteOnlySpend {
-            aggregatedProviders.append(entry.provider)
-            aggregatedSnapshots[entry.provider.id] = entry.snapshot
-        }
-        // Titles resolve here — the one place with registry access — so the legend AND the share
-        // export (rendered outside the environment) carry live renames.
-        return TotalSpendAggregator.total(
-            for: period,
-            providers: aggregatedProviders,
-            snapshots: aggregatedSnapshots,
-            title: { container.displayName(for: $0) }
-        )
+        TotalSpendAggregator.total(for: period, providers: providers, snapshots: dataStore.snapshots)
     }
 
     private var projection: TotalSpendProjection {
@@ -121,7 +104,7 @@ struct TotalSpendCard: View {
     /// hardcoded list, so disabling a provider (or a new spend provider shipping) can't make the
     /// tooltip lie about what the total reflects.
     private var infoTooltip: String {
-        let names = providers.map { container.displayName(for: $0) }
+        let names = providers.map(\.displayName)
         return "Only includes \(names.formatted(.list(type: .and)))."
     }
 
@@ -349,7 +332,7 @@ struct TotalSpendRingContent: View {
             Circle()
                 .fill(TotalSpendPalette.color(for: slice.provider.id))
                 .frame(width: 8, height: 8)
-            Text(slice.title)
+            Text(slice.provider.displayName)
                 .font(.system(size: density.supportingPointSize))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
