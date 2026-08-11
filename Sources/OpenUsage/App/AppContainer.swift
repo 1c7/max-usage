@@ -278,7 +278,7 @@ final class AppContainer {
         // `@AppStorage` properties observe the change. New settings must be added here.
         for key in [
             AppearanceSetting.key, TimeFormatSetting.key, DensitySetting.key,
-            LogLevelSetting.key, TotalSpendSetting.key,
+            ReduceAnimationsSetting.key, LogLevelSetting.key, TotalSpendSetting.key,
             TotalSpendSetting.periodKey, TotalSpendSetting.metricKey,
         ] {
             UserDefaults.standard.removeObject(forKey: key)
