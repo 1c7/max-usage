@@ -1,5 +1,47 @@
 # Changelog
 
+## v0.7.8
+
+### New Features
+- Add Reduce Animations support ([#1019](https://github.com/robinebers/openusage/pull/1019)) by @davidarny
+- Add Reset All Settings with confirmation ([#1033](https://github.com/robinebers/openusage/pull/1033)) by @ricardoakrug
+
+### Bug Fixes
+- Use the newer of the cached and bundled pricing supplement ([#1089](https://github.com/robinebers/openusage/pull/1089)) by @robinebers
+- Price Kimi K3 and Cursor Router rows ([#1087](https://github.com/robinebers/openusage/pull/1087)) by @robinebers
+- Price Claude Opus 5 in the pricing supplement ([#1050](https://github.com/robinebers/openusage/pull/1050)) by @validatedev
+- Track Codex auto-review separately from pricing model ([#1085](https://github.com/robinebers/openusage/pull/1085)) by @validatedev
+- Account-first Phase 1: account registry, default identity, cache stamp, plain-matching CLI/API ([#1027](https://github.com/robinebers/openusage/pull/1027)) by @robinebers
+- Account-first Phase 0: shell-environment snapshot + the plan ([#1026](https://github.com/robinebers/openusage/pull/1026)) by @robinebers
+- Cache parsed local usage logs across launches ([#1017](https://github.com/robinebers/openusage/pull/1017)) by @robinebers
+
+### Chores
+- Bump PostHog iOS 3.64.5 → 3.69.0 ([#1083](https://github.com/robinebers/openusage/pull/1083)) by @dependabot[bot]
+- Bump Sparkle 2.9.4 → 2.9.5 ([#1082](https://github.com/robinebers/openusage/pull/1082)) by @dependabot[bot]
+- Bump actions/stale 10 → 11 ([#1069](https://github.com/robinebers/openusage/pull/1069)) by @dependabot[bot]
+
+---
+
+### Changelog
+**Full Changelog**: [v0.7.6...v0.7.8](https://github.com/robinebers/openusage/compare/v0.7.6...v0.7.8)
+
+- [cd3dec0](https://github.com/robinebers/openusage/commit/cd3dec05042bdff7587ff20353488628530f8711) Revert Account-first Phase 2 and 2b ahead of the release (#1090) by @robinebers
+- [ccfcc85](https://github.com/robinebers/openusage/commit/ccfcc8501aa2cdb4649355fc20f216dfb91a2f3d) Use the newer of the cached and bundled pricing supplement (#1089) by @robinebers
+- [404a97c](https://github.com/robinebers/openusage/commit/404a97c8ac9b7297068b2b57c693f11453be9414) Price Kimi K3 and Cursor Router rows (#1087) by @robinebers
+- [0cc04e0](https://github.com/robinebers/openusage/commit/0cc04e018c92a81e2c6dea05477f6b74026fe41b) Add Reduce Animations support (#1019) by @davidarny
+- [bd2f1d6](https://github.com/robinebers/openusage/commit/bd2f1d6b5be14efd1072a34364444a7bbabcd95f) feat(settings): add Reset All Settings with confirmation (#1033) by @ricardoakrug
+- [72ba5da](https://github.com/robinebers/openusage/commit/72ba5dad15dbca5a42e8db56a8bff70b28c0b343) chore(deps): bump github.com/posthog/posthog-ios from 3.64.5 to 3.69.0 (#1083) by @dependabot[bot]
+- [8a4dc73](https://github.com/robinebers/openusage/commit/8a4dc73f8b2634138972a73ec30ad1c8eb3a1461) chore(deps): bump github.com/sparkle-project/sparkle from 2.9.4 to 2.9.5 (#1082) by @dependabot[bot]
+- [a20d4b8](https://github.com/robinebers/openusage/commit/a20d4b8da0e6fd2ab935e8e49760f6b76a371654) Price Claude Opus 5 in the pricing supplement (#1050) by @validatedev
+- [366c89a](https://github.com/robinebers/openusage/commit/366c89a6b99d3e4b8770e4e8054ed51220136045) Track Codex auto-review separately from pricing model (#1085) by @validatedev
+- [b5d6b47](https://github.com/robinebers/openusage/commit/b5d6b47c566f51446a6dfb36921df6cee802f14f) chore(deps): bump actions/stale from 10 to 11 (#1069) by @dependabot[bot]
+- [9d2bf09](https://github.com/robinebers/openusage/commit/9d2bf09f10e21f769494a525a9d65c84d7aeb1df) Account-first Phase 2b: one name resolver for card titles (#1031) by @robinebers
+- [842feae](https://github.com/robinebers/openusage/commit/842feae4e48337749e94946a6c6d714b6cfb97ba) Account-first Phase 2: Claude multi-account from custom config dirs (#1030) by @robinebers
+- [29253f4](https://github.com/robinebers/openusage/commit/29253f4f3e0b714a85c206bf5b95e1164e7de299) docs: changelog for v0.7.7-beta.1 by @robinebers
+- [7723025](https://github.com/robinebers/openusage/commit/7723025777716bcc3326cea22c890b3f706deb0a) Account-first Phase 1: account registry, default identity, cache stamp, plain-matching CLI/API (#1027) by @robinebers
+- [d785f7e](https://github.com/robinebers/openusage/commit/d785f7e8b85669e840ecb5363443dfbf1a107806) Account-first Phase 0: shell-environment snapshot + the plan (#1026) by @robinebers
+- [6a2d74d](https://github.com/robinebers/openusage/commit/6a2d74d2f277287714376d7549ab1a979a4fc3d1) Cache parsed local usage logs across launches (#1017) by @robinebers
+
 ## v0.7.7-beta.1
 
 ### Bug Fixes
