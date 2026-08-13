@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.7.9
+
+### New Features
+- Add Daybreak Blue model pricing ([#1093](https://github.com/robinebers/openusage/pull/1093)) by @validatedev
+- Switch OpenCode Go meters to the official usage API ([#1097](https://github.com/robinebers/openusage/pull/1097)) by @robinebers
+- Price Cursor Grok 4.6 and correct Grok 4.5 Fast output ([#1101](https://github.com/robinebers/openusage/pull/1101)) by @robinebers
+
+---
+
+### Changelog
+**Full Changelog**: [v0.7.8...v0.7.9](https://github.com/robinebers/openusage/compare/v0.7.8...v0.7.9)
+
+- [e171fd7](https://github.com/robinebers/openusage/commit/e171fd75af15d1b945dfc6ba9df8918905b9cd66) Add Daybreak Blue model pricing (#1093) by @validatedev
+- [064819b](https://github.com/robinebers/openusage/commit/064819bf582a444d163d878e57967d4620d3b0d5) feat(opencode): switch Go meters to the official usage API (#1097) by @robinebers
+- [e9e8a77](https://github.com/robinebers/openusage/commit/e9e8a77c6d663f2cce53b9d2aacc685f33dd9eb8) feat(pricing): price Cursor Grok 4.6 and correct Grok 4.5 Fast output (#1101) by @robinebers
+
 ## v0.7.8
 
 ### New Features
