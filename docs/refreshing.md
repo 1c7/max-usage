@@ -34,6 +34,12 @@ are debounced until after refresh; the one-shot CLI drains pending writes before
 
 A failed refresh **never wipes your data**: the last good values stay on screen, and a small warning triangle appears next to the provider's name — hover it for the error message (e.g. "Not logged in"). The error clears on the next successful refresh.
 
+A provider that stops responding altogether is given up on after two minutes. Its spinner stops, the
+warning triangle reads "Refresh timed out after 120s", and it is tried again on a later pass — so one
+stuck provider can't leave a spinner turning for the rest of the session. The wait is deliberately long:
+a healthy provider on a slow network can legitimately take over a minute, and it should be reported as
+slow, not as broken.
+
 The last good normalized history is preserved too, so a temporary provider failure—or a successful
 limit refresh whose local log scan is temporarily unavailable—does not remove this Mac's previous
 contribution from an iCloud-combined spend total.

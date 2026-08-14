@@ -379,6 +379,32 @@ final class CountingProviderRuntime: ProviderRuntime {
     }
 }
 
+/// A runtime whose `refresh()` never returns on its own — it waits until it is cancelled. Models the
+/// hung provider the refresh deadline exists to bound (a subprocess that never exits, a credential read
+/// that blocks). `wasCancelled` records whether the store actually cancelled the work it gave up on.
+@MainActor
+final class HangingProviderRuntime: ProviderRuntime {
+    let provider: Provider
+    let widgetDescriptors: [WidgetDescriptor]
+    private(set) var wasCancelled = false
+
+    init(provider: Provider, descriptors: [WidgetDescriptor]) {
+        self.provider = provider
+        self.widgetDescriptors = descriptors
+    }
+
+    func refresh() async -> ProviderSnapshot {
+        // Far longer than any test's injected deadline, so the deadline always wins the race. The sleep
+        // is cancellable purely so a test can observe the cancellation and the task doesn't outlive it.
+        do {
+            try await Task.sleep(for: .seconds(60))
+        } catch {
+            wasCancelled = true
+        }
+        return ProviderSnapshot.error(provider: provider, message: "hung")
+    }
+}
+
 /// A runtime that returns `first` on the first refresh and `second` on every refresh after — for
 /// sequences like a success that later turns into a failure (e.g. testing that a hard error takes
 /// precedence over a stale soft warning from the prior success).
