@@ -156,17 +156,13 @@ private struct MenuBarTextStrip: View {
     let content: MenuBarContent
 
     var body: some View {
-        HStack(spacing: 6) {
-            ForEach(content.groups, id: \.providerID) { group in
-                HStack(spacing: 5) {
-                    Image(systemName: "hare.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 14, height: 14)
-                    Text(group.displayName)
-                        .font(.system(size: 12, weight: .semibold))
-                }
-            }
+        HStack(spacing: 5) {
+            Image(systemName: "hare.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 14, height: 14)
+            Text("MaxUsage")
+                .font(.system(size: 12, weight: .semibold))
         }
         .foregroundStyle(.black)
         .padding(.horizontal, 2)
