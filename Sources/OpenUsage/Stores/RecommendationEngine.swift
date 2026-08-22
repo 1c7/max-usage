@@ -69,35 +69,38 @@ enum RecommendationEngine {
     /// "Weekly quota still has 74%, resets in 2 days" — the level word mirrors the doc's own example
     /// phrasing (still has / left / only has) by remaining band.
     private static func reasonText(for candidate: QuotaCandidate, now: Date) -> String {
+        let loc = LanguageSetting.current.effectiveLocale
         let pct = Int(candidate.weeklyRemainingPct.rounded())
         let level: String
         if candidate.weeklyRemainingPct > 70 {
-            level = String(localized: "recommendation.reason.stillHas", defaultValue: "Weekly quota still has \(pct)%")
+            level = String(localized: "recommendation.reason.stillHas", defaultValue: "Weekly quota still has \(pct)%", locale: loc)
         } else if candidate.weeklyRemainingPct < 20 {
-            level = String(localized: "recommendation.reason.onlyHas", defaultValue: "Weekly quota only has \(pct)% left")
+            level = String(localized: "recommendation.reason.onlyHas", defaultValue: "Weekly quota only has \(pct)% left", locale: loc)
         } else {
-            level = String(localized: "recommendation.reason.has", defaultValue: "Weekly quota has \(pct)% left")
+            level = String(localized: "recommendation.reason.has", defaultValue: "Weekly quota has \(pct)% left", locale: loc)
         }
         guard let hours = candidate.weeklyHoursUntilReset(now: now) else { return level }
         let resetText = ResetTimeFormatter.format(hoursUntilReset: hours)
-        return String(localized: "recommendation.reason.combined", defaultValue: "\(level), \(resetText.lowercased())")
+        return String(localized: "recommendation.reason.combined", defaultValue: "\(level), \(resetText.lowercased())", locale: loc)
     }
 
     /// Among candidates that still have weekly quota but are currently blocked by an exhausted short
     /// window, the one whose short window resets soonest — the doc's optional "no recommendation"
     /// helper hint. `nil` when no such candidate exists.
     private static func soonestRecovery(among candidates: [QuotaCandidate], now: Date) -> Recommendation? {
+        let loc = LanguageSetting.current.effectiveLocale
         let blocked = candidates.filter { $0.weeklyRemainingPct > 0 && $0.shortWindowRemainingPct <= 0 }
         guard let soonest = blocked.min(by: { lhs, rhs in
             (lhs.shortWindowResetsAt ?? .distantFuture) < (rhs.shortWindowResetsAt ?? .distantFuture)
         }) else { return nil }
         guard let resetsAt = soonest.shortWindowResetsAt else { return nil }
         let hours = max(0, resetsAt.timeIntervalSince(now)) / 3600
-        let windowLabel = soonest.shortWindowLabel ?? String(localized: "recommendation.reason.session", defaultValue: "Session")
+        let windowLabel = soonest.shortWindowLabel ?? String(localized: "recommendation.reason.session", defaultValue: "Session", locale: loc)
         let resetText = ResetTimeFormatter.format(hoursUntilReset: hours)
         let reason = String(
             localized: "recommendation.reason.recoversAt",
-            defaultValue: "\(windowLabel) \(resetText.lowercased())"
+            defaultValue: "\(windowLabel) \(resetText.lowercased())",
+            locale: loc
         )
         return Recommendation(candidate: soonest, reason: reason)
     }

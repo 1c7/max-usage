@@ -5,16 +5,18 @@ import SwiftUI
 struct RecommendationTabView: View {
     let candidates: [QuotaCandidate]
     let now: Date
+    @AppStorage(LanguageSetting.key) private var language = LanguageSetting.fallback
 
     private var result: RecommendationEngine.Result {
         RecommendationEngine.evaluate(candidates: candidates, now: now)
     }
 
     var body: some View {
+        let loc = LanguageSetting.current.effectiveLocale
         VStack(alignment: .leading, spacing: 16) {
             switch result {
             case .recommended(let recommendation):
-                Text(String(localized: "recommendation.eyebrow", defaultValue: "RECOMMENDED"))
+                Text(String(localized: "recommendation.eyebrow", defaultValue: "RECOMMENDED", locale: loc))
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundStyle(Theme.positive)
                 HStack(spacing: 10) {
@@ -28,19 +30,20 @@ struct RecommendationTabView: View {
                     .font(.title3)
                     .foregroundStyle(.secondary)
             case .none(let hint):
-                Text(String(localized: "recommendation.none.title", defaultValue: "No Recommendation"))
+                Text(String(localized: "recommendation.none.title", defaultValue: "No Recommendation", locale: loc))
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundStyle(.primary)
                 Text(String(
                     localized: "recommendation.none.body",
-                    defaultValue: "Every subscription is at its limit right now."
+                    defaultValue: "Every subscription is at its limit right now.",
+                    locale: loc
                 ))
                 .font(.title3)
                 .foregroundStyle(.secondary)
                 if let hint {
                     Divider()
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(String(localized: "recommendation.none.recoversSoonest", defaultValue: "Recovers soonest"))
+                        Text(String(localized: "recommendation.none.recoversSoonest", defaultValue: "Recovers soonest", locale: loc))
                             .font(.subheadline)
                             .foregroundStyle(.tertiary)
                         HStack(spacing: 8) {

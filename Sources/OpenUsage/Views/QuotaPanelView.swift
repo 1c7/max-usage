@@ -15,6 +15,7 @@ struct QuotaPanelView: View {
     let container: AppContainer
 
     @Environment(WidgetDataStore.self) private var dataStore
+    @AppStorage(LanguageSetting.key) private var language = LanguageSetting.fallback
     @State private var tab: QuotaPanelTab = .recommend
 
     var body: some View {
@@ -52,9 +53,10 @@ struct QuotaPanelView: View {
     /// full rectangle (label + pill + generous padding), not just the tightly-cropped pill shape, so
     /// there's a large, obvious click/hover area edge to edge.
     private var tabBar: some View {
-        HStack(spacing: 6) {
-            tabButton(.recommend, title: String(localized: "quotaPanel.tab.recommend", defaultValue: "Recommended"))
-            tabButton(.quota, title: String(localized: "quotaPanel.tab.quota", defaultValue: "Quotas"))
+        let loc = LanguageSetting.current.effectiveLocale
+        return HStack(spacing: 6) {
+            tabButton(.recommend, title: String(localized: "quotaPanel.tab.recommend", defaultValue: "Recommended", locale: loc))
+            tabButton(.quota, title: String(localized: "quotaPanel.tab.quota", defaultValue: "Quotas", locale: loc))
         }
         .padding(.horizontal, 10)
         .padding(.top, 6)

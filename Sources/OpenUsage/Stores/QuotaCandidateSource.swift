@@ -10,40 +10,46 @@ import Foundation
 enum QuotaCandidateSource {
     /// One weekly-window metric, optionally paired with a shorter window that gates it (Claude/Codex/
     /// OpenCode/Z.ai's rolling 5-hour session, Devin's daily cap). Grok has no short window at all.
+    private enum ShortWindowKind {
+        case session
+        case daily
+
+        var label: String {
+            switch self {
+            case .session:
+                return String(localized: "quotaCandidate.shortWindow.session", defaultValue: "5-Hour", locale: LanguageSetting.current.effectiveLocale)
+            case .daily:
+                return String(localized: "quotaCandidate.shortWindow.daily", defaultValue: "Daily", locale: LanguageSetting.current.effectiveLocale)
+            }
+        }
+    }
+
     private struct Spec {
         let providerID: String
         let candidateID: String
-        /// `nil` uses the provider's own display name; set for a provider's second independent pool.
         let displayNameSuffix: String?
         let weeklyDescriptorID: String
         let shortDescriptorID: String?
-        let shortWindowLabel: String?
-    }
-
-    private static var sessionLabel: String {
-        String(localized: "quotaCandidate.shortWindow.session", defaultValue: "5-Hour")
-    }
-    private static var dailyLabel: String {
-        String(localized: "quotaCandidate.shortWindow.daily", defaultValue: "Daily")
+        let shortWindowKind: ShortWindowKind?
     }
 
     private static let specs: [Spec] = [
         .init(providerID: "claude", candidateID: "claude", displayNameSuffix: nil,
-              weeklyDescriptorID: "claude.weekly", shortDescriptorID: "claude.session", shortWindowLabel: sessionLabel),
+              weeklyDescriptorID: "claude.weekly", shortDescriptorID: "claude.session", shortWindowKind: .session),
         .init(providerID: "codex", candidateID: "codex", displayNameSuffix: nil,
-              weeklyDescriptorID: "codex.weekly", shortDescriptorID: "codex.session", shortWindowLabel: sessionLabel),
+              weeklyDescriptorID: "codex.weekly", shortDescriptorID: "codex.session", shortWindowKind: .session),
         .init(providerID: "opencode", candidateID: "opencode", displayNameSuffix: nil,
-              weeklyDescriptorID: "opencode.weekly", shortDescriptorID: "opencode.session", shortWindowLabel: sessionLabel),
+              weeklyDescriptorID: "opencode.weekly", shortDescriptorID: "opencode.session", shortWindowKind: .session),
         .init(providerID: "zai", candidateID: "zai", displayNameSuffix: nil,
-              weeklyDescriptorID: "zai.weekly", shortDescriptorID: "zai.session", shortWindowLabel: sessionLabel),
+              weeklyDescriptorID: "zai.weekly", shortDescriptorID: "zai.session", shortWindowKind: .session),
         .init(providerID: "antigravity", candidateID: "antigravity.gemini", displayNameSuffix: nil,
-              weeklyDescriptorID: "antigravity.geminiWeekly", shortDescriptorID: "antigravity.geminiPro", shortWindowLabel: sessionLabel),
+              weeklyDescriptorID: "antigravity.geminiWeekly", shortDescriptorID: "antigravity.geminiPro", shortWindowKind: .session),
         .init(providerID: "antigravity", candidateID: "antigravity.claude", displayNameSuffix: "Claude",
-              weeklyDescriptorID: "antigravity.claudeWeekly", shortDescriptorID: "antigravity.claude", shortWindowLabel: sessionLabel),
+              weeklyDescriptorID: "antigravity.claudeWeekly", shortDescriptorID: "antigravity.claude", shortWindowKind: .session),
         .init(providerID: "devin", candidateID: "devin", displayNameSuffix: nil,
-              weeklyDescriptorID: "devin.weekly", shortDescriptorID: "devin.daily", shortWindowLabel: dailyLabel),
+              weeklyDescriptorID: "devin.weekly", shortDescriptorID: "devin.daily", shortWindowKind: .daily),
         .init(providerID: "grok", candidateID: "grok", displayNameSuffix: nil,
-              weeklyDescriptorID: "grok.weekly", shortDescriptorID: nil, shortWindowLabel: nil)
+              weeklyDescriptorID: "grok.weekly", shortDescriptorID: nil, shortWindowKind: nil)
     ]
 
     @MainActor
@@ -82,7 +88,7 @@ enum QuotaCandidateSource {
                 shortWindowUsed: shortUsed,
                 shortWindowLimit: shortLimit,
                 shortWindowResetsAt: shortResetsAt,
-                shortWindowLabel: spec.shortWindowLabel
+                shortWindowLabel: spec.shortWindowKind?.label
             )
         }
     }
