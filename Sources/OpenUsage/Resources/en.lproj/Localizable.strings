@@ -356,3 +356,4 @@
 "Show Pace Prediction" = "Show Pace Prediction";
 "settingsScreen.showPacePredictionTooltip" = "Predict when you'll hit a limit based on your usage rate, not just how much is left";
 "formatters.resetCombined" = "%@ (%@)";
+"soonestWeeklyReset.banner" = "Weekly quota resets soonest: %1$@ (%2$@)";

@@ -33,6 +33,9 @@ struct DashboardContentView: View {
                         .padding(.bottom, density.sectionSpacing)
                         .transition(.scale(scale: 0.95).combined(with: .opacity))
                 }
+                // Live status, not a one-time notice — manages its own bottom spacing so it takes up
+                // nothing when no provider currently qualifies.
+                SoonestWeeklyResetBanner()
                 widgetContent
             }
             .animation(Motion.spring, value: container.onboarding.isCustomizeHintPending)
