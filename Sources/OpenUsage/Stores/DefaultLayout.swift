@@ -9,24 +9,24 @@ enum DefaultLayout {
     static let metricIDs: [String] = [
         "antigravity.geminiPro", "antigravity.geminiWeekly", "antigravity.claude", "antigravity.claudeWeekly",
 
-        "claude.session", "claude.weekly", "claude.trend",
-        "claude.extra", "claude.today", "claude.yesterday", "claude.last30",
+        "claude.session", "claude.weekly",
+        "claude.today", "claude.yesterday", "claude.last30",
 
-        "codex.session", "codex.weekly", "codex.spark", "codex.sparkWeekly", "codex.trend",
-        "codex.credits", "codex.rateLimitResets", "codex.today", "codex.yesterday", "codex.last30",
+        "codex.session", "codex.weekly", "codex.spark", "codex.sparkWeekly",
+        "codex.rateLimitResets", "codex.today", "codex.yesterday", "codex.last30",
 
-        "cursor.usage", "cursor.auto", "cursor.api", "cursor.trend",
-        "cursor.onDemand", "cursor.today", "cursor.yesterday", "cursor.last30",
+        "cursor.usage", "cursor.auto", "cursor.api",
+        "cursor.today", "cursor.yesterday", "cursor.last30",
 
-        "copilot.premium", "copilot.extra", "copilot.orgCredits", "copilot.orgSpend",
+        "copilot.premium", "copilot.orgCredits", "copilot.orgSpend",
         "copilot.chat", "copilot.completions",
 
         "devin.daily", "devin.weekly", "devin.extra",
 
-        "grok.weekly", "grok.trend",
-        "grok.payAsYouGo", "grok.today", "grok.yesterday", "grok.last30",
+        "grok.weekly",
+        "grok.today", "grok.yesterday", "grok.last30",
 
-        "opencode.session", "opencode.weekly", "opencode.monthly", "opencode.trend",
+        "opencode.session", "opencode.weekly", "opencode.monthly",
         "opencode.today", "opencode.yesterday", "opencode.last30",
 
         "openrouter.credits", "openrouter.balance",
