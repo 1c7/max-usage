@@ -8,12 +8,10 @@ struct QuotaListTabView: View {
     @AppStorage(LanguageSetting.key) private var language = LanguageSetting.fallback
 
     var body: some View {
-        let loc = LanguageSetting.current.effectiveLocale
         if candidates.isEmpty {
-            Text(String(
-                localized: "quotaList.empty",
-                defaultValue: "Turn on a provider in Customize to see its quota here.",
-                locale: loc
+            Text(AppLocalization.string(
+                "quotaList.empty",
+                defaultValue: "Turn on a provider in Customize to see its quota here."
             ))
             .font(.title3)
             .foregroundStyle(.secondary)
@@ -40,7 +38,6 @@ private struct QuotaCandidateRow: View {
     let now: Date
 
     var body: some View {
-        let loc = LanguageSetting.current.effectiveLocale
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 Text(candidate.displayName)
@@ -53,7 +50,7 @@ private struct QuotaCandidateRow: View {
                 }
             }
             QuotaMeterRow(
-                label: String(localized: "quotaList.weekly", defaultValue: "Weekly", locale: loc),
+                label: AppLocalization.string("quotaList.weekly", defaultValue: "Weekly"),
                 remainingPct: candidate.weeklyRemainingPct
             )
             // A spent weekly quota makes the short window moot — the subscription can't be used

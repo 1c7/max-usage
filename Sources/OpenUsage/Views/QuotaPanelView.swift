@@ -55,10 +55,9 @@ struct QuotaPanelView: View {
     /// full rectangle (label + pill + generous padding), not just the tightly-cropped pill shape, so
     /// there's a large, obvious click/hover area edge to edge.
     private var tabBar: some View {
-        let loc = LanguageSetting.current.effectiveLocale
-        return HStack(spacing: 6) {
-            tabButton(.recommend, title: String(localized: "quotaPanel.tab.recommend", defaultValue: "Recommended", locale: loc))
-            tabButton(.quota, title: String(localized: "quotaPanel.tab.quota", defaultValue: "Quotas", locale: loc))
+        HStack(spacing: 6) {
+            tabButton(.recommend, title: AppLocalization.string("quotaPanel.tab.recommend", defaultValue: "Recommended"))
+            tabButton(.quota, title: AppLocalization.string("quotaPanel.tab.quota", defaultValue: "Quotas"))
         }
         .padding(.horizontal, 10)
         .padding(.top, 6)

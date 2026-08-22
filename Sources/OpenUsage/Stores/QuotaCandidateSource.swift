@@ -17,9 +17,9 @@ enum QuotaCandidateSource {
         var label: String {
             switch self {
             case .session:
-                return String(localized: "quotaCandidate.shortWindow.session", defaultValue: "5-Hour", locale: LanguageSetting.current.effectiveLocale)
+                return AppLocalization.string("quotaCandidate.shortWindow.session", defaultValue: "5-Hour")
             case .daily:
-                return String(localized: "quotaCandidate.shortWindow.daily", defaultValue: "Daily", locale: LanguageSetting.current.effectiveLocale)
+                return AppLocalization.string("quotaCandidate.shortWindow.daily", defaultValue: "Daily")
             }
         }
     }

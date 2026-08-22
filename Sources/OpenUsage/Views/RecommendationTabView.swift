@@ -12,11 +12,10 @@ struct RecommendationTabView: View {
     }
 
     var body: some View {
-        let loc = LanguageSetting.current.effectiveLocale
         VStack(alignment: .leading, spacing: 16) {
             switch result {
             case .recommended(let recommendation):
-                Text(String(localized: "recommendation.eyebrow", defaultValue: "RECOMMENDED", locale: loc))
+                Text(AppLocalization.string("recommendation.eyebrow", defaultValue: "RECOMMENDED"))
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundStyle(Theme.positive)
                 HStack(spacing: 10) {
@@ -30,20 +29,19 @@ struct RecommendationTabView: View {
                     .font(.title3)
                     .foregroundStyle(.secondary)
             case .none(let hint):
-                Text(String(localized: "recommendation.none.title", defaultValue: "No Recommendation", locale: loc))
+                Text(AppLocalization.string("recommendation.none.title", defaultValue: "No Recommendation"))
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundStyle(.primary)
-                Text(String(
-                    localized: "recommendation.none.body",
-                    defaultValue: "Every subscription is at its limit right now.",
-                    locale: loc
+                Text(AppLocalization.string(
+                    "recommendation.none.body",
+                    defaultValue: "Every subscription is at its limit right now."
                 ))
                 .font(.title3)
                 .foregroundStyle(.secondary)
                 if let hint {
                     Divider()
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(String(localized: "recommendation.none.recoversSoonest", defaultValue: "Recovers soonest", locale: loc))
+                        Text(AppLocalization.string("recommendation.none.recoversSoonest", defaultValue: "Recovers soonest"))
                             .font(.subheadline)
                             .foregroundStyle(.tertiary)
                         HStack(spacing: 8) {

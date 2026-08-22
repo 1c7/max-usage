@@ -12,13 +12,14 @@ enum MenuBarStripRenderer {
     /// Returning the same `NSImage` instance lets `StatusItemImageUpdater` skip the status-item set
     /// (an unconditional set still costs a WindowServer redraw), and keeps `ImageRenderer` (which
     /// retains a little memory per run on macOS) to actual visual changes.
-    private static var lastRender: (content: MenuBarContent, style: MenuBarStyle, image: NSImage?)?
+    private static var lastRender: (content: MenuBarContent, style: MenuBarStyle, lang: String, image: NSImage?)?
 
     /// The strip image for the given content and style, or `nil` when the content renders nothing
     /// in that style (caller falls back to the app icon). Memoized: equal inputs return the
     /// previously rendered instance.
     static func image(for content: MenuBarContent, style: MenuBarStyle) -> NSImage? {
-        if let lastRender, lastRender.content == content, lastRender.style == style {
+        let currentLang = LanguageSetting.current.effectiveLanguageCode
+        if let lastRender, lastRender.content == content, lastRender.style == style, lastRender.lang == currentLang {
             AppLog.debug(.menubar, "strip cache hit")
             return lastRender.image
         }
@@ -28,7 +29,7 @@ enum MenuBarStripRenderer {
         case .text: image = textImage(for: content)
         case .bars: image = barsImage(for: content)
         }
-        lastRender = (content, style, image)
+        lastRender = (content, style, currentLang, image)
         return image
     }
 
@@ -142,7 +143,7 @@ private struct MenuBarPrivacyLabel: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 14, height: 14)
-            Text("MaxUsage")
+            Text(AppLocalization.string("app.name", defaultValue: "MaxUsage"))
                 .font(.system(size: 12, weight: .semibold))
         }
         .foregroundStyle(.black)
@@ -161,7 +162,7 @@ private struct MenuBarTextStrip: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 14, height: 14)
-            Text("MaxUsage")
+            Text(AppLocalization.string("app.name", defaultValue: "MaxUsage"))
                 .font(.system(size: 12, weight: .semibold))
         }
         .foregroundStyle(.black)

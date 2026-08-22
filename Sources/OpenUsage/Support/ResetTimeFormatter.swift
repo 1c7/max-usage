@@ -10,25 +10,28 @@ enum ResetTimeFormatter {
     /// `hoursUntilReset` is a plain hour count (not a `Date`) so callers control "now" once, at the
     /// point they measure the gap — the formatter itself has no clock dependency and is trivial to test.
     static func format(hoursUntilReset hours: Double) -> String {
-        let loc = LanguageSetting.current.effectiveLocale
         if hours < 1.0 / 60.0 {
-            return String(localized: "resetTime.minutes", defaultValue: "Resets in \(1) min", locale: loc)
+            let tmpl = AppLocalization.string("resetTime.minutes", defaultValue: "Resets in %lld min")
+            return String(format: tmpl, 1)
         }
         if hours < 1 {
             let minutes = Int(max(1, (hours * 60).rounded()))
-            return String(localized: "resetTime.minutes", defaultValue: "Resets in \(minutes) min", locale: loc)
+            let tmpl = AppLocalization.string("resetTime.minutes", defaultValue: "Resets in %lld min")
+            return String(format: tmpl, minutes)
         }
         if hours < 24 {
             let rounded = Int(hours.rounded())
             if rounded >= 24 {
-                return String(localized: "resetTime.tomorrow", defaultValue: "Resets tomorrow", locale: loc)
+                return AppLocalization.string("resetTime.tomorrow", defaultValue: "Resets tomorrow")
             }
-            return String(localized: "resetTime.hours", defaultValue: "Resets in \(rounded) hr", locale: loc)
+            let tmpl = AppLocalization.string("resetTime.hours", defaultValue: "Resets in %lld hr")
+            return String(format: tmpl, rounded)
         }
         if hours < 48 {
-            return String(localized: "resetTime.tomorrow", defaultValue: "Resets tomorrow", locale: loc)
+            return AppLocalization.string("resetTime.tomorrow", defaultValue: "Resets tomorrow")
         }
         let days = max(1, Int((hours / 24).rounded()))
-        return String(localized: "resetTime.days", defaultValue: "Resets in \(days) days", locale: loc)
+        let tmpl = AppLocalization.string("resetTime.days", defaultValue: "Resets in %lld days")
+        return String(format: tmpl, days)
     }
 }

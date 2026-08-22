@@ -377,3 +377,4 @@
 "settingsScreen.showPacePredictionTooltip" = "根据消耗速度预测何时会达到上限，而不只是显示剩余量";
 "formatters.resetCombined" = "%1$@后（%2$@）";
 "soonestWeeklyReset.banner" = "周额度刷新时间最短：%1$@（%2$@后）";
+"app.name" = "最大用量";

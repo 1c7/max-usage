@@ -32,6 +32,9 @@ final class StatusItemImageUpdater {
     init(container: AppContainer, apply: @escaping (NSImage) -> Void) {
         self.container = container
         self.apply = apply
+        NotificationCenter.default.addObserver(forName: LanguageSetting.didChangeNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.update()
+        }
     }
 
     /// Render now and re-arm on the next observable change.
