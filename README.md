@@ -4,15 +4,7 @@
   <strong>English</strong> | <a href="README-zh-CN.md">简体中文</a>
 </p>
 
-> *"I have multiple AI coding subscriptions — which one should I use right now to maximize my quota?"*
-
-**MaxUsage** is a lightweight macOS menu-bar app that intelligently recommends which AI coding subscription (Claude, Codex, Antigravity, OpenCode, Cursor, and more) you should use right now, based on your remaining quotas and reset countdowns to prevent quota waste.
-
-It also provides an instant overview of all your subscription limits, 5-hour/weekly quotas, credits, and reset countdowns in a single click.
-
----
-
-## Screenshots
+Intelligently recommends which AI coding subscription (Claude, Codex, Antigravity, OpenCode, Cursor, and more) to use right now to maximize your quotas.
 
 <p align="center">
   <img src="assets/recommendation-en-v2.jpg" alt="MaxUsage Smart Recommendation" />

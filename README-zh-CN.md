@@ -4,15 +4,7 @@
   <a href="README.md">English</a> | <strong>简体中文</strong>
 </p>
 
-> *"我订阅了多个 AI 编程工具，现在写代码应该开哪一个，才能最大化利用额度、避免浪费？"*
-
-**MaxUsage** 根据你的多个（2 个以上） AI 编程订阅（Claude、Codex、Antigravity、OpenCode 等）的实时剩余额度与重置倒计时，**精准推荐你当前最应该使用哪一个订阅**，让你花钱买的每一分算力都物尽其用。
-
-额外功能：一键总览所有订阅的 5 小时额度、一周额度，重置时间。
-
----
-
-## 界面截图
+根据实时剩余额度与重置时间，智能推荐当前最该使用的 AI 编程订阅（Claude、Codex、Antigravity 等）。
 
 <p align="center">
   <img src="assets/recommendation-zh-v2.jpg" alt="MaxUsage 智能推荐" />
