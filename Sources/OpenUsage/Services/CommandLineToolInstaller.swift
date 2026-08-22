@@ -27,7 +27,7 @@ final class CommandLineToolInstaller {
     init(
         sourcePath: String = Bundle.main.bundleURL
             .appendingPathComponent("Contents/Helpers/openusage").path,
-        destinationPath: String = "/usr/local/bin/openusage",
+        destinationPath: String = "/usr/local/bin/maxusage",
         fileManager: FileManager = .default,
         performPrivileged: (@MainActor (Operation, String, String) -> OperationResult)? = nil
     ) {
@@ -70,14 +70,14 @@ final class CommandLineToolInstaller {
         guard status != .conflict else {
             errorMessage = String(
                 localized: "commandLineTool.conflict",
-                defaultValue: "\(destinationPath) already exists and wasn't installed by OpenUsage."
+                defaultValue: "\(destinationPath) already exists and wasn't installed by MaxUsage."
             )
             return
         }
         guard fileManager.isExecutableFile(atPath: sourcePath) else {
             errorMessage = String(
                 localized: "commandLineTool.helperMissing",
-                defaultValue: "The bundled terminal helper couldn't be found. Reinstall OpenUsage and try again."
+                defaultValue: "The bundled terminal helper couldn't be found. Reinstall MaxUsage and try again."
             )
             return
         }

@@ -50,9 +50,7 @@ struct SettingsScreen: View {
         // Same section rhythm as the dashboard and Customize (all read the density setting).
         VStack(alignment: .leading, spacing: density.sectionSpacing) {
             generalSection
-            ICloudSyncSettingsSection(sync: container.iCloudSync)
             appearanceSection
-            usageDisplaySection
             notificationsSection
             privacySection
             commandLineSection
@@ -96,19 +94,15 @@ struct SettingsScreen: View {
                     .id(shortcutFieldGeneration)
                     .hoverTooltip(String(
                         localized: "settingsScreen.globalShortcutTooltip",
-                        defaultValue: "Open OpenUsage from anywhere"
+                        defaultValue: "Open MaxUsage from anywhere"
                     ))
             }
         }
     }
 
     private var appearanceSection: some View {
-        @Bindable var layout = container.layout
         @Bindable var transparency = container.transparency
         return section("Appearance") {
-            row("Icon Style") {
-                picker($layout.menuBarStyle, options: MenuBarStyle.allCases, label: \.label)
-            }
             row("Theme") {
                 picker($appearance, options: AppearanceSetting.allCases, label: \.label)
                     // NSApp-level so the popover panel restyles too (it ignores preferredColorScheme).
@@ -175,40 +169,6 @@ struct SettingsScreen: View {
         }
     }
 
-    private var usageDisplaySection: some View {
-        @Bindable var store = container.dataStore
-        return section("Usage Display") {
-            row("Show Usage As") {
-                picker($store.meterStyle, options: WidgetDisplayMode.allCases, label: \.label)
-            }
-            row("Reset Times") {
-                picker($store.resetDisplayMode, options: ResetDisplayMode.allCases, label: \.label)
-            }
-            // Off by default: a linear burn-rate projection reads as noise for a bursty usage pattern,
-            // so every row starts out with plain absolute-level coloring only (yellow at 80% used, red
-            // at ≤10% left) — no flame/spare copy, no even-pace tick — until explicitly turned on.
-            row("Show Pace Prediction") {
-                Toggle("", isOn: $store.showPacePrediction)
-                    .settingsSwitchStyle()
-                    .hoverTooltip(String(
-                        localized: "settingsScreen.showPacePredictionTooltip",
-                        defaultValue: "Predict when you'll hit a limit based on your usage rate, not just how much is left"
-                    ))
-            }
-            // Dimmed (has no effect) while pace prediction itself is off above — there's no pace verdict
-            // to surface on the blue row yet.
-            row("Always Show Pacing") {
-                Toggle("", isOn: $store.alwaysShowPacing)
-                    .settingsSwitchStyle()
-                    .disabled(!store.showPacePrediction)
-                    .hoverTooltip(String(
-                        localized: "settingsScreen.alwaysShowPacingTooltip",
-                        defaultValue: "Show how you're pacing on every metric, not just ones near their limit"
-                    ))
-            }
-        }
-    }
-
     private var privacySection: some View {
         @Bindable var privacy = container.privacy
         return section("Privacy") {
@@ -216,7 +176,7 @@ struct SettingsScreen: View {
                 Toggle("", isOn: $privacy.hideUsageWhileScreenSharing)
                     .settingsSwitchStyle()
             }
-            Text("While your screen is shared or recorded, the menu bar shows “OpenUsage” instead of your usage.")
+            Text("While your screen is shared or recorded, the menu bar shows “MaxUsage” instead of your usage.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 12)
@@ -231,7 +191,7 @@ struct SettingsScreen: View {
             }
             // Plain-language disclosure of exactly what leaves the machine — coarse counts and
             // error types only, never account details or usage values.
-            Text("Shares anonymous usage counts and error types to help improve OpenUsage. No account details, credentials, or usage values are sent.")
+            Text("Shares anonymous usage counts and error types to help improve MaxUsage. No account details, credentials, or usage values are sent.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 12)
@@ -295,11 +255,11 @@ struct SettingsScreen: View {
                         .hoverTooltip(notificationsAuth == .denied
                             ? String(
                                 localized: "settingsScreen.notificationsDenied",
-                                defaultValue: "Notifications are turned off for OpenUsage. Enable them in System Settings."
+                                defaultValue: "Notifications are turned off for MaxUsage. Enable them in System Settings."
                             )
                             : String(
                                 localized: "settingsScreen.notificationsNeedsPermission",
-                                defaultValue: "OpenUsage needs permission to send alerts."
+                                defaultValue: "MaxUsage needs permission to send alerts."
                             ))
                 }
             }
@@ -315,13 +275,11 @@ struct SettingsScreen: View {
             .cardSurface()
         }
         .onChange(of: anyToggleOn) { _, on in
-            if on {
-                // The first time a trigger is turned on, ask macOS for permission (memoized — it only
-                // prompts while authorization is still not determined). Then refresh so the
-                // warning/action row reflects the new status.
-                AppNotifications.shared.requestAuthorization()
-                Task { await refreshNotificationsAuth() }
-            }
+            // The first time a trigger is turned on, ask macOS for permission (memoized — it only
+            // prompts while authorization is still not determined). Then refresh so the
+            // warning/action row reflects the new status.
+            AppNotifications.shared.requestAuthorization()
+            Task { await refreshNotificationsAuth() }
         }
     }
 
@@ -400,7 +358,7 @@ struct SettingsScreen: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            Text("Adds a global `openusage` command agents can use to monitor limits.")
+            Text("Adds a global `maxusage` command agents can use to monitor limits.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 12)
@@ -409,7 +367,7 @@ struct SettingsScreen: View {
             if commandLineTool.status == .conflict {
                 inlineNotice(String(
                     localized: "commandLineTool.conflict",
-                    defaultValue: "\(commandLineTool.destinationPath) already exists and wasn't installed by OpenUsage."
+                    defaultValue: "\(commandLineTool.destinationPath) already exists and wasn't installed by MaxUsage."
                 ))
             } else if let errorMessage = commandLineTool.errorMessage {
                 inlineNotice(errorMessage)
