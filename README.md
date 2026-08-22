@@ -29,16 +29,11 @@ I subscribe to 5 different AI coding tools. Before writing code, I constantly fa
 Checking 5 separate usage pages every day is tedious:
 
 <p align="center">
-  <img src="docs/images/claude-code.jpg" alt="Claude Code Usage" width="31%" />
-  &nbsp;
-  <img src="docs/images/codex.jpg" alt="Codex Usage" width="31%" />
-  &nbsp;
-  <img src="docs/images/agy.jpg" alt="Antigravity Usage" width="31%" />
-</p>
-<p align="center">
-  <img src="docs/images/opencode%20go.jpg" alt="OpenCode Usage" width="31%" />
-  &nbsp;
-  <img src="docs/images/z.ai.jpg" alt="Z.ai Usage" width="31%" />
+  <img src="docs/images/claude-code.jpg" alt="Claude Code Usage" width="700" /><br/><br/>
+  <img src="docs/images/codex.jpg" alt="Codex Usage" width="700" /><br/><br/>
+  <img src="docs/images/agy.jpg" alt="Antigravity Usage" width="700" /><br/><br/>
+  <img src="docs/images/opencode%20go.jpg" alt="OpenCode Usage" width="700" /><br/><br/>
+  <img src="docs/images/z.ai.jpg" alt="Z.ai Usage" width="700" />
 </p>
 
 **MaxUsage solves this in 1 click** — it analyzes remaining quotas and reset windows across all your plans, and instantly tells you exactly which one to use next.

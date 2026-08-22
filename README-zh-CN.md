@@ -29,16 +29,11 @@
 每天手动去查 5 个服务的网页后台非常繁琐耗时：
 
 <p align="center">
-  <img src="docs/images/claude-code.jpg" alt="Claude Code 用量" width="31%" />
-  &nbsp;
-  <img src="docs/images/codex.jpg" alt="Codex 用量" width="31%" />
-  &nbsp;
-  <img src="docs/images/agy.jpg" alt="Antigravity 用量" width="31%" />
-</p>
-<p align="center">
-  <img src="docs/images/opencode%20go.jpg" alt="OpenCode 用量" width="31%" />
-  &nbsp;
-  <img src="docs/images/z.ai.jpg" alt="Z.ai 用量" width="31%" />
+  <img src="docs/images/claude-code.jpg" alt="Claude Code 用量" width="700" /><br/><br/>
+  <img src="docs/images/codex.jpg" alt="Codex 用量" width="700" /><br/><br/>
+  <img src="docs/images/agy.jpg" alt="Antigravity 用量" width="700" /><br/><br/>
+  <img src="docs/images/opencode%20go.jpg" alt="OpenCode 用量" width="700" /><br/><br/>
+  <img src="docs/images/z.ai.jpg" alt="Z.ai 用量" width="700" />
 </p>
 
 **MaxUsage 让这一切只需 1 秒** —— 它在本地自动分析你所有订阅的剩余额度与重置窗口，直接告诉你下一刻最该打开谁。
