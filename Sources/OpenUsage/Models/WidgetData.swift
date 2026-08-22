@@ -569,14 +569,14 @@ extension WidgetData {
 
     /// Trailing text on the bounded primary row. Priority mirrors `boundedSubtitle`, but a concrete
     /// reset always reads as "<duration> (<clock time>)" — both the countdown and the exact time in
-    /// one phrase, so the compact single-line row needs no click-to-flip between them.
-    /// Claude and Antigravity session rows show "Not started" while the rolling window has not begun.
+    /// one phrase, so the compact single-line row needs no click-to-flip between them. `nil` (blank
+    /// trailing slot, name + bar/percent only) when there's no data or the session hasn't started yet
+    /// — "No data" / "Not started" read as noise on the compact row, and the bar/percent already show
+    /// the state (empty track, or a full "100%" for a not-yet-started session).
     func boundedTrailingText(now: Date = Date()) -> String? {
-        guard hasData else { return Self.noDataSubtitle }
+        guard hasData else { return nil }
         if let subtitleOverride { return subtitleOverride }
-        if isFreshSessionWindow(now: now) {
-            return String(localized: "widgetData.notStarted", defaultValue: "Not started")
-        }
+        if isFreshSessionWindow(now: now) { return nil }
         if let resetsAt {
             return Formatters.resetCombinedLabel(at: resetsAt, now: now)
         }

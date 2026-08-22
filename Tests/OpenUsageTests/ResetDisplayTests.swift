@@ -51,7 +51,7 @@ final class ResetDisplayTests: XCTestCase {
         XCTAssertNil(data.resetTooltip())
     }
 
-    func testFreshSessionWindowShowsNotStartedForClaudeAndAntigravity() {
+    func testFreshSessionWindowLeavesTrailingTextBlankForClaudeAndAntigravity() {
         let now = Date(timeIntervalSince1970: 1_800_000_000)
         let period: TimeInterval = 5 * 3600
         for id in ["claude.session",
@@ -60,9 +60,11 @@ final class ResetDisplayTests: XCTestCase {
             data.isSessionWindow = true   // descriptor opt-in the session tiles now carry
             data.periodDurationMs = Int(period * 1000)
             // Half the window has elapsed on the clock, so pace would otherwise project — but usage is
-            // still zero, which is what "Not started" keys off (see `isFreshSessionWindow`).
+            // still zero, which is what the fresh-session check keys off (see `isFreshSessionWindow`).
+            // The compact row leaves the trailing slot blank rather than printing "Not started" — the
+            // bar (full, calm blue) and bare "100%" already say enough.
             data.resetsAt = now.addingTimeInterval(period / 2)
-            XCTAssertEqual(data.boundedTrailingText(now: now), "Not started", id)
+            XCTAssertNil(data.boundedTrailingText(now: now), id)
             XCTAssertFalse(data.hasResetLabel(now: now), id)
             XCTAssertEqual(data.resetTooltip(now: now), WidgetData.freshSessionTooltip, id)
             // The bar and its hover must not contradict "Not started": a calm level state, no pace

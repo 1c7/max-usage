@@ -141,6 +141,9 @@ struct WidgetRowView: View {
     /// Bare percent reading (no "left"/"used" word — the row is too tight for it); `data.fraction`
     /// already reflects the global Used/Left display mode, so the number alone still flips correctly.
     private var percentText: String {
+        // Matches the bar, which already renders an empty (unfilled) track without data — showing a
+        // number here too would read as a real reading instead of a placeholder.
+        guard data.hasData else { return WidgetData.noDataHeadline }
         let percent = Int((data.fraction * 100).rounded())
         return "\(percent)%"
     }
