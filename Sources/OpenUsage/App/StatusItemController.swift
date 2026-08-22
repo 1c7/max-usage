@@ -268,7 +268,7 @@ final class StatusItemController: NSObject {
         })
         menu.addItem(.separator())
         menu.addItem(ClosureMenuItem(
-            title: String(localized: "statusItem.menu.quit", defaultValue: "Quit OpenUsage"),
+            title: String(localized: "statusItem.menu.quit", defaultValue: "Quit MaxUsage"),
             systemSymbol: "power", keyEquivalent: "q"
         ) {
             NSApplication.shared.terminate(nil)

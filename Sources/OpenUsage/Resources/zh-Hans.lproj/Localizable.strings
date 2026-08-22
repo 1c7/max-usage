@@ -1,9 +1,9 @@
-/* Generated for OpenUsage localization. */
+/* Generated for MaxUsage localization. */
 "%@, opens in browser" = "%@，在浏览器中打开";
 "%lld available" = "%lld 个可用";
 "%lld metrics" = "%lld 个指标";
 "API Key" = "API 密钥";
-"About OpenUsage" = "关于 OpenUsage";
+"About MaxUsage" = "关于 MaxUsage";
 "Add" = "添加";
 "Adds a global `openusage` command agents can use to monitor limits." = "添加一个全局 `openusage` 命令，供智能体用来监控额度。";
 "Advanced" = "高级";
@@ -37,7 +37,7 @@
 "Install…" = "安装…";
 "Launch at Login" = "登录时启动";
 "Log Level" = "日志级别";
-"Monitor Your AI Subscriptions with OpenUsage" = "使用 OpenUsage 监控你的 AI 订阅";
+"Monitor Your AI Subscriptions with MaxUsage" = "使用 MaxUsage 监控你的 AI 订阅";
 "No Enabled Providers" = "没有已启用的服务商";
 "No metrics to show" = "没有可显示的指标";
 "Notifications" = "通知";
@@ -47,7 +47,7 @@
 "Override With a Custom Key" = "使用自定义密钥覆盖";
 "Party Mode" = "派对模式";
 "Privacy" = "隐私";
-"Quit OpenUsage" = "退出 OpenUsage";
+"Quit MaxUsage" = "退出 MaxUsage";
 "Record Shortcut" = "录制快捷键";
 "Reduce Animations" = "减少动效";
 "Refresh %@" = "刷新 %@";
@@ -66,7 +66,7 @@
 "Settings" = "设置";
 "Share Anonymous Usage" = "分享匿名使用数据";
 "Share Screenshot" = "分享截图";
-"Shares anonymous usage counts and error types to help improve OpenUsage. No account details, credentials, or usage values are sent." = "分享匿名的使用次数和错误类型以帮助改进 OpenUsage，不会发送账户详情、凭据或具体用量数值。";
+"Shares anonymous usage counts and error types to help improve MaxUsage. No account details, credentials, or usage values are sent." = "分享匿名的使用次数和错误类型以帮助改进 MaxUsage，不会发送账户详情、凭据或具体用量数值。";
 "Shares usage history through iCloud, so you can see one combined summary for all your Macs." = "通过 iCloud 共享使用记录，以便在所有 Mac 上查看汇总数据。";
 "Show Usage As" = "用量显示方式";
 "Star for menu bar" = "标星以显示在菜单栏";
@@ -90,7 +90,7 @@
 "Use" = "使用";
 "Use this reset?" = "使用此重置？";
 "Waiting for this Mac’s first iCloud update…" = "正在等待此 Mac 的首次 iCloud 更新…";
-"While your screen is shared or recorded, the menu bar shows “OpenUsage” instead of your usage." = "屏幕共享或录制期间，菜单栏会显示“OpenUsage”而不是你的使用情况。";
+"While your screen is shared or recorded, the menu bar shows “MaxUsage” instead of your usage." = "屏幕共享或录制期间，菜单栏会显示“MaxUsage”而不是你的使用情况。";
 "You have no rate limit resets" = "没有可用的限额重置";
 "about.createdBy" = "由 ";
 "about.maintainedAlsoBy" = "\n同时由 维护";
@@ -106,11 +106,11 @@
 "commandLineTool.actionFailed" = "无法%@终端助手：%@";
 "commandLineTool.authPrepareFailed" = "macOS 无法准备授权请求。";
 "commandLineTool.authRejected" = "macOS 拒绝了此授权请求。";
-"commandLineTool.conflict" = "%@ 已存在，且并非由 OpenUsage 安装。";
-"commandLineTool.helperMissing" = "找不到内置的终端助手，请重新安装 OpenUsage 后再试。";
+"commandLineTool.conflict" = "%@ 已存在，且并非由 MaxUsage 安装。";
+"commandLineTool.helperMissing" = "找不到内置的终端助手，请重新安装 MaxUsage 后再试。";
 "customizeHint.buttonTitle" = "打开“自定义”";
 "customizeHint.message" = "已根据你 Mac 上检测到的 AI 工具为你设置好，你可以随时添加或隐藏服务商。";
-"customizeHint.title" = "欢迎使用 OpenUsage";
+"customizeHint.title" = "欢迎使用 MaxUsage";
 "customizeProviderList.settingsLink.subtitle" = "通知、外观等设置";
 "customizeProviderList.settingsLink.title" = "设置";
 "densitySetting.compact" = "紧凑";
@@ -123,7 +123,7 @@
 "error.claude.credentialsChanged" = "刷新过程中 Claude 登录信息发生变化，请重新刷新。";
 "error.claude.desktopCredentialsUnavailable" = "无法读取 Claude Desktop 登录信息，请打开 Claude Desktop 后重试。";
 "error.claude.desktopPermissionRequired" = "检测到 Claude Desktop 登录，请刷新一次并选择“始终允许”以连接。";
-"error.claude.desktopTokenExpired" = "Claude Desktop 登录已过期，请打开 Claude Desktop 后刷新 OpenUsage。";
+"error.claude.desktopTokenExpired" = "Claude Desktop 登录已过期，请打开 Claude Desktop 后刷新 MaxUsage。";
 "error.claude.invalidOAuthURL" = "Claude OAuth URL 无效：%@，请检查 CLAUDE_CODE_CUSTOM_OAUTH_URL / CLAUDE_LOCAL_OAUTH_API_BASE。";
 "error.claude.notLoggedIn" = "未登录，请运行 `claude` 进行身份验证。";
 "error.claude.sessionExpired" = "会话已过期，请运行 `claude` 重新登录。";
@@ -180,7 +180,7 @@
 "error.usageHistory.invalidDevice" = "同步的 Mac 标识无效。";
 "error.usageHistory.invalidProvider" = "同步的服务商标识无效。";
 "error.usageHistory.invalidValue" = "同步的记录中包含无效的用量数值。";
-"error.usageHistory.unsupportedSchema" = "此 Mac 写入了更新版本的用量记录格式，请更新 OpenUsage。";
+"error.usageHistory.unsupportedSchema" = "此 Mac 写入了更新版本的用量记录格式，请更新 MaxUsage。";
 "error.zai.deleteFailed" = "无法删除已保存的 Z.ai API 密钥。";
 "error.zai.invalidKey" = "Z.ai API 密钥无效，请前往 z.ai/manage-apikey/apikey-list 检查密钥。";
 "error.zai.missingKey" = "未设置 Z.ai API 密钥，请设置 ZAI_API_KEY 或将其添加到 ~/.config/openusage/zai.json。";
@@ -199,7 +199,7 @@
 "grok.payAsYouGo.cap" = "上限 %@";
 "grok.payAsYouGo.disabled" = "已禁用";
 "iCloud Sync" = "iCloud 同步";
-"iCloudSync.infoTooltip" = "OpenUsage 会根据 Claude、Codex 等服务商在此 Mac 上的本地文件计算费用和 Token 数，账户额度、凭据与日志绝不会被共享。";
+"iCloudSync.infoTooltip" = "MaxUsage 会根据 Claude、Codex 等服务商在此 Mac 上的本地文件计算费用和 Token 数，账户额度、凭据与日志绝不会被共享。";
 "iCloudSync.relativeAge.days" = "%lld 天前";
 "iCloudSync.relativeAge.hours" = "%lld 小时前";
 "iCloudSync.relativeAge.justNow" = "刚刚";
@@ -216,7 +216,7 @@
 "logLevelSetting.error" = "错误";
 "logLevelSetting.info" = "信息";
 "logLevelSetting.warn" = "警告";
-"menuBarStrip.privacyAccessibility" = "OpenUsage，屏幕共享期间已隐藏使用情况";
+"menuBarStrip.privacyAccessibility" = "MaxUsage，屏幕共享期间已隐藏使用情况";
 "menuBarStyle.bars" = "进度条";
 "menuBarStyle.text" = "文字";
 "metric.apiUsage" = "API 用量";
@@ -301,9 +301,9 @@
 "settingsScreen.copyLogPathFailed" = "无法将日志路径复制到剪贴板。";
 "settingsScreen.customizeLink.subtitle" = "选择要显示的内容及其位置";
 "settingsScreen.customizeLink.title" = "自定义";
-"settingsScreen.globalShortcutTooltip" = "随时随地打开 OpenUsage";
-"settingsScreen.notificationsDenied" = "OpenUsage 的通知已关闭，请在系统设置中开启。";
-"settingsScreen.notificationsNeedsPermission" = "OpenUsage 需要权限才能发送提醒。";
+"settingsScreen.globalShortcutTooltip" = "随时随地打开 MaxUsage";
+"settingsScreen.notificationsDenied" = "MaxUsage 的通知已关闭，请在系统设置中开启。";
+"settingsScreen.notificationsNeedsPermission" = "MaxUsage 需要权限才能发送提醒。";
 "settingsScreen.partyModePaused" = "派对模式已开启，因此暂停显示。";
 "settingsScreen.partyTransparencyPaused" = "macOS 的“减弱透明度”或“提高对比度”已开启，因此派对效果暂停。";
 "settingsScreen.transparencyPaused" = "macOS 的“减弱透明度”或“提高对比度”已开启，因此暂停显示。";
@@ -313,7 +313,7 @@
 "sourceNote.cursor" = "来自你的 Cursor 用量导出";
 "sourceNote.grok" = "来自你的 Grok 日志（估算）";
 "sourceNote.openCode" = "来自你的 OpenCode 日志";
-"statusItem.menu.quit" = "退出 OpenUsage";
+"statusItem.menu.quit" = "退出 MaxUsage";
 "statusItem.menu.settings" = "设置";
 "store.refreshFailed" = "刷新失败";
 "timeFormatSetting.auto" = "自动";
@@ -334,7 +334,7 @@
 "totalSpendRing.accessibilityLabel.costPerMtok" = "每百万 Token 混合花费 %@，来自 %lld 个服务商";
 "totalSpendRing.accessibilityLabel.tokens" = "总 Token 数 %@，来自 %lld 个服务商";
 "updateBanner.buttonTitle" = "安装更新";
-"updateBanner.message" = "OpenUsage %@ 已可供下载。";
+"updateBanner.message" = "MaxUsage %@ 已可供下载。";
 "updateBanner.title" = "有可用更新";
 "usageSparkline.accessibilityLabel" = "%@：%lld 天，%@ 至 %@，峰值 %@。";
 "usageTrendDetail.peak" = "峰值 %@";

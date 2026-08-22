@@ -38,3 +38,10 @@ Download the latest universal DMG from the [GitHub Releases](https://github.com/
 
 - **User & Feature Docs:** See the full [Documentation Index](docs/README.md) for details on supported providers, dashboard shortcuts, proxy configuration, CLI usage, and local HTTP APIs.
 - **Developer Guide:** See [Development & Architecture Docs](docs/development.md) for instructions on building from source, running tests, release workflows, and codebase architecture.
+
+---
+
+## 致谢 / Acknowledgments
+
+本项目基于 [OpenUsage](https://github.com/robinebers/openusage) 修改与开发，特别感谢原作者 [@robinebers](https://github.com/robinebers) 的开源贡献。
+

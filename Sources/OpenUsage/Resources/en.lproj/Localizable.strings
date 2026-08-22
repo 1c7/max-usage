@@ -1,9 +1,9 @@
-/* Generated for OpenUsage localization. */
+/* Generated for MaxUsage localization. */
 "%@, opens in browser" = "%@, opens in browser";
 "%lld available" = "%lld available";
 "%lld metrics" = "%lld metrics";
 "API Key" = "API Key";
-"About OpenUsage" = "About OpenUsage";
+"About MaxUsage" = "About MaxUsage";
 "Add" = "Add";
 "Adds a global `openusage` command agents can use to monitor limits." = "Adds a global `openusage` command agents can use to monitor limits.";
 "Advanced" = "Advanced";
@@ -37,7 +37,7 @@
 "Install…" = "Install…";
 "Launch at Login" = "Launch at Login";
 "Log Level" = "Log Level";
-"Monitor Your AI Subscriptions with OpenUsage" = "Monitor Your AI Subscriptions with OpenUsage";
+"Monitor Your AI Subscriptions with MaxUsage" = "Monitor Your AI Subscriptions with MaxUsage";
 "No Enabled Providers" = "No Enabled Providers";
 "No metrics to show" = "No metrics to show";
 "Notifications" = "Notifications";
@@ -47,7 +47,7 @@
 "Override With a Custom Key" = "Override With a Custom Key";
 "Party Mode" = "Party Mode";
 "Privacy" = "Privacy";
-"Quit OpenUsage" = "Quit OpenUsage";
+"Quit MaxUsage" = "Quit MaxUsage";
 "Record Shortcut" = "Record Shortcut";
 "Reduce Animations" = "Reduce Animations";
 "Refresh %@" = "Refresh %@";
@@ -66,7 +66,7 @@
 "Settings" = "Settings";
 "Share Anonymous Usage" = "Share Anonymous Usage";
 "Share Screenshot" = "Share Screenshot";
-"Shares anonymous usage counts and error types to help improve OpenUsage. No account details, credentials, or usage values are sent." = "Shares anonymous usage counts and error types to help improve OpenUsage. No account details, credentials, or usage values are sent.";
+"Shares anonymous usage counts and error types to help improve MaxUsage. No account details, credentials, or usage values are sent." = "Shares anonymous usage counts and error types to help improve MaxUsage. No account details, credentials, or usage values are sent.";
 "Shares usage history through iCloud, so you can see one combined summary for all your Macs." = "Shares usage history through iCloud, so you can see one combined summary for all your Macs.";
 "Show Usage As" = "Show Usage As";
 "Star for menu bar" = "Star for menu bar";
@@ -91,7 +91,7 @@
 "Use" = "Use";
 "Use this reset?" = "Use this reset?";
 "Waiting for this Mac’s first iCloud update…" = "Waiting for this Mac’s first iCloud update…";
-"While your screen is shared or recorded, the menu bar shows “OpenUsage” instead of your usage." = "While your screen is shared or recorded, the menu bar shows “OpenUsage” instead of your usage.";
+"While your screen is shared or recorded, the menu bar shows “MaxUsage” instead of your usage." = "While your screen is shared or recorded, the menu bar shows “MaxUsage” instead of your usage.";
 "You have no rate limit resets" = "You have no rate limit resets";
 "about.createdBy" = "Created by ";
 "about.maintainedAlsoBy" = "\nMaintained also by ";
@@ -107,11 +107,11 @@
 "commandLineTool.actionFailed" = "Couldn't %1$@ the terminal helper: %2$@";
 "commandLineTool.authPrepareFailed" = "macOS couldn't prepare the authorization request.";
 "commandLineTool.authRejected" = "macOS rejected the authorization request.";
-"commandLineTool.conflict" = "%@ already exists and wasn't installed by OpenUsage.";
-"commandLineTool.helperMissing" = "The bundled terminal helper couldn't be found. Reinstall OpenUsage and try again.";
+"commandLineTool.conflict" = "%@ already exists and wasn't installed by MaxUsage.";
+"commandLineTool.helperMissing" = "The bundled terminal helper couldn't be found. Reinstall MaxUsage and try again.";
 "customizeHint.buttonTitle" = "Open Customize";
 "customizeHint.message" = "We set you up with the AI tools found on your Mac. Add or hide providers any time.";
-"customizeHint.title" = "Welcome to OpenUsage";
+"customizeHint.title" = "Welcome to MaxUsage";
 "customizeProviderList.settingsLink.subtitle" = "Notifications, appearance and more";
 "customizeProviderList.settingsLink.title" = "Settings";
 "densitySetting.compact" = "Compact";
@@ -124,7 +124,7 @@
 "error.claude.credentialsChanged" = "Claude login changed during refresh. Refresh again.";
 "error.claude.desktopCredentialsUnavailable" = "Claude Desktop login couldn't be read. Open Claude Desktop, then try again.";
 "error.claude.desktopPermissionRequired" = "Claude Desktop login found. Refresh once and choose Always Allow to connect it.";
-"error.claude.desktopTokenExpired" = "Claude Desktop login is stale. Open Claude Desktop, then refresh OpenUsage.";
+"error.claude.desktopTokenExpired" = "Claude Desktop login is stale. Open Claude Desktop, then refresh MaxUsage.";
 "error.claude.invalidOAuthURL" = "Invalid Claude OAuth URL: %@. Check CLAUDE_CODE_CUSTOM_OAUTH_URL / CLAUDE_LOCAL_OAUTH_API_BASE.";
 "error.claude.notLoggedIn" = "Not logged in. Run `claude` to authenticate.";
 "error.claude.sessionExpired" = "Session expired. Run `claude` to log in again.";
@@ -181,7 +181,7 @@
 "error.usageHistory.invalidDevice" = "The synced Mac identity is invalid.";
 "error.usageHistory.invalidProvider" = "The synced provider identifier is invalid.";
 "error.usageHistory.invalidValue" = "The synced history contains an invalid usage value.";
-"error.usageHistory.unsupportedSchema" = "This Mac wrote a newer usage-history format. Update OpenUsage.";
+"error.usageHistory.unsupportedSchema" = "This Mac wrote a newer usage-history format. Update MaxUsage.";
 "error.zai.deleteFailed" = "Couldn't remove the saved Z.ai API key.";
 "error.zai.invalidKey" = "Z.ai API key invalid. Check your key at z.ai/manage-apikey/apikey-list.";
 "error.zai.missingKey" = "No Z.ai API key. Set ZAI_API_KEY or add it to ~/.config/openusage/zai.json.";
@@ -200,7 +200,7 @@
 "grok.payAsYouGo.cap" = "%@ cap";
 "grok.payAsYouGo.disabled" = "Disabled";
 "iCloud Sync" = "iCloud Sync";
-"iCloudSync.infoTooltip" = "OpenUsage calculates costs and tokens for Claude, Codex, and other providers from files stored on each Mac. Account limits, credentials, and logs are never shared.";
+"iCloudSync.infoTooltip" = "MaxUsage calculates costs and tokens for Claude, Codex, and other providers from files stored on each Mac. Account limits, credentials, and logs are never shared.";
 "iCloudSync.relativeAge.days" = "%lldd ago";
 "iCloudSync.relativeAge.hours" = "%lldh ago";
 "iCloudSync.relativeAge.justNow" = "just now";
@@ -217,7 +217,7 @@
 "logLevelSetting.error" = "Error";
 "logLevelSetting.info" = "Info";
 "logLevelSetting.warn" = "Warning";
-"menuBarStrip.privacyAccessibility" = "OpenUsage, usage hidden while the screen is shared";
+"menuBarStrip.privacyAccessibility" = "MaxUsage, usage hidden while the screen is shared";
 "menuBarStyle.bars" = "Bars";
 "menuBarStyle.text" = "Text";
 "metric.apiUsage" = "API Usage";
@@ -302,9 +302,9 @@
 "settingsScreen.copyLogPathFailed" = "Couldn't copy the log path to the clipboard.";
 "settingsScreen.customizeLink.subtitle" = "Choose what's visible and where";
 "settingsScreen.customizeLink.title" = "Customize";
-"settingsScreen.globalShortcutTooltip" = "Open OpenUsage from anywhere";
-"settingsScreen.notificationsDenied" = "Notifications are turned off for OpenUsage. Enable them in System Settings.";
-"settingsScreen.notificationsNeedsPermission" = "OpenUsage needs permission to send alerts.";
+"settingsScreen.globalShortcutTooltip" = "Open MaxUsage from anywhere";
+"settingsScreen.notificationsDenied" = "Notifications are turned off for MaxUsage. Enable them in System Settings.";
+"settingsScreen.notificationsNeedsPermission" = "MaxUsage needs permission to send alerts.";
 "settingsScreen.partyModePaused" = "Party mode is on, so this stays paused.";
 "settingsScreen.partyTransparencyPaused" = "macOS Reduce Transparency or Increase Contrast is on, so the party stays paused.";
 "settingsScreen.transparencyPaused" = "macOS Reduce Transparency or Increase Contrast is on, so this stays paused.";
@@ -314,7 +314,7 @@
 "sourceNote.cursor" = "From your Cursor usage export";
 "sourceNote.grok" = "From your Grok logs (estimated)";
 "sourceNote.openCode" = "From your OpenCode logs";
-"statusItem.menu.quit" = "Quit OpenUsage";
+"statusItem.menu.quit" = "Quit MaxUsage";
 "statusItem.menu.settings" = "Settings";
 "store.refreshFailed" = "Refresh failed";
 "timeFormatSetting.auto" = "Auto";
@@ -335,7 +335,7 @@
 "totalSpendRing.accessibilityLabel.costPerMtok" = "Blended cost per megatoken %1$@ across %2$lld providers";
 "totalSpendRing.accessibilityLabel.tokens" = "Total tokens %1$@ across %2$lld providers";
 "updateBanner.buttonTitle" = "Install Update";
-"updateBanner.message" = "OpenUsage %@ is ready to download.";
+"updateBanner.message" = "MaxUsage %@ is ready to download.";
 "updateBanner.title" = "Update Available";
 "usageSparkline.accessibilityLabel" = "%1$@: %2$lld days, %3$@ to %4$@, peak %5$@.";
 "usageTrendDetail.peak" = "peak %@";

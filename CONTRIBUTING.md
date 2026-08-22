@@ -56,7 +56,7 @@ Each provider is a small Swift module under `Sources/OpenUsage/Providers/<Name>/
 6. Test it locally with `./script/build_and_run.sh`
 7. Open a PR with screenshots showing it working
 
-You can also [open an issue](https://github.com/robinebers/openusage/issues/new?template=new_provider.yml) to request a provider without building it yourself.
+You can also [open an issue](https://github.com/1c7/max-usage/issues/new?template=new_provider.yml) to request a provider without building it yourself.
 
 ### Fix a bug
 
@@ -95,15 +95,6 @@ Don't open a PR for a feature without an approved issue first. [Open an issue](h
 - UI copy is plain language and sentence case
 - No new dependencies without justification
 
-## Maintainers
-
-- [@robinebers](https://github.com/robinebers) (lead)
-- [@validatedev](https://github.com/validatedev)
-- [@davidarny](https://github.com/davidarny)
-
-All PRs require approval from at least 2 maintainers before merging.
-Release tags (`v*`) are owner-managed and can only be created by [@robinebers](https://github.com/robinebers).
-
 ## Questions?
 
-Open a [bug report](https://github.com/robinebers/openusage/issues/new?template=bug_report.yml) or [feature request](https://github.com/robinebers/openusage/issues/new?template=feature_request.yml) using the issue templates.
+Open a [bug report](https://github.com/1c7/max-usage/issues/new?template=bug_report.yml) or [feature request](https://github.com/1c7/max-usage/issues/new?template=feature_request.yml) using the issue templates.

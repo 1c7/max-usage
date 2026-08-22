@@ -1,6 +1,6 @@
 # AGENTS.md
 
-OpenUsage is a SwiftPM-based SwiftUI menu-bar app for macOS that shows AI provider usage widgets (Claude, Codex, Cursor, Grok, Devin, and more).
+MaxUsage (originally based on OpenUsage) is a SwiftPM-based SwiftUI menu-bar app for macOS that intelligently recommends AI coding subscriptions and shows provider usage widgets (Claude, Codex, Antigravity, OpenCode, Cursor, Grok, Devin, and more).
 
 This file documents the engineering conventions for the project. Read it before contributing.
 
@@ -8,18 +8,17 @@ This file documents the engineering conventions for the project. Read it before 
 
 AGENTS.md is the source of truth for agent instructions in this repository. CLAUDE.md files may only point to the nearest AGENTS.md file with `@AGENTS.md`; do not add guidance, duplicate instructions, or project rules to CLAUDE.md.
 
-> **Repository note:** This is the native Swift edition of OpenUsage. Active development happens on the `main` branch. (NOT the legacy Tauri version which now sits in the `tauri-legacy` branch)
+> **Repository note:** Active development happens on the `main` branch.
 
 ## Releases
 
-`main` is the active development line; it ships via `.github/workflows/release.yml` (Sparkle appcast on `gh-pages`). Cut releases with the release-swift skill.
+`main` is the active development line; it ships via `.github/workflows/release.yml`. Cut releases with the release-swift skill.
 
 ### Guardrails (do not break)
-- Versions are `0.7.x` and up. Never reuse a `0.6.x` number — those are the original edition's released tags, now frozen on the `tauri-legacy` branch (final release `v0.6.28`).
 - **Never increase the version number on your own initiative — always ask for explicit approval first.** The version is a deliberate owner decision: propose the number and wait for explicit sign-off before tagging or cutting a release.
 - Beta releases use `-beta.N` tags and stay GitHub pre-releases on Sparkle's beta channel. Stable releases use plain tags and become GitHub "Latest".
-- Stable releases must carry forward the legacy `latest.json` so any remaining `0.6.x` installs can still update to `v0.6.28`. `release.yml` handles this; verify it with the release-swift skill.
 - Never leave a release in Draft, and never ship blank notes: the release-swift skill generates the changelog and verifies the published release after every cut.
+
 
 ## Architecture
 
@@ -75,5 +74,5 @@ Always fail loudly into error logging (log file, PostHog) and show friendly erro
 ## UI
 
 - Use title case for any hardcoded copy used as a title.
-- Match the existing design language; OpenUsage has a specific look and feel.
+- Match the existing design language; MaxUsage has a specific look and feel.
 - Only add tooltips (`hoverTooltip`) when explicitly asked to. Don't add them proactively to new controls.

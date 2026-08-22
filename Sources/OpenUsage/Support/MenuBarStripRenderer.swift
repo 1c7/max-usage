@@ -117,7 +117,7 @@ enum MenuBarStripRenderer {
         image.isTemplate = true
         image.accessibilityDescription = String(
             localized: "menuBarStrip.privacyAccessibility",
-            defaultValue: "OpenUsage, usage hidden while the screen is shared"
+            defaultValue: "MaxUsage, usage hidden while the screen is shared"
         )
         return image
     }()
@@ -126,7 +126,7 @@ enum MenuBarStripRenderer {
     static let fallbackIcon: NSImage = {
         let image = NSImage(
             systemSymbolName: "gauge.with.dots.needle.bottom.50percent",
-            accessibilityDescription: "OpenUsage"
+            accessibilityDescription: "MaxUsage"
         ) ?? NSImage()
         image.isTemplate = true
         return image
@@ -146,7 +146,7 @@ private struct MenuBarPrivacyLabel: View {
                     .fill(Color.black)
                     .frame(width: 16, height: 16)
             }
-            Text("OpenUsage")
+            Text("MaxUsage")
                 .font(.system(size: 12, weight: .bold))
         }
         .foregroundStyle(.black)
