@@ -15,10 +15,10 @@
 ## 界面截图
 
 <p align="center">
-  <img src="assets/recommendation-2.jpg" alt="MaxUsage 智能推荐" width="360" />
+  <img src="assets/recommendation-2.jpg" alt="MaxUsage 智能推荐" />
 </p>
 <p align="center">
-  <img src="assets/quotas-2.jpg" alt="MaxUsage 额度总览" width="360" />
+  <img src="assets/quotas-2.jpg" alt="MaxUsage 额度总览" />
 </p>
 
 ---
