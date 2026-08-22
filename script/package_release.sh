@@ -56,6 +56,11 @@ if [ -d "$APP_RESOURCES/$RESOURCE_BUNDLE_NAME" ]; then
     cp -R "$lproj" "$APP_RESOURCES/$(basename "$lproj")"
   done
 fi
+
+for lproj_dir in "$ROOT_DIR/Sources/OpenUsage/Resources"/*.lproj; do
+  mkdir -p "$APP_RESOURCES/$(basename "$lproj_dir")"
+  cp -R "$lproj_dir"/* "$APP_RESOURCES/$(basename "$lproj_dir")/"
+done
 shopt -u nullglob
 
 PREBUILT_ICON_DIR="$ROOT_DIR/assets/AppIcon.prebuilt"
