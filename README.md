@@ -20,10 +20,10 @@ It also provides an instant overview of all your subscription limits, 5-hour/wee
 
 ## Installation
 
-### Homebrew
+### Homebrew (Recommended)
 
 ```sh
-brew install --cask max-usage
+brew install 1c7/tap/max-usage
 ```
 
 ### Direct Download
