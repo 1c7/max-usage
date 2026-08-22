@@ -17,11 +17,11 @@ enum LanguageSetting: String, Hashable, Sendable, CaseIterable, UserDefaultsBack
     var label: String {
         switch self {
         case .system:
-            return String(localized: "languageSetting.system", defaultValue: "System", locale: LanguageSetting.current.effectiveLocale)
+            return AppLocalization.string("languageSetting.system", defaultValue: "System")
         case .en:
-            return String(localized: "languageSetting.en", defaultValue: "English", locale: LanguageSetting.current.effectiveLocale)
+            return AppLocalization.string("languageSetting.en", defaultValue: "English")
         case .zhHans:
-            return String(localized: "languageSetting.zhHans", defaultValue: "简体中文", locale: LanguageSetting.current.effectiveLocale)
+            return AppLocalization.string("languageSetting.zhHans", defaultValue: "简体中文")
         }
     }
 
@@ -41,13 +41,13 @@ enum LanguageSetting: String, Hashable, Sendable, CaseIterable, UserDefaultsBack
         Locale(identifier: effectiveLanguageCode)
     }
 
-    /// Determines the effective language code from system preferences.
-    /// If the top preferred language is Chinese (any variant: zh-Hans, zh-Hant, zh-CN, etc.),
+    /// Determines the effective language code from macOS system preferences.
+    /// Reads from the global system domain first to prevent being shadowed by app-level defaults.
+    /// If the top preferred language is Chinese (zh-Hans, zh-Hant, zh-CN, zh-HK, etc.),
     /// returns "zh-Hans"; otherwise defaults to "en".
     static var systemEffectiveLanguageCode: String {
-        guard let preferred = Locale.preferredLanguages.first else {
-            return "en"
-        }
+        let globalLanguages = UserDefaults.standard.persistentDomain(forName: UserDefaults.globalDomain)?["AppleLanguages"] as? [String]
+        let preferred = globalLanguages?.first ?? Locale.preferredLanguages.first ?? "en"
         let lower = preferred.lowercased()
         return lower.hasPrefix("zh") ? "zh-Hans" : "en"
     }
@@ -56,8 +56,15 @@ enum LanguageSetting: String, Hashable, Sendable, CaseIterable, UserDefaultsBack
     /// and posts change notification).
     @MainActor
     static func apply(_ setting: LanguageSetting) {
+        switch setting {
+        case .system:
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        case .en:
+            UserDefaults.standard.set(["en"], forKey: "AppleLanguages")
+        case .zhHans:
+            UserDefaults.standard.set(["zh-Hans"], forKey: "AppleLanguages")
+        }
         let code = setting.effectiveLanguageCode
-        UserDefaults.standard.set([code], forKey: "AppleLanguages")
         Bundle.setLanguage(code)
         NotificationCenter.default.post(name: didChangeNotification, object: nil)
     }
