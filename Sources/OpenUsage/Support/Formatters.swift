@@ -91,6 +91,17 @@ enum Formatters {
         deadlineLabel(resetsPrefix, at: resetsAt, mode: .absolute, now: now, calendar: calendar)
     }
 
+    /// The compact row's reset phrase: relative duration plus the concrete clock time in one shot
+    /// ("3h 12m (2:45 PM)"), so the single-line row never needs a click-to-flip between countdown and
+    /// exact time — both are always visible. Collapses to just `imminent` ("soon") when the reset is
+    /// due within the next 5 minutes or already past, matching `whenLabel`'s own imminent handling.
+    static func resetCombinedLabel(at resetsAt: Date, now: Date = Date()) -> String? {
+        guard let relative = whenLabel(at: resetsAt, mode: .relative, now: now) else { return nil }
+        if relative == imminent { return relative }
+        let time = TimeFormatSetting.current.shortTime(resetsAt)
+        return String(localized: "formatters.resetCombined", defaultValue: "\(relative) (\(time))")
+    }
+
     /// Compact "Xd Yh" / "Xh Ym" / "Xm" duration. At the day scale it always shows two units — the
     /// hours ride along even when zero ("4d 0h") — so a span 4 days + 52 min out never reads as a flat
     /// "4d" that hides the sub-day remainder. Minutes are dropped at the day scale.

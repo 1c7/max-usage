@@ -225,7 +225,6 @@ struct WidgetGroupedListView: View {
         let isActive = activeMetricID == descriptor.id
         return WidgetRowView(
             data: data,
-            onToggleResetDisplay: { dataStore.resetDisplayMode.toggle() },
             onToggleMeterStyle: { dataStore.meterStyle.toggle() },
             condensedTop: condensedTop
         )

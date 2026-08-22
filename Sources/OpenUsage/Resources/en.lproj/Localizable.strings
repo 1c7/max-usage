@@ -355,3 +355,4 @@
 "widgetData.meterState.spare" = "~%lld%% spare";
 "Show Pace Prediction" = "Show Pace Prediction";
 "settingsScreen.showPacePredictionTooltip" = "Predict when you'll hit a limit based on your usage rate, not just how much is left";
+"formatters.resetCombined" = "%@ (%@)";

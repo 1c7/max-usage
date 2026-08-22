@@ -670,21 +670,30 @@ final class LayoutStoreTests: XCTestCase {
         ])
         let store = LayoutStore(registry: registry, defaults: makeDefaults("RecommendedDefaults"), storageKey: "layout")
 
+        // Extra Usage and Usage Trend are off by default across every provider (owner call — not
+        // something most users watch day to day); everything else keeps its prior default.
         XCTAssertEqual(Set(store.placed.map(\.descriptorID)), Set([
-            "claude.session", "claude.weekly", "claude.trend",
-            "claude.extra", "claude.today", "claude.yesterday", "claude.last30",
-            "codex.session", "codex.weekly", "codex.spark", "codex.sparkWeekly", "codex.trend",
-            "codex.credits", "codex.rateLimitResets", "codex.today", "codex.yesterday", "codex.last30",
+            "claude.session", "claude.weekly",
+            "claude.today", "claude.yesterday", "claude.last30",
+            "codex.session", "codex.weekly", "codex.spark", "codex.sparkWeekly",
+            "codex.rateLimitResets", "codex.today", "codex.yesterday", "codex.last30",
             "devin.daily", "devin.weekly", "devin.extra",
-            "grok.weekly", "grok.trend",
-            "grok.payAsYouGo", "grok.today", "grok.yesterday", "grok.last30",
-            // Cursor spend tiles + usage trend are enabled, joining its live meters in the default layout.
-            "cursor.usage", "cursor.auto", "cursor.api", "cursor.trend",
-            "cursor.onDemand", "cursor.today", "cursor.yesterday", "cursor.last30"
+            "grok.weekly",
+            "grok.today", "grok.yesterday", "grok.last30",
+            "cursor.usage", "cursor.auto", "cursor.api",
+            "cursor.today", "cursor.yesterday", "cursor.last30"
         ]))
         XCTAssertFalse(store.isMetricEnabled("claude.sonnet"))
         XCTAssertFalse(store.isMetricEnabled("cursor.requests"))
         XCTAssertFalse(store.isMetricEnabled("cursor.credits"))
+        XCTAssertFalse(store.isMetricEnabled("claude.trend"))
+        XCTAssertFalse(store.isMetricEnabled("claude.extra"))
+        XCTAssertFalse(store.isMetricEnabled("codex.trend"))
+        XCTAssertFalse(store.isMetricEnabled("codex.credits"))
+        XCTAssertFalse(store.isMetricEnabled("cursor.trend"))
+        XCTAssertFalse(store.isMetricEnabled("cursor.onDemand"))
+        XCTAssertFalse(store.isMetricEnabled("grok.trend"))
+        XCTAssertFalse(store.isMetricEnabled("grok.payAsYouGo"))
 
         let primaryByProvider = Dictionary(uniqueKeysWithValues: store.customizeGroups.map {
             ($0.provider.id, $0.alwaysShownMetrics.map(\.id))

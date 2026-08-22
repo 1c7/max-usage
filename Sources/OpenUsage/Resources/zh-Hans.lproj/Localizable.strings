@@ -239,7 +239,7 @@
 "metric.orgSpend" = "组织支出";
 "metric.rateLimitResets" = "限额重置";
 "metric.requests" = "请求次数";
-"metric.session" = "会话";
+"metric.session" = "5小时";
 "metric.thisMonth" = "本月";
 "metric.thisWeek" = "本周";
 "metric.today" = "今天";
@@ -355,3 +355,4 @@
 "widgetData.meterState.spare" = "剩余约 %lld%%";
 "Show Pace Prediction" = "显示进度预测";
 "settingsScreen.showPacePredictionTooltip" = "根据消耗速度预测何时会达到上限，而不只是显示剩余量";
+"formatters.resetCombined" = "%1$@后（%2$@）";

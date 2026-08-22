@@ -29,11 +29,12 @@ struct WidgetData: Hashable {
     /// the blue/healthy row also shows the even-pace tick and its projection copy. Yellow and red rows
     /// always show the tick when a reset window exists; this toggle only adds it on blue.
     var alwaysShowPacing: Bool = false
-    /// Global "show pace prediction" opt-in, stamped by `WidgetDataStore` (like `displayMode`). Off by
-    /// default — a burn-rate projection assumes steady usage across the window, which reads as noise
-    /// for a bursty usage pattern, so every bounded row falls back to absolute level bands (yellow at
-    /// 80% used, red at ≤10% left) with no flame/spare copy or tick until the user opts in.
-    var showPacePrediction: Bool = false
+    /// Global "show pace prediction" opt-in, stamped by `WidgetDataStore` (like `displayMode`) — the
+    /// *store's* persisted default is off (see `WidgetDataStore.showPacePrediction`), so real users see
+    /// absolute level bands until they opt in. This struct-level default stays `true` so unit tests that
+    /// build a `WidgetData` directly (bypassing the store) keep exercising the full pace-verdict math
+    /// without every one of them having to opt back in by hand.
+    var showPacePrediction: Bool = true
     var resetsAt: Date?
     /// Zero or more future expiry instants surfaced in the row's hover tooltip (Codex rate-limit-reset
     /// credits — one entry per still-available credit). Empty for every other row. Kept as raw `Date`s so
@@ -566,8 +567,9 @@ extension WidgetData {
         return displayMode == .remaining ? 1 - elapsedFraction : elapsedFraction
     }
 
-    /// Trailing text on the bounded primary row, reset-display-mode aware. Priority mirrors
-    /// `boundedSubtitle`, but a concrete reset honors `resetDisplayMode` (relative ⟷ absolute).
+    /// Trailing text on the bounded primary row. Priority mirrors `boundedSubtitle`, but a concrete
+    /// reset always reads as "<duration> (<clock time>)" — both the countdown and the exact time in
+    /// one phrase, so the compact single-line row needs no click-to-flip between them.
     /// Claude and Antigravity session rows show "Not started" while the rolling window has not begun.
     func boundedTrailingText(now: Date = Date()) -> String? {
         guard hasData else { return Self.noDataSubtitle }
@@ -576,9 +578,7 @@ extension WidgetData {
             return String(localized: "widgetData.notStarted", defaultValue: "Not started")
         }
         if let resetsAt {
-            return resetDisplayMode == .absolute
-                ? Formatters.resetAbsoluteLabel(at: resetsAt, now: now)
-                : Formatters.resetRelativeLabel(until: resetsAt, now: now)
+            return Formatters.resetCombinedLabel(at: resetsAt, now: now)
         }
         return boundedSubtitle // period cadence / dollar limit / count suffix — nothing to flip
     }
@@ -598,8 +598,8 @@ extension WidgetData {
         return now < resetsAt
     }
 
-    /// True when the bounded primary row's trailing text is a concrete reset countdown (so the row makes
-    /// it the clickable toggle). False for limit/suffix context, fresh session windows, or no reset date.
+    /// True when the bounded primary row's trailing text is a concrete reset countdown, as opposed to
+    /// static limit/suffix context. False for fresh session windows or rows with no reset date.
     func hasResetLabel(now: Date = Date()) -> Bool {
         hasData && subtitleOverride == nil && resetsAt != nil && !isFreshSessionWindow(now: now)
     }
@@ -611,15 +611,12 @@ extension WidgetData {
         defaultValue: "Sessions start after you send your first message."
     )
 
-    /// Hover tooltip for the reset label: the *opposite* format from what's shown, mirroring the
-    /// original's `formatResetTooltipText`. A fresh ("Not started") session explains itself instead of
-    /// showing a reset time, since the window hasn't begun counting down.
+    /// Hover tooltip for the reset label. The row's combined "<duration> (<time>)" phrase already
+    /// carries both readings, so the only thing left worth explaining on hover is a fresh session
+    /// window, which shows "Not started" instead of a countdown.
     func resetTooltip(now: Date = Date()) -> String? {
-        if isFreshSessionWindow(now: now) { return Self.freshSessionTooltip }
-        guard hasResetLabel(now: now), let resetsAt else { return nil }
-        return resetDisplayMode == .absolute
-            ? Formatters.resetRelativeLabel(until: resetsAt, now: now)
-            : Formatters.resetAbsoluteLabel(at: resetsAt, now: now)
+        guard isFreshSessionWindow(now: now) else { return nil }
+        return Self.freshSessionTooltip
     }
 
     /// True when the bounded headline is a flippable Used/Left reading (so the row makes it the

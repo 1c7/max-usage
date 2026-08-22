@@ -89,6 +89,10 @@ final class WidgetDataStoreNotificationTests: XCTestCase {
                 return delivered()
             }
         )
+        // These tests exercise the pace-verdict-driven milestones (healthyToClose / closeToRunningOut),
+        // which only fire once a metric's `MeterState` actually reflects a pace projection — off by
+        // default in the store (see `WidgetDataStore.showPacePrediction`), so opt in explicitly here.
+        store.showPacePrediction = true
         return (store, runtime, descriptor)
     }
 

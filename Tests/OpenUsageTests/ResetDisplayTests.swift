@@ -33,20 +33,22 @@ final class ResetDisplayTests: XCTestCase {
                                                      now: now, calendar: calendar), "Resets soon")
     }
 
-    func testWidgetDataTrailingAndTooltipHonorMode() {
+    func testWidgetDataTrailingTextShowsCombinedRelativeAndAbsolute() {
+        // The compact row always shows both readings at once ("<duration> (<time>)"), independent of
+        // `resetDisplayMode` (that setting now only affects the pace ETA / reset-credit tooltip, not
+        // this label) — no more click-to-flip, no opposite-format tooltip.
         var data = WidgetData(title: "Weekly", icon: .providerMark("codex"),
                               kind: .percent, used: 50, limit: 100)
         data.resetsAt = Date().addingTimeInterval(4 * 24 * 3600 + 17 * 3600) // ~4d17h out
         data.periodDurationMs = 7 * 24 * 60 * 60 * 1000
         XCTAssertTrue(data.hasResetLabel())
 
-        data.resetDisplayMode = .relative
-        XCTAssertEqual(data.boundedTrailingText()?.hasPrefix("Resets in "), true)
-        XCTAssertEqual(data.resetTooltip()?.hasPrefix("Resets "), true)         // opposite = absolute
-
-        data.resetDisplayMode = .absolute
-        XCTAssertEqual(data.boundedTrailingText()?.hasPrefix("Resets "), true)
-        XCTAssertEqual(data.resetTooltip()?.hasPrefix("Resets in "), true)      // opposite = relative
+        let text = data.boundedTrailingText()
+        XCTAssertEqual(text?.contains("4d 17h"), true)
+        XCTAssertEqual(text?.contains("("), true)
+        XCTAssertEqual(text?.contains(")"), true)
+        // No alternate-format tooltip left to show — the label already carries both readings.
+        XCTAssertNil(data.resetTooltip())
     }
 
     func testFreshSessionWindowShowsNotStartedForClaudeAndAntigravity() {
@@ -105,7 +107,8 @@ final class ResetDisplayTests: XCTestCase {
             data.resetsAt = now.addingTimeInterval(period / 2)
             XCTAssertFalse(data.isFreshSessionWindow(now: now), id)
             XCTAssertNotEqual(data.boundedTrailingText(now: now), "Not started", id)
-            XCTAssertEqual(data.boundedTrailingText(now: now)?.hasPrefix("Resets"), true, id)
+            // The compact row's combined "<duration> (<clock time>)" phrase, not a "Not started" fallback.
+            XCTAssertEqual(data.boundedTrailingText(now: now)?.contains("("), true, id)
         }
     }
 

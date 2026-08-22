@@ -2,22 +2,20 @@ import SwiftUI
 
 /// One metric as a row inside a provider's grouped list container. The provider icon is drawn once in the
 /// section header (not per row), so a row shows only the metric. Two layouts:
-/// - **Bounded** (`limit != nil`, meter row): a label line (right-aligned flame + run-out time when
-///   projected to run out before reset, or "~3% spare" when cutting it close), then a full-width
-///   capsule meter (color = pace verdict; in the amber state a tick splits the projected spare
-///   cushion off the bar; hovering shows the verdict), then a primary text row ("50% left" ⟷ "Resets in 4d 17h").
-///   Mirrors the original OpenUsage card.
+/// - **Bounded** (`limit != nil`, meter row): one line — name, then a narrow capsule meter (color = pace
+///   verdict) immediately followed by the bare percent reading, then the reset time on the trailing edge
+///   ("<duration> (<clock time>)", always both readings — no click-to-flip). Collapsed from an earlier
+///   three-line label/bar/reading stack so more providers fit the popover without scrolling; the pace
+///   verdict (when "Show Pace Prediction" is on) still tints the bar and rides the hover tooltip, it no
+///   longer prints inline warning copy.
 /// - **Unbounded** (`limit == nil`, text-only row): **no bar**. Label on the left, a single right-aligned
 ///   descriptive line ("1,503 left") and an optional secondary line ("on-device estimate").
 /// Rows size to their own content (variable height). Same `WidgetData` the menu bar uses — only layout differs.
 struct WidgetRowView: View {
     let data: WidgetData
-    /// Flips the global relative/absolute reset display. Supplied where the row has the data store
-    /// (the dashboard list); `nil` in static contexts like the drag-reorder preview, where the reset
-    /// label stays plain text.
-    var onToggleResetDisplay: (() -> Void)?
-    /// Flips the global Used/Left meter style — the headline's counterpart to the reset toggle.
-    /// Same supply rules as `onToggleResetDisplay`.
+    /// Flips the global Used/Left meter style. Supplied where the row has the data store (the
+    /// dashboard list); `nil` in static contexts like the drag-reorder preview, where the meter
+    /// cluster stays plain (not a button).
     var onToggleMeterStyle: (() -> Void)?
     /// True when this text-only row sits directly under another text-only row. Rows don't know
     /// their neighbors — the list supplies it — and both densities use it to pull consecutive
@@ -72,12 +70,11 @@ struct WidgetRowView: View {
     }
 
     private var topPadding: CGFloat {
-        if data.isBounded { return density.barRowPadding }
-        return condensedTop ? density.condensedTextRowTopPadding : density.textRowPadding
+        condensedTop ? density.condensedTextRowTopPadding : density.textRowPadding
     }
 
     private var bottomPadding: CGFloat {
-        data.isBounded ? density.barRowPadding : density.textRowPadding
+        density.textRowPadding
     }
 
     @ViewBuilder
@@ -93,113 +90,59 @@ struct WidgetRowView: View {
         }
     }
 
-    /// Bounded: label (+ run-out warning) → meter → primary text row.
-    /// The label, bar, and reading are one perceptual unit, so they sit on the tight step of the
-    /// grid (`rowInnerSpacing`); the row's vertical padding provides the separation from
-    /// neighboring rows.
+    /// Bounded: one line — name, the narrow meter cluster (bar + bare percent), and the reset time
+    /// trailing. The old label/bar/reading stack is now one row; the pace verdict still tints the bar
+    /// (and rides its hover tooltip when "Show Pace Prediction" is on) but no longer prints inline
+    /// warning copy — there's no room for it, and most usage patterns don't want it anyway.
     private var boundedRow: some View {
         let state = data.meterState()
-        return VStack(alignment: .leading, spacing: density.rowInnerSpacing) {
-            boundedLabelRow(state)
-            meter(state)
-            primaryTextRow
-        }
-    }
-
-    /// Label with the pace warning right-aligned on the same line — one slot, escalating with the
-    /// `MeterState`. Spent: a flame + "Limit reached",
-    /// the terminal state that outranks any pace projection. Running out: a flame + projected
-    /// run-out time, read as "Limit in 3h 45m" ⟷ "Limit today at 11:49 PM" (following the global
-    /// countdown/exact mode) — clicking the time flips the global mode like the reset label. Close
-    /// to limit: a quiet "~3% spare" — the cushion projected at reset. Healthy / level / no-data:
-    /// nothing unless "always show pacing" surfaces projection on blue. Only the flame carries
-    /// flame carries the severity color — tint on glass is reserved for the symbol while copy
-    /// stays secondary like the row's other supporting text; the bar below carries the color.
-    /// Hovering shows the pace projection at reset. The warning gets the space; the title truncates.
-    private func boundedLabelRow(_ state: WidgetData.MeterState) -> some View {
-        HStack(spacing: 6) {
+        return HStack(spacing: 8) {
             Text(data.title)
                 .font(labelFont)
                 .foregroundStyle(.primary)
                 .lineLimit(1)
-            warning(state)
+                .layoutPriority(1)
+            meterCluster(state)
+            Spacer(minLength: 8)
+            trailingContext
         }
     }
 
-    /// The single escalating warning slot, switching exhaustively over the state so the copy can
-    /// never contradict the bar. The flame cases share one builder; the amber and (always-show-pacing)
-    /// blue cases are plain text.
+    /// The narrow bar immediately followed by its bare percent reading — one visual unit, click to
+    /// flip the global Used/Left meter style (the compact row's counterpart to the old headline
+    /// toggle). Hovering surfaces the pace verdict projection when there is one, otherwise the
+    /// opposite Used/Left reading.
     @ViewBuilder
-    private func warning(_ state: WidgetData.MeterState) -> some View {
-        switch state {
-        case .spent:
-            let limitReached = String(localized: "widgetRow.limitReached", defaultValue: "Limit reached")
-            flameWarning(text: limitReached, state: state, accessibility: limitReached)
-        case .runningOut(let eta, _):
-            // `eta == nil` is the float-edge case: the flame stands alone (the projection lives in
-            // the tooltip), rather than printing a misleading time. A shown time reads "Limit in 3h
-            // 45m" (or the exact "Limit today at …"), carrying its own verb and following the global
-            // countdown/exact mode, so — exactly like the reset label — clicking it flips that mode
-            // (lifted reorder previews pass no toggle and render it inert).
-            flameWarning(text: eta, state: state,
-                         accessibility: eta ?? String(localized: "widgetRow.willReachLimit", defaultValue: "Will reach limit"),
-                         action: eta == nil ? nil : onToggleResetDisplay)
-        case .closeToLimit(let spare, _):
-            Spacer(minLength: 8)
-            Text(spare)
+    private func meterCluster(_ state: WidgetData.MeterState) -> some View {
+        let cluster = HStack(spacing: 6) {
+            meter(state)
+                .frame(width: Self.compactMeterWidth)
+            Text(percentText)
                 .font(supportingFont)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.primary)
+                .monospacedDigit()
+                .contentTransition(.numericText())
                 .lineLimit(1)
                 .fixedSize(horizontal: true, vertical: false)
-                .hoverTooltip(state.tooltip)
-        case .healthy where data.alwaysShowPacing:
-            // "Always show pacing" surfaces the projection on the otherwise-silent on-track row: the
-            // same quiet secondary note as the amber case, but the cushion ("~33% left at reset")
-            // rather than the spare. No flame (blue isn't a warning) and no hover tooltip — the copy
-            // already *is* the projection the amber case hides in its tooltip.
-            if let projection = state.tooltip {
-                Spacer(minLength: 8)
-                Text(projection)
-                    .font(supportingFont)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .fixedSize(horizontal: true, vertical: false)
-            }
-        case .noData, .healthy, .level:
-            EmptyView()
+        }
+        if data.hasMeterStyleToggle, let onToggleMeterStyle {
+            Button(action: onToggleMeterStyle) { cluster }
+                .buttonStyle(.plain)
+                .hoverTooltip(clusterTooltip(state))
+        } else {
+            cluster.hoverTooltip(clusterTooltip(state))
         }
     }
 
-    /// Flame icon + optional label text, carrying the state's projection tooltip — shared by the
-    /// spent and running-out cases. Only the flame is severity-tinted; the copy stays secondary
-    /// (tint on glass is reserved for the symbol). An optional `action` wraps the warning in a
-    /// plain button (the run-out time's countdown/exact toggle).
-    @ViewBuilder
-    private func flameWarning(text: String?, state: WidgetData.MeterState,
-                              accessibility: String, action: (() -> Void)? = nil) -> some View {
-        Spacer(minLength: 8)
-        let label = HStack(spacing: 3) {
-            Image(systemName: "flame.fill")
-                .font(.system(size: density.supportingPointSize - 1))
-                .foregroundStyle(severityColor(state.severity))
-                .accessibilityHidden(true) // the warning text alongside carries the message
-            if let text {
-                Text(text)
-                    .font(supportingFont)
-                    .lineLimit(1)
-                    .fixedSize(horizontal: true, vertical: false)
-            }
-        }
-        .foregroundStyle(.secondary)
-        .hoverTooltip(state.tooltip)
-        .accessibilityLabel(accessibility)
+    /// Fixed width for the compact bar — narrow enough that name, meter, and reset time share one
+    /// line even on the smaller Compact density.
+    private static let compactMeterWidth: CGFloat = 44
 
-        if let action {
-            Button(action: action) { label }
-                .buttonStyle(.plain)
-        } else {
-            label
-        }
+    /// Bare percent reading (no "left"/"used" word — the row is too tight for it); `data.fraction`
+    /// already reflects the global Used/Left display mode, so the number alone still flips correctly.
+    private var percentText: String {
+        let percent = Int((data.fraction * 100).rounded())
+        return "\(percent)%"
     }
 
     /// Bar/copy color for a severity, or the inactive gray when there's none (the no-data track).
@@ -207,55 +150,22 @@ struct WidgetRowView: View {
         severity.map(Theme.meterFill) ?? AnyShapeStyle(Color.secondary)
     }
 
-    /// Primary line under the bar: value+mode word on the left ("50% left"), reset/limit context on
-    /// the right. The headline is the Used/Left toggle (click to flip the global meter style, with
-    /// the opposite reading in its tooltip) — the exact counterpart of the reset label's toggle.
-    private var primaryTextRow: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
-            headlineText
-            Spacer(minLength: 8)
-            trailingContext
-        }
-        .font(supportingFont)
-        .lineLimit(1)
+    /// Hover explanation for the meter cluster: the pace verdict projection when "Show Pace
+    /// Prediction" surfaces one (`state.tooltip`), otherwise the opposite Used/Left reading.
+    private func clusterTooltip(_ state: WidgetData.MeterState) -> String? {
+        state.tooltip ?? data.meterStyleTooltip
     }
 
-    // The headline value is the row's payload — the number the user opened the popover to read —
-    // so it sits at `.primary` (vibrant full-contrast on the popover glass); the surrounding
-    // context (reset countdown, deficit) stays `.secondary`.
-    @ViewBuilder
-    private var headlineText: some View {
-        if data.hasMeterStyleToggle, let onToggleMeterStyle {
-            Button(action: onToggleMeterStyle) {
-                Text(data.headline)
-                    .foregroundStyle(.primary)
-                    .contentTransition(.numericText())
-            }
-            .buttonStyle(.plain)
-            .hoverTooltip(data.meterStyleTooltip)
-        } else {
-            Text(data.headline)
-                .foregroundStyle(.primary)
-                .contentTransition(.numericText())
-        }
-    }
-
-    /// Reset/limit context on the trailing edge. When it's a concrete reset countdown it becomes a
-    /// click target that flips the global relative/absolute mode (with the opposite format in its
-    /// tooltip), mirroring the original. Otherwise it's plain text.
+    /// Reset time on the trailing edge, plain text — the combined "<duration> (<clock time>)" phrase
+    /// already carries both the countdown and the exact time, so there's nothing left to click-to-flip.
     @ViewBuilder
     private var trailingContext: some View {
         if let text = data.boundedTrailingText() {
-            if data.hasResetLabel(), let onToggleResetDisplay {
-                Button(action: onToggleResetDisplay) {
-                    Text(text).foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
+            Text(text)
+                .font(supportingFont)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
                 .hoverTooltip(data.resetTooltip())
-            } else {
-                Text(text).foregroundStyle(.secondary)
-                    .hoverTooltip(data.resetTooltip())
-            }
         }
     }
 
