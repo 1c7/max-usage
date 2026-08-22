@@ -7,7 +7,7 @@ final class DevinProvider: ProviderRuntime {
         displayName: "Devin",
         icon: .providerMark("devin"),
         links: [
-            .init(label: "Dashboard", url: "https://app.devin.ai/settings/plans")
+            .init(label: String(localized: "link.dashboard", defaultValue: "Dashboard"), url: "https://app.devin.ai/settings/plans")
         ]
     )
 
@@ -27,11 +27,15 @@ final class DevinProvider: ProviderRuntime {
 
     var widgetDescriptors: [WidgetDescriptor] {
         [
-            .percent(id: "devin.daily", provider: provider, title: "Daily", metricLabel: "Daily quota")
+            .percent(id: "devin.daily", provider: provider,
+                     title: String(localized: "metric.daily", defaultValue: "Daily"), metricLabel: "Daily quota")
                 .exportingLimit("daily", unit: "percent"),
-            .percent(id: "devin.weekly", provider: provider, title: "Weekly", metricLabel: "Weekly quota")
+            .percent(id: "devin.weekly", provider: provider,
+                     title: String(localized: "metric.weekly", defaultValue: "Weekly"), metricLabel: "Weekly quota")
                 .exportingLimit("weekly", unit: "percent"),
-            .dollarBalance(id: "devin.extra", provider: provider, title: "Extra Balance", metricLabel: "Extra usage balance", valueWord: "left")
+            .dollarBalance(id: "devin.extra", provider: provider,
+                           title: String(localized: "metric.extraBalance", defaultValue: "Extra Balance"),
+                           metricLabel: "Extra usage balance", valueWord: "left")
                 .exportingLimit("extraUsageBalance", kind: .balance, unit: "usd", source: .value(kind: .dollars))
         ]
     }

@@ -7,8 +7,8 @@ final class OpenRouterProvider: ProviderRuntime {
         displayName: "OpenRouter",
         icon: .providerMark("openrouter"),
         links: [
-            ProviderLink(label: "Activity", url: "https://openrouter.ai/activity"),
-            ProviderLink(label: "Credits", url: "https://openrouter.ai/settings/credits")
+            ProviderLink(label: String(localized: "link.activity", defaultValue: "Activity"), url: "https://openrouter.ai/activity"),
+            ProviderLink(label: String(localized: "link.credits", defaultValue: "Credits"), url: "https://openrouter.ai/settings/credits")
         ]
     )
 
@@ -28,19 +28,25 @@ final class OpenRouterProvider: ProviderRuntime {
 
     var widgetDescriptors: [WidgetDescriptor] {
         [
-            .boundedDollars(id: "openrouter.credits", provider: provider, title: "Credits",
+            .boundedDollars(id: "openrouter.credits", provider: provider,
+                            title: String(localized: "metric.credits", defaultValue: "Credits"),
                             metricLabel: "Credits", limit: 100, limitNoun: "purchased")
                 .exportingLimit("credits", unit: "usd"),
-            .dollarBalance(id: "openrouter.balance", provider: provider, title: "Balance",
+            .dollarBalance(id: "openrouter.balance", provider: provider,
+                           title: String(localized: "metric.balance", defaultValue: "Balance"),
                            metricLabel: "Balance", valueWord: "left")
                 .exportingLimit("balance", kind: .balance, unit: "usd", source: .value(kind: .dollars)),
-            .values(id: "openrouter.today", provider: provider, title: "Today",
+            .values(id: "openrouter.today", provider: provider,
+                    title: String(localized: "metric.today", defaultValue: "Today"),
                     metricLabel: "Today", selection: .kind(.dollars), isUsagePeriod: true),
-            .values(id: "openrouter.week", provider: provider, title: "This Week",
+            .values(id: "openrouter.week", provider: provider,
+                    title: String(localized: "metric.thisWeek", defaultValue: "This Week"),
                     metricLabel: "This Week", selection: .kind(.dollars), isUsagePeriod: true),
-            .values(id: "openrouter.month", provider: provider, title: "This Month",
+            .values(id: "openrouter.month", provider: provider,
+                    title: String(localized: "metric.thisMonth", defaultValue: "This Month"),
                     metricLabel: "This Month", selection: .kind(.dollars), isUsagePeriod: true),
-            .boundedDollars(id: "openrouter.keyLimit", provider: provider, title: "Key Limit",
+            .boundedDollars(id: "openrouter.keyLimit", provider: provider,
+                            title: String(localized: "metric.keyLimit", defaultValue: "Key Limit"),
                             metricLabel: "Key Limit", limit: 100, valueWord: "spent")
                 .exportingLimit("keyLimit", unit: "usd")
         ]

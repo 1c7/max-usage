@@ -15,9 +15,12 @@ extension PaceMilestone {
     /// User-facing label for the Settings row and the notification title (they match by design).
     var settingLabel: String {
         switch self {
-        case .underTenPercent: return "Almost Out"
-        case .healthyToClose: return "Cutting It Close"
-        case .closeToRunningOut: return "Will Run Out"
+        case .underTenPercent:
+            return String(localized: "paceMilestone.underTenPercent.label", defaultValue: "Almost Out")
+        case .healthyToClose:
+            return String(localized: "paceMilestone.healthyToClose.label", defaultValue: "Cutting It Close")
+        case .closeToRunningOut:
+            return String(localized: "paceMilestone.closeToRunningOut.label", defaultValue: "Will Run Out")
         }
     }
 
@@ -28,18 +31,42 @@ extension PaceMilestone {
     /// body stays generic and reads well for any metric (sessions, rate-limit resets, spend tiles).
     var body: String {
         switch self {
-        case .underTenPercent: return "Under 10% usage remaining for this window."
-        case .healthyToClose: return "Projected to finish close to your limit."
-        case .closeToRunningOut: return "Projected to finish before the limit resets."
+        case .underTenPercent:
+            return String(
+                localized: "paceMilestone.underTenPercent.body",
+                defaultValue: "Under 10% usage remaining for this window."
+            )
+        case .healthyToClose:
+            return String(
+                localized: "paceMilestone.healthyToClose.body",
+                defaultValue: "Projected to finish close to your limit."
+            )
+        case .closeToRunningOut:
+            return String(
+                localized: "paceMilestone.closeToRunningOut.body",
+                defaultValue: "Projected to finish before the limit resets."
+            )
         }
     }
 
     /// One-sentence Settings tooltip (the (i) beside the row) explaining when this fires.
     var tooltip: String {
         switch self {
-        case .underTenPercent: return "Alert when a limit drops below 10% remaining."
-        case .healthyToClose: return "Alert when a limit is projected to finish with little left."
-        case .closeToRunningOut: return "Alert when a limit is projected to finish before it resets."
+        case .underTenPercent:
+            return String(
+                localized: "paceMilestone.underTenPercent.tooltip",
+                defaultValue: "Alert when a limit drops below 10% remaining."
+            )
+        case .healthyToClose:
+            return String(
+                localized: "paceMilestone.healthyToClose.tooltip",
+                defaultValue: "Alert when a limit is projected to finish with little left."
+            )
+        case .closeToRunningOut:
+            return String(
+                localized: "paceMilestone.closeToRunningOut.tooltip",
+                defaultValue: "Alert when a limit is projected to finish before it resets."
+            )
         }
     }
 }

@@ -51,7 +51,7 @@ struct CustomizeProviderDetailView: View {
 
     // MARK: - Metric sections
 
-    private func metricSection(_ title: String, metrics: [WidgetDescriptor], providerID: String) -> some View {
+    private func metricSection(_ title: LocalizedStringKey, metrics: [WidgetDescriptor], providerID: String) -> some View {
         VStack(alignment: .leading, spacing: density.headerToCardSpacing) {
             Text(title)
                 .font(.caption.weight(.semibold))
@@ -185,10 +185,18 @@ private struct StarButton: View {
             Button {
                 if layout.canPin(metric.id) {
                     layout.togglePin(metric.id)
-                    layout.presentCustomizationNotice(pinned ? "Removed from menu bar" : "Starred for menu bar")
+                    layout.presentCustomizationNotice(pinned
+                        ? String(localized: "customizeProviderDetail.removedFromMenuBar", defaultValue: "Removed from menu bar")
+                        : String(localized: "customizeProviderDetail.starredForMenuBar", defaultValue: "Starred for menu bar"))
                 } else {
                     shakeTrigger += 1
-                    layout.presentCustomizationNotice(layout.pinDenialReason(metric.id) ?? "Up to 2 stars per provider", tone: .notice)
+                    layout.presentCustomizationNotice(
+                        layout.pinDenialReason(metric.id) ?? String(
+                            localized: "customizeProviderDetail.upToTwoStars",
+                            defaultValue: "Up to 2 stars per provider"
+                        ),
+                        tone: .notice
+                    )
                 }
             } label: {
                 Image(systemName: pinned ? "star.fill" : "star")

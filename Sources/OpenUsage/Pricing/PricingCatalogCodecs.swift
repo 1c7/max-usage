@@ -156,8 +156,13 @@ enum PricingCodecError: Error, LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .notAnObject: return "Pricing feed is not a JSON object."
-        case .noUsableEntries: return "Pricing feed contained no usable model entries."
+        case .notAnObject:
+            return String(localized: "error.pricing.notAnObject", defaultValue: "Pricing feed is not a JSON object.")
+        case .noUsableEntries:
+            return String(
+                localized: "error.pricing.noUsableEntries",
+                defaultValue: "Pricing feed contained no usable model entries."
+            )
         }
     }
 }

@@ -12,9 +12,15 @@ enum CopilotAuthError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .notLoggedIn:
-            return "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again."
+            return String(
+                localized: "error.copilot.notLoggedIn",
+                defaultValue: "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again."
+            )
         case .tokenInvalid:
-            return "GitHub token invalid or expired. Re-authenticate (gh auth login) and try again."
+            return String(
+                localized: "error.copilot.tokenInvalid",
+                defaultValue: "GitHub token invalid or expired. Re-authenticate (gh auth login) and try again."
+            )
         }
     }
 }

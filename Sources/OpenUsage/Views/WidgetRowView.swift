@@ -133,7 +133,8 @@ struct WidgetRowView: View {
     private func warning(_ state: WidgetData.MeterState) -> some View {
         switch state {
         case .spent:
-            flameWarning(text: "Limit reached", state: state, accessibility: "Limit reached")
+            let limitReached = String(localized: "widgetRow.limitReached", defaultValue: "Limit reached")
+            flameWarning(text: limitReached, state: state, accessibility: limitReached)
         case .runningOut(let eta, _):
             // `eta == nil` is the float-edge case: the flame stands alone (the projection lives in
             // the tooltip), rather than printing a misleading time. A shown time reads "Limit in 3h
@@ -141,7 +142,7 @@ struct WidgetRowView: View {
             // countdown/exact mode, so — exactly like the reset label — clicking it flips that mode
             // (lifted reorder previews pass no toggle and render it inert).
             flameWarning(text: eta, state: state,
-                         accessibility: eta ?? "Will reach limit",
+                         accessibility: eta ?? String(localized: "widgetRow.willReachLimit", defaultValue: "Will reach limit"),
                          action: eta == nil ? nil : onToggleResetDisplay)
         case .closeToLimit(let spare, _):
             Spacer(minLength: 8)
@@ -404,9 +405,18 @@ struct WidgetRowView: View {
 
     private func expiryStatusAccessibilityLabel(_ severity: WidgetData.MeterSeverity) -> String {
         switch severity {
-        case .normal: return "Reset credits expire in more than 7 days"
-        case .warning: return "A reset credit expires within 7 days"
-        case .critical: return "A reset credit expires within 48 hours"
+        case .normal:
+            return String(
+                localized: "widgetRow.expiryStatus.normal",
+                defaultValue: "Reset credits expire in more than 7 days"
+            )
+        case .warning:
+            return String(localized: "widgetRow.expiryStatus.warning", defaultValue: "A reset credit expires within 7 days")
+        case .critical:
+            return String(
+                localized: "widgetRow.expiryStatus.critical",
+                defaultValue: "A reset credit expires within 48 hours"
+            )
         }
     }
 

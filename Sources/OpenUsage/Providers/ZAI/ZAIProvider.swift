@@ -7,8 +7,8 @@ final class ZAIProvider: ProviderRuntime {
         displayName: "Z.ai",
         icon: .providerMark("zai"),
         links: [
-            ProviderLink(label: "Dashboard", url: "https://z.ai/manage-apikey/coding-plan/personal/my-plan"),
-            ProviderLink(label: "API Keys", url: "https://z.ai/manage-apikey/apikey-list")
+            ProviderLink(label: String(localized: "link.dashboard", defaultValue: "Dashboard"), url: "https://z.ai/manage-apikey/coding-plan/personal/my-plan"),
+            ProviderLink(label: String(localized: "link.apiKeys", defaultValue: "API Keys"), url: "https://z.ai/manage-apikey/apikey-list")
         ]
     )
 
@@ -28,13 +28,14 @@ final class ZAIProvider: ProviderRuntime {
 
     var widgetDescriptors: [WidgetDescriptor] {
         [
-            .percent(id: "zai.session", provider: provider, title: "Session",
+            .percent(id: "zai.session", provider: provider, title: String(localized: "metric.session", defaultValue: "Session"),
                      metricLabel: "Session")
                 .exportingLimit("session", unit: "percent"),
-            .percent(id: "zai.weekly", provider: provider, title: "Weekly",
+            .percent(id: "zai.weekly", provider: provider, title: String(localized: "metric.weekly", defaultValue: "Weekly"),
                      metricLabel: "Weekly")
                 .exportingLimit("weekly", unit: "percent"),
-            .boundedCount(id: "zai.webSearches", provider: provider, title: "Web Searches",
+            .boundedCount(id: "zai.webSearches", provider: provider,
+                          title: String(localized: "metric.webSearches", defaultValue: "Web Searches"),
                           metricLabel: "Web Searches", limit: 1000, suffix: "searches",
                           periodDurationMs: ZAIUsageMapper.monthlyPeriodMs)
                 .exportingLimit("webSearches", unit: "searches")

@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "OpenUsage",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v15)
     ],
@@ -32,7 +33,13 @@ let package = Package(
                 .copy("Resources/ProviderIcons"),
                 .copy("Resources/pricing_supplement.json"),
                 .copy("Resources/pricing_litellm_snapshot.json"),
-                .copy("Resources/pricing_models_dev_snapshot.json")
+                .copy("Resources/pricing_models_dev_snapshot.json"),
+                // `swift build` (this project's only build path — see AGENTS.md) copies .xcstrings
+                // resources verbatim instead of compiling them; only Xcode's build system runs the
+                // String Catalog compiler. Plain .strings tables need no compile step, so they're the
+                // functional source here.
+                .process("Resources/en.lproj"),
+                .process("Resources/zh-Hans.lproj")
             ],
             swiftSettings: [
                 .swiftLanguageMode(.v6)

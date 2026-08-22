@@ -7,8 +7,8 @@ final class CursorProvider: ProviderRuntime {
         displayName: "Cursor",
         icon: .providerMark("cursor"),
         links: [
-            .init(label: "Status", url: "https://status.cursor.com/"),
-            .init(label: "Dashboard", url: "https://www.cursor.com/dashboard")
+            .init(label: String(localized: "link.status", defaultValue: "Status"), url: "https://status.cursor.com/"),
+            .init(label: String(localized: "link.dashboard", defaultValue: "Dashboard"), url: "https://www.cursor.com/dashboard")
         ]
     )
 
@@ -31,24 +31,36 @@ final class CursorProvider: ProviderRuntime {
 
     var widgetDescriptors: [WidgetDescriptor] {
         [
-            .percent(id: "cursor.usage", provider: provider, title: "Total Usage", metricLabel: "Total usage")
+            .percent(id: "cursor.usage", provider: provider,
+                     title: String(localized: "metric.totalUsage", defaultValue: "Total Usage"), metricLabel: "Total usage")
                 .exportingLimit("totalUsage", unit: "percent"),
-            .percent(id: "cursor.auto", provider: provider, title: "Auto Usage", metricLabel: "Auto usage")
+            .percent(id: "cursor.auto", provider: provider,
+                     title: String(localized: "metric.autoUsage", defaultValue: "Auto Usage"), metricLabel: "Auto usage")
                 .exportingLimit("autoUsage", unit: "percent"),
-            .percent(id: "cursor.api", provider: provider, title: "API Usage", metricLabel: "API usage")
+            .percent(id: "cursor.api", provider: provider,
+                     title: String(localized: "metric.apiUsage", defaultValue: "API Usage"), metricLabel: "API usage")
                 .exportingLimit("apiUsage", unit: "percent"),
-            .boundedDollars(id: "cursor.onDemand", provider: provider, title: "Extra Usage", metricLabel: "On-demand", limit: 100, valueWord: "spent")
+            .boundedDollars(id: "cursor.onDemand", provider: provider,
+                            title: String(localized: "metric.extraUsage", defaultValue: "Extra Usage"),
+                            metricLabel: "On-demand", limit: 100, valueWord: "spent")
                 .exportingLimit("onDemand", unit: "usd", source: .progressOrValue(kind: .dollars)),
-            .boundedCount(id: "cursor.requests", provider: provider, title: "Requests", limit: 500,
+            // `metricLabel` stays literal English — it's the lookup key matched against
+            // `CursorUsageMapper`'s emitted `MetricLine.label` ("Requests"/"Credits", never localized);
+            // only `title` (what renders on screen) is translated.
+            .boundedCount(id: "cursor.requests", provider: provider,
+                          title: String(localized: "metric.requests", defaultValue: "Requests"),
+                          metricLabel: "Requests", limit: 500,
                           suffix: "requests", periodDurationMs: CursorUsageMapper.billingPeriodMs)
                 .exportingLimit("requests", unit: "requests"),
-            .dollarBalance(id: "cursor.credits", provider: provider, title: "Credits", valueWord: "left")
+            .dollarBalance(id: "cursor.credits", provider: provider,
+                           title: String(localized: "metric.credits", defaultValue: "Credits"),
+                           metricLabel: "Credits", valueWord: "left")
                 .exportingLimit("credits", kind: .balance, unit: "usd", source: .value(kind: .dollars)),
             .usageTrend(provider: provider)
                 .exportingHistory(
                     scope: .accountWide,
                     estimatedCost: true,
-                    sourceNote: "From your Cursor usage export"
+                    sourceNote: String(localized: "sourceNote.cursor", defaultValue: "From your Cursor usage export")
                 )
         ] + WidgetDescriptor.spendTiles(
             provider: provider,

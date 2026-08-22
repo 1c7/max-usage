@@ -56,24 +56,38 @@ final class CommandLineToolInstaller {
         )
     }
 
+    private static var installActionLabel: String {
+        String(localized: "commandLineTool.action.install", defaultValue: "install")
+    }
+
+    private static var removeActionLabel: String {
+        String(localized: "commandLineTool.action.remove", defaultValue: "remove")
+    }
+
     func install() {
         refreshStatus()
         guard status != .installed else { return }
         guard status != .conflict else {
-            errorMessage = "\(destinationPath) already exists and wasn't installed by OpenUsage."
+            errorMessage = String(
+                localized: "commandLineTool.conflict",
+                defaultValue: "\(destinationPath) already exists and wasn't installed by OpenUsage."
+            )
             return
         }
         guard fileManager.isExecutableFile(atPath: sourcePath) else {
-            errorMessage = "The bundled terminal helper couldn't be found. Reinstall OpenUsage and try again."
+            errorMessage = String(
+                localized: "commandLineTool.helperMissing",
+                defaultValue: "The bundled terminal helper couldn't be found. Reinstall OpenUsage and try again."
+            )
             return
         }
-        handle(performPrivileged(.install, sourcePath, destinationPath), action: "install")
+        handle(performPrivileged(.install, sourcePath, destinationPath), action: Self.installActionLabel)
     }
 
     func uninstall() {
         refreshStatus()
         guard status == .installed else { return }
-        handle(performPrivileged(.uninstall, sourcePath, destinationPath), action: "remove")
+        handle(performPrivileged(.uninstall, sourcePath, destinationPath), action: Self.removeActionLabel)
     }
 
     private func handle(_ result: OperationResult, action: String) {
@@ -83,7 +97,10 @@ final class CommandLineToolInstaller {
         case .cancelled:
             break
         case .failure(let message):
-            errorMessage = "Couldn't \(action) the terminal helper: \(message)"
+            errorMessage = String(
+                localized: "commandLineTool.actionFailed",
+                defaultValue: "Couldn't \(action) the terminal helper: \(message)"
+            )
             AppLog.error(.config, "Terminal helper \(action) failed: \(message)")
         }
         refreshStatus()
@@ -125,7 +142,10 @@ final class CommandLineToolInstaller {
 
         let source = "do shell script \(appleScriptStringLiteral(command)) with administrator privileges"
         guard let script = NSAppleScript(source: source) else {
-            return .failure("macOS couldn't prepare the authorization request.")
+            return .failure(String(
+                localized: "commandLineTool.authPrepareFailed",
+                defaultValue: "macOS couldn't prepare the authorization request."
+            ))
         }
         var errorInfo: NSDictionary?
         script.executeAndReturnError(&errorInfo)
@@ -135,7 +155,10 @@ final class CommandLineToolInstaller {
         }
         return .failure(
             (errorInfo[NSAppleScript.errorMessage] as? String)
-                ?? "macOS rejected the authorization request."
+                ?? String(
+                    localized: "commandLineTool.authRejected",
+                    defaultValue: "macOS rejected the authorization request."
+                )
         )
     }
 

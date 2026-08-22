@@ -56,7 +56,7 @@ struct ShortcutRecorderField: View {
                         .imageScale(.medium)
                 }
                 .buttonStyle(.plain)
-                .hoverTooltip("Clear Shortcut")
+                .hoverTooltip(String(localized: "shortcutRecorder.clear", defaultValue: "Clear Shortcut"))
                 .accessibilityLabel("Clear Shortcut")
             }
         }

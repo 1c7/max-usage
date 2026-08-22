@@ -27,13 +27,19 @@ enum AboutPanel {
         ]
 
         let credits = NSMutableAttributedString()
-        credits.append(NSAttributedString(string: "Created by ", attributes: base))
+        credits.append(NSAttributedString(
+            string: String(localized: "about.createdBy", defaultValue: "Created by "), attributes: base
+        ))
         credits.append(link("Robin Ebers", "https://itsbyrob.in/x", base: base))
-        credits.append(NSAttributedString(string: "\nMaintained also by ", attributes: base))
+        credits.append(NSAttributedString(
+            string: String(localized: "about.maintainedAlsoBy", defaultValue: "\nMaintained also by "), attributes: base
+        ))
         credits.append(link("Mert", "https://github.com/validatedev", base: base))
         credits.append(NSAttributedString(string: " & ", attributes: base))
         credits.append(link("David", "https://github.com/davidarny", base: base))
-        credits.append(NSAttributedString(string: "\n\nOpen source on ", attributes: base))
+        credits.append(NSAttributedString(
+            string: String(localized: "about.openSourceOn", defaultValue: "\n\nOpen source on "), attributes: base
+        ))
         credits.append(link("GitHub", "https://github.com/robinebers/openusage", base: base))
         return credits
     }

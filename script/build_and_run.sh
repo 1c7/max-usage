@@ -89,6 +89,16 @@ for bundle in "$BUILD_DIR"/*.bundle; do
 done
 shopt -u nullglob
 
+# `Text(_:)` / `String(localized:)` calls with no explicit `bundle:` resolve against
+# Bundle.main (this app's own .app bundle), not the OpenUsage module's own resource
+# bundle nested inside it — so the compiled .lproj tables also need to sit directly
+# under Contents/Resources for localization to actually take effect.
+shopt -s nullglob
+for lproj in "$APP_RESOURCES/$RESOURCE_BUNDLE_NAME"/*.lproj; do
+  cp -R "$lproj" "$APP_RESOURCES/$(basename "$lproj")"
+done
+shopt -u nullglob
+
 # Compile the Icon Composer source (assets/AppIcon.icon) into Assets.car so
 # Tahoe renders the real Liquid Glass icon. CFBundleIconName below must match
 # the .icon file stem ("AppIcon"). The app floor is macOS 15, so a classic .icns
@@ -140,6 +150,13 @@ cat >"$INFO_PLIST" <<PLIST
   <string>$MIN_SYSTEM_VERSION</string>
   <key>CFBundleIconName</key>
   <string>AppIcon</string>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+  <key>CFBundleLocalizations</key>
+  <array>
+    <string>en</string>
+    <string>zh-Hans</string>
+  </array>
   <key>LSUIElement</key>
   <true/>
   <key>NSPrincipalClass</key>

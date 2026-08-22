@@ -81,7 +81,7 @@ enum MenuBarContentBuilder {
     private static func resolve(_ descriptor: WidgetDescriptor, _ data: WidgetData) -> MenuBarContent.Metric {
         MenuBarContent.Metric(
             id: descriptor.id,
-            label: trayLabel(descriptor.metricLabel),
+            label: trayLabel(id: descriptor.id, metricLabel: descriptor.metricLabel),
             value: data.menuBarValue,
             fraction: data.fraction,
             isBounded: data.isBounded,
@@ -90,13 +90,14 @@ enum MenuBarContentBuilder {
     }
 
     /// Tray-only label shortening (the dashboard keeps the full names): the long time-window metrics
-    /// collapse to a single letter so a two-metric stack stays narrow. Unknown labels pass through.
-    private static func trayLabel(_ metricLabel: String) -> String {
-        switch metricLabel.lowercased() {
-        case "today": return "T"
-        case "yesterday": return "Y"
-        case "last 30 days": return "M"
-        default: return metricLabel
-        }
+    /// collapse to a single letter so a two-metric stack stays narrow. Matched on the descriptor's
+    /// stable (English, never localized) `id` suffix rather than the display label — `metricLabel` is
+    /// user-facing and localized, so matching its text would silently break once translated. Unknown
+    /// labels pass through.
+    private static func trayLabel(id: String, metricLabel: String) -> String {
+        if id.hasSuffix(".today") { return "T" }
+        if id.hasSuffix(".yesterday") { return "Y" }
+        if id.hasSuffix(".last30") { return "M" }
+        return metricLabel
     }
 }

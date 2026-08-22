@@ -7,8 +7,8 @@ final class CodexProvider: ProviderRuntime {
         displayName: "Codex",
         icon: .providerMark("codex"),
         links: [
-            .init(label: "Status", url: "https://status.openai.com/"),
-            .init(label: "Dashboard", url: "https://chatgpt.com/codex/settings/usage")
+            .init(label: String(localized: "link.status", defaultValue: "Status"), url: "https://status.openai.com/"),
+            .init(label: String(localized: "link.dashboard", defaultValue: "Dashboard"), url: "https://chatgpt.com/codex/settings/usage")
         ]
     )
 
@@ -34,27 +34,36 @@ final class CodexProvider: ProviderRuntime {
 
     var widgetDescriptors: [WidgetDescriptor] {
         [
-            .percent(id: "codex.session", provider: provider, title: "Session")
+            // `metricLabel` stays literal English — it's the lookup key matched against
+            // `CodexUsageMapper`'s emitted `MetricLine.label` ("Session"/"Weekly", never localized);
+            // only `title` (what renders on screen) is translated.
+            .percent(id: "codex.session", provider: provider,
+                     title: String(localized: "metric.session", defaultValue: "Session"), metricLabel: "Session")
                 .exportingLimit("session", unit: "percent"),
-            .percent(id: "codex.weekly", provider: provider, title: "Weekly")
+            .percent(id: "codex.weekly", provider: provider,
+                     title: String(localized: "metric.weekly", defaultValue: "Weekly"), metricLabel: "Weekly")
                 .exportingLimit("weekly", unit: "percent"),
             // Model-specific Spark limits (GPT-5.3-Codex-Spark), parsed from `additional_rate_limits`.
             // Declared right after Weekly so they group with the core rate-limit meters; seeded On
-            // Demand (below the caret) and unpinned in `DefaultLayout`.
+            // Demand (below the caret) and unpinned in `DefaultLayout`. "Spark" is a model feature name,
+            // not translated.
             .percent(id: "codex.spark", provider: provider, title: "Spark")
                 .exportingLimit("spark", unit: "percent"),
             .percent(id: "codex.sparkWeekly", provider: provider, title: "Spark Weekly")
                 .exportingLimit("sparkWeekly", unit: "percent"),
-            .combined(id: "codex.credits", provider: provider, title: "Extra Usage", metricLabel: "Credits")
+            .combined(id: "codex.credits", provider: provider,
+                      title: String(localized: "metric.extraUsage", defaultValue: "Extra Usage"), metricLabel: "Credits")
                 .exportingLimit("credits", kind: .balance, unit: "credits", source: .value(kind: .count, label: "credits"))
                 .exportingLimit("creditValue", kind: .balance, unit: "usd", source: .value(kind: .dollars)),
-            .values(id: "codex.rateLimitResets", provider: provider, title: "Rate Limit Resets", metricLabel: "Rate Limit Resets", traySuffix: "resets", showsResetExpiries: true)
+            .values(id: "codex.rateLimitResets", provider: provider,
+                    title: String(localized: "metric.rateLimitResets", defaultValue: "Rate Limit Resets"),
+                    metricLabel: "Rate Limit Resets", traySuffix: "resets", showsResetExpiries: true)
                 .exportingLimit("rateLimitResets", kind: .balance, unit: "resets", source: .value(kind: .count, label: "available")),
             .usageTrend(provider: provider)
                 .exportingHistory(
                     scope: .machineLocal,
                     estimatedCost: true,
-                    sourceNote: "From your Codex logs (estimated)"
+                    sourceNote: String(localized: "sourceNote.codex", defaultValue: "From your Codex logs (estimated)")
                 )
         ] + WidgetDescriptor.spendTiles(provider: provider)
     }

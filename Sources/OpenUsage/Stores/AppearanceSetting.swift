@@ -19,9 +19,9 @@ enum AppearanceSetting: String, Hashable, Sendable, CaseIterable, UserDefaultsBa
 
     var label: String {
         switch self {
-        case .system: return "System"
-        case .light: return "Light"
-        case .dark: return "Dark"
+        case .system: return String(localized: "appearanceSetting.system", defaultValue: "System")
+        case .light: return String(localized: "appearanceSetting.light", defaultValue: "Light")
+        case .dark: return String(localized: "appearanceSetting.dark", defaultValue: "Dark")
         }
     }
 

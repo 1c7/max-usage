@@ -42,7 +42,10 @@ enum ICloudUsageSyncError: Error, LocalizedError {
     case unavailable
 
     var errorDescription: String? {
-        "iCloud Drive isn’t available. Check that this Mac is signed into iCloud and iCloud Drive is on."
+        String(
+            localized: "error.icloudSync.unavailable",
+            defaultValue: "iCloud Drive isn’t available. Check that this Mac is signed into iCloud and iCloud Drive is on."
+        )
     }
 }
 

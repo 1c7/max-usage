@@ -7,8 +7,8 @@ enum WidgetDisplayMode: String, Hashable, Sendable, CaseIterable {
     /// "Left" mirrors the legacy app's wording for remaining headroom.
     var label: String {
         switch self {
-        case .used: return "Used"
-        case .remaining: return "Left"
+        case .used: return String(localized: "widgetDisplayMode.used", defaultValue: "Used")
+        case .remaining: return String(localized: "widgetDisplayMode.left", defaultValue: "Left")
         }
     }
 

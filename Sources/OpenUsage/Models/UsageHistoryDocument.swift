@@ -107,13 +107,35 @@ enum UsageHistoryDocumentError: Error, LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .unsupportedSchema: "This Mac wrote a newer usage-history format. Update OpenUsage."
-        case .invalidDevice: "The synced Mac identity is invalid."
-        case .invalidProvider: "The synced provider identifier is invalid."
-        case .invalidDay: "The synced history contains an invalid date."
-        case .duplicateDay: "The synced history contains the same date more than once."
-        case .duplicateModel: "The synced history contains the same model more than once."
-        case .invalidValue: "The synced history contains an invalid usage value."
+        case .unsupportedSchema:
+            String(
+                localized: "error.usageHistory.unsupportedSchema",
+                defaultValue: "This Mac wrote a newer usage-history format. Update OpenUsage."
+            )
+        case .invalidDevice:
+            String(localized: "error.usageHistory.invalidDevice", defaultValue: "The synced Mac identity is invalid.")
+        case .invalidProvider:
+            String(
+                localized: "error.usageHistory.invalidProvider",
+                defaultValue: "The synced provider identifier is invalid."
+            )
+        case .invalidDay:
+            String(localized: "error.usageHistory.invalidDay", defaultValue: "The synced history contains an invalid date.")
+        case .duplicateDay:
+            String(
+                localized: "error.usageHistory.duplicateDay",
+                defaultValue: "The synced history contains the same date more than once."
+            )
+        case .duplicateModel:
+            String(
+                localized: "error.usageHistory.duplicateModel",
+                defaultValue: "The synced history contains the same model more than once."
+            )
+        case .invalidValue:
+            String(
+                localized: "error.usageHistory.invalidValue",
+                defaultValue: "The synced history contains an invalid usage value."
+            )
         }
     }
 }

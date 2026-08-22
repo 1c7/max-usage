@@ -21,11 +21,20 @@ enum OpenCodeUsageError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .notLoggedIn:
-            return "OpenCode not detected. Log in with OpenCode Go or use OpenCode locally first."
+            return String(
+                localized: "error.opencode.notLoggedIn",
+                defaultValue: "OpenCode not detected. Log in with OpenCode Go or use OpenCode locally first."
+            )
         case .credentialsUnreadable:
-            return "Couldn't read OpenCode's auth.json. Check its file permissions or log into OpenCode Go again."
+            return String(
+                localized: "error.opencode.credentialsUnreadable",
+                defaultValue: "Couldn't read OpenCode's auth.json. Check its file permissions or log into OpenCode Go again."
+            )
         case .databaseUnreadable:
-            return "Couldn't read OpenCode's local database. Quit OpenCode and refresh, or check the data directory's permissions."
+            return String(
+                localized: "error.opencode.databaseUnreadable",
+                defaultValue: "Couldn't read OpenCode's local database. Quit OpenCode and refresh, or check the data directory's permissions."
+            )
         case .connectionFailed:
             return ProviderUsageErrorText.connectionFailed
         case .invalidResponse:
@@ -33,9 +42,15 @@ enum OpenCodeUsageError: Error, LocalizedError, Equatable {
         case .requestFailed(let status):
             return ProviderUsageErrorText.requestFailed(statusCode: status)
         case .unauthorized:
-            return "OpenCode Go key was rejected. Log into OpenCode Go again."
+            return String(
+                localized: "error.opencode.unauthorized",
+                defaultValue: "OpenCode Go key was rejected. Log into OpenCode Go again."
+            )
         case .noGoSubscription:
-            return "No OpenCode Go subscription on this key."
+            return String(
+                localized: "error.opencode.noGoSubscription",
+                defaultValue: "No OpenCode Go subscription on this key."
+            )
         }
     }
 }
@@ -49,7 +64,7 @@ final class OpenCodeProvider: ProviderRuntime {
         displayName: "OpenCode",
         icon: .providerMark("opencode"),
         links: [
-            .init(label: "Dashboard", url: "https://opencode.ai/auth")
+            .init(label: String(localized: "link.dashboard", defaultValue: "Dashboard"), url: "https://opencode.ai/auth")
         ]
     )
 
@@ -61,7 +76,7 @@ final class OpenCodeProvider: ProviderRuntime {
     /// Names the local source on hover (the dollars can only undercount true account usage — this
     /// machine only). No "(estimated)": OpenCode records its own per-message cost, so the values are
     /// measured, not imputed.
-    private let sourceNote = "From your OpenCode logs"
+    private let sourceNote = String(localized: "sourceNote.openCode", defaultValue: "From your OpenCode logs")
 
     /// Edge-triggers the auth-read-failure log so a persistently unreadable `auth.json` warns once per
     /// run, not once per 5-minute refresh.
@@ -83,11 +98,17 @@ final class OpenCodeProvider: ProviderRuntime {
         // Go plan windows from `/zen/go/v1/usage` (Session/Weekly/Monthly + trend above the fold);
         // the spend tiles below sum combined OpenCode-hosted (Go + Zen) spend from local logs.
         [
-            .percent(id: "opencode.session", provider: provider, title: "Session", isSessionWindow: true)
+            // `metricLabel` stays literal English — matched against `OpenCodeUsageMapper`'s emitted
+            // `MetricLine.label` (never localized); only `title` (what renders on screen) is translated.
+            .percent(id: "opencode.session", provider: provider,
+                     title: String(localized: "metric.session", defaultValue: "Session"),
+                     metricLabel: "Session", isSessionWindow: true)
                 .exportingLimit("session", unit: "percent"),
-            .percent(id: "opencode.weekly", provider: provider, title: "Weekly")
+            .percent(id: "opencode.weekly", provider: provider,
+                     title: String(localized: "metric.weekly", defaultValue: "Weekly"), metricLabel: "Weekly")
                 .exportingLimit("weekly", unit: "percent"),
-            .percent(id: "opencode.monthly", provider: provider, title: "Monthly")
+            .percent(id: "opencode.monthly", provider: provider,
+                     title: String(localized: "metric.monthly", defaultValue: "Monthly"), metricLabel: "Monthly")
                 .exportingLimit("monthly", unit: "percent"),
             .usageTrend(provider: provider)
                 .exportingHistory(

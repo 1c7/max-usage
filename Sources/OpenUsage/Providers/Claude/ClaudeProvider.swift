@@ -8,8 +8,8 @@ final class ClaudeProvider: ProviderRuntime {
         displayName: "Claude",
         icon: .providerMark("claude"),
         links: [
-            .init(label: "Status", url: "https://status.anthropic.com/"),
-            .init(label: "Dashboard", url: "https://claude.ai/settings/usage")
+            .init(label: String(localized: "link.status", defaultValue: "Status"), url: "https://status.anthropic.com/"),
+            .init(label: String(localized: "link.dashboard", defaultValue: "Dashboard"), url: "https://claude.ai/settings/usage")
         ]
     )
 
@@ -45,21 +45,30 @@ final class ClaudeProvider: ProviderRuntime {
 
     var widgetDescriptors: [WidgetDescriptor] {
         [
-            .percent(id: "claude.session", provider: provider, title: "Session", isSessionWindow: true)
+            // `metricLabel` stays the literal English "Session"/"Weekly" — it's the lookup key matched
+            // against `ClaudeUsageMapper`'s `MetricLine.label` (never localized); only `title` (what
+            // renders on screen) is translated.
+            .percent(id: "claude.session", provider: provider,
+                     title: String(localized: "metric.session", defaultValue: "Session"),
+                     metricLabel: "Session", isSessionWindow: true)
                 .exportingLimit("session", unit: "percent"),
-            .percent(id: "claude.weekly", provider: provider, title: "Weekly")
+            .percent(id: "claude.weekly", provider: provider,
+                     title: String(localized: "metric.weekly", defaultValue: "Weekly"), metricLabel: "Weekly")
                 .exportingLimit("weekly", unit: "percent"),
+            // "Sonnet" / "Fable" are Claude model family names, not translated.
             .percent(id: "claude.sonnet", provider: provider, title: "Sonnet")
                 .exportingLimit("sonnet", unit: "percent"),
             .percent(id: "claude.fable", provider: provider, title: "Fable")
                 .exportingLimit("fable", unit: "percent"),
-            .boundedDollars(id: "claude.extra", provider: provider, title: "Extra Usage", metricLabel: "Extra usage spent", limit: 100, valueWord: "spent")
+            .boundedDollars(id: "claude.extra", provider: provider,
+                            title: String(localized: "metric.extraUsage", defaultValue: "Extra Usage"),
+                            metricLabel: "Extra usage spent", limit: 100, valueWord: "spent")
                 .exportingLimit("extraUsage", unit: "usd", source: .progressOrValue(kind: .dollars)),
             .usageTrend(provider: provider)
                 .exportingHistory(
                     scope: .machineLocal,
                     estimatedCost: true,
-                    sourceNote: "From your Claude usage history (estimated)"
+                    sourceNote: String(localized: "sourceNote.claude", defaultValue: "From your Claude usage history (estimated)")
                 )
         ] + WidgetDescriptor.spendTiles(provider: provider)
     }

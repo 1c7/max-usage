@@ -114,21 +114,39 @@ enum ClaudeAuthError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .notLoggedIn:
-            return "Not logged in. Run `claude` to authenticate."
+            return String(localized: "error.claude.notLoggedIn", defaultValue: "Not logged in. Run `claude` to authenticate.")
         case .desktopPermissionRequired:
-            return "Claude Desktop login found. Refresh once and choose Always Allow to connect it."
+            return String(
+                localized: "error.claude.desktopPermissionRequired",
+                defaultValue: "Claude Desktop login found. Refresh once and choose Always Allow to connect it."
+            )
         case .desktopTokenExpired:
-            return "Claude Desktop login is stale. Open Claude Desktop, then refresh OpenUsage."
+            return String(
+                localized: "error.claude.desktopTokenExpired",
+                defaultValue: "Claude Desktop login is stale. Open Claude Desktop, then refresh OpenUsage."
+            )
         case .desktopCredentialsUnavailable:
-            return "Claude Desktop login couldn't be read. Open Claude Desktop, then try again."
+            return String(
+                localized: "error.claude.desktopCredentialsUnavailable",
+                defaultValue: "Claude Desktop login couldn't be read. Open Claude Desktop, then try again."
+            )
         case .sessionExpired:
-            return "Session expired. Run `claude` to log in again."
+            return String(
+                localized: "error.claude.sessionExpired",
+                defaultValue: "Session expired. Run `claude` to log in again."
+            )
         case .tokenExpired:
-            return "Token expired. Run `claude` to log in again."
+            return String(localized: "error.claude.tokenExpired", defaultValue: "Token expired. Run `claude` to log in again.")
         case .credentialsChanged:
-            return "Claude login changed during refresh. Refresh again."
+            return String(
+                localized: "error.claude.credentialsChanged",
+                defaultValue: "Claude login changed during refresh. Refresh again."
+            )
         case .invalidOAuthURL(let value):
-            return "Invalid Claude OAuth URL: \(value). Check CLAUDE_CODE_CUSTOM_OAUTH_URL / CLAUDE_LOCAL_OAUTH_API_BASE."
+            return String(
+                localized: "error.claude.invalidOAuthURL",
+                defaultValue: "Invalid Claude OAuth URL: \(value). Check CLAUDE_CODE_CUSTOM_OAUTH_URL / CLAUDE_LOCAL_OAUTH_API_BASE."
+            )
         }
     }
 

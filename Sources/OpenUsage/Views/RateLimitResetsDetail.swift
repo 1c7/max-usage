@@ -274,7 +274,9 @@ struct RateLimitResetsDetail: View {
                 Button("Use") { beginConfirm(entry.date) }
                     .controlSize(.small)
                     .disabled(nothingToReset)
-                    .hoverTooltip(nothingToReset ? "Nothing to reset right now" : nil)
+                    .hoverTooltip(nothingToReset
+                        ? String(localized: "rateLimitResets.nothingToReset", defaultValue: "Nothing to reset right now")
+                        : nil)
                     .transition(.opacity)
             } else if let countdown = entry.countdown {
                 Text(countdown)
@@ -402,15 +404,36 @@ struct RateLimitResetsDetail: View {
         case .success:
             claimedExpiries.insert(date)
             nothingToReset = true
-            banner = .init(text: "Reset claimed. Enjoy!", icon: "checkmark.circle.fill", tint: .green)
+            banner = .init(
+                text: String(localized: "rateLimitResets.banner.success", defaultValue: "Reset claimed. Enjoy!"),
+                icon: "checkmark.circle.fill", tint: .green
+            )
         case .nothingToReset:
             nothingToReset = true
-            banner = .init(text: "Your usage doesn't need a reset yet", icon: "info.circle.fill", tint: .accentColor)
+            banner = .init(
+                text: String(
+                    localized: "rateLimitResets.banner.nothingToReset",
+                    defaultValue: "Your usage doesn't need a reset yet"
+                ),
+                icon: "info.circle.fill", tint: .accentColor
+            )
         case .noCredit:
             claimedExpiries.insert(date)
-            banner = .init(text: "That reset is no longer available", icon: "exclamationmark.triangle.fill", tint: .orange)
+            banner = .init(
+                text: String(
+                    localized: "rateLimitResets.banner.noCredit",
+                    defaultValue: "That reset is no longer available"
+                ),
+                icon: "exclamationmark.triangle.fill", tint: .orange
+            )
         case .failed:
-            banner = .init(text: "Couldn't reset usage. Please try again.", icon: "xmark.circle.fill", tint: .red)
+            banner = .init(
+                text: String(
+                    localized: "rateLimitResets.banner.failed",
+                    defaultValue: "Couldn't reset usage. Please try again."
+                ),
+                icon: "xmark.circle.fill", tint: .red
+            )
         }
     }
 
@@ -450,7 +473,12 @@ struct RateLimitResetsDetail: View {
         let countdown: String? // "12d 18h"; nil when imminent (no useful countdown to show)
 
         var accessibilityLabel: String {
-            "Reset \(number), \(time)" + (countdown.map { ", expires in \($0)" } ?? "")
+            let base = String(localized: "rateLimitResets.entry.accessibilityLabel", defaultValue: "Reset \(number), \(time)")
+            guard let countdown else { return base }
+            return base + String(
+                localized: "rateLimitResets.entry.accessibilityLabel.expiresIn",
+                defaultValue: ", expires in \(countdown)"
+            )
         }
     }
 
@@ -470,7 +498,9 @@ struct RateLimitResetsDetail: View {
                 number: index + 1,
                 date: date,
                 severity: WidgetData.expirySeverity(secondsRemaining: date.timeIntervalSince(now)),
-                time: (imminent || absolute == nil) ? "Expiring soon" : absolute!,
+                time: (imminent || absolute == nil)
+                    ? String(localized: "rateLimitResets.expiringSoon", defaultValue: "Expiring soon")
+                    : absolute!,
                 countdown: imminent ? nil : relative
             )
         }

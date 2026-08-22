@@ -98,7 +98,12 @@ struct UsageTrendDetail: View {
         if let activeIndex, points.indices.contains(activeIndex) {
             return "\(points[activeIndex].label) · \(points[activeIndex].readout)"
         }
-        if let peakIndex { return "peak \(points[peakIndex].readout)" }
+        if let peakIndex {
+            return String(
+                localized: "usageTrendDetail.peak",
+                defaultValue: "peak \(points[peakIndex].readout)"
+            )
+        }
         return ""
     }
 

@@ -105,11 +105,17 @@ struct TotalSpendCard: View {
     /// tooltip lie about what the total reflects.
     private var infoTooltip: String {
         let names = providers.map(\.displayName)
-        return "Only includes \(names.formatted(.list(type: .and)))."
+        return String(
+            localized: "totalSpendCard.infoTooltip",
+            defaultValue: "Only includes \(names.formatted(.list(type: .and)))."
+        )
     }
 
     private var shareButton: some View {
-        CopyFeedbackButton(accessibilityLabel: "Copy \(metric.title) Screenshot") {
+        CopyFeedbackButton(accessibilityLabel: String(
+            localized: "totalSpendCard.shareAccessibilityLabel",
+            defaultValue: "Copy \(metric.title) Screenshot"
+        )) {
             ShareCardRenderer.shareTotalSpend(
                 total: total,
                 metric: metric,
@@ -250,13 +256,23 @@ struct TotalSpendRingContent: View {
 
     private var accessibilityLabel: String {
         let center = formatValue(projection.centerValue, style: .full)
+        let count = projection.slices.count
         switch projection.metric {
         case .cost:
-            return "Total cost \(center) across \(projection.slices.count) providers"
+            return String(
+                localized: "totalSpendRing.accessibilityLabel.cost",
+                defaultValue: "Total cost \(center) across \(count) providers"
+            )
         case .tokens:
-            return "Total tokens \(center) across \(projection.slices.count) providers"
+            return String(
+                localized: "totalSpendRing.accessibilityLabel.tokens",
+                defaultValue: "Total tokens \(center) across \(count) providers"
+            )
         case .costPerMtok:
-            return "Blended cost per megatoken \(center) across \(projection.slices.count) providers"
+            return String(
+                localized: "totalSpendRing.accessibilityLabel.costPerMtok",
+                defaultValue: "Blended cost per megatoken \(center) across \(count) providers"
+            )
         }
     }
 

@@ -145,6 +145,16 @@ for bundle in "$BUILD_DIR"/*.bundle; do
 done
 shopt -u nullglob
 
+# `Text(_:)` / `String(localized:)` calls with no explicit `bundle:` resolve against
+# Bundle.main (this app's own .app bundle), not the OpenUsage module's own resource
+# bundle nested inside it — so the compiled .lproj tables also need to sit directly
+# under Contents/Resources for localization to actually take effect.
+shopt -s nullglob
+for lproj in "$APP_RESOURCES/OpenUsage_OpenUsage.bundle"/*.lproj; do
+  cp -R "$lproj" "$APP_RESOURCES/$(basename "$lproj")"
+done
+shopt -u nullglob
+
 # Install the app icon. Prefer the prebuilt compiled catalog: actool on GitHub's runners (Xcode 26.4.1
 # and 26.5) crashes on the Icon Composer `.icon` refractivity feature (Apple regression FB20183399), so
 # CI can't compile it. The committed Assets.car is produced by a working actool via script/compile_icon.sh;
@@ -177,6 +187,12 @@ cat >"$APP_CONTENTS/Info.plist" <<PLIST
   <key>LSMinimumSystemVersion</key><string>$MIN_SYSTEM_VERSION</string>
   <key>CFBundleIconName</key><string>AppIcon</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
+  <key>CFBundleLocalizations</key>
+  <array>
+    <string>en</string>
+    <string>zh-Hans</string>
+  </array>
   <key>LSUIElement</key><true/>
   <key>NSPrincipalClass</key><string>NSApplication</string>
   <key>NSHighResolutionCapable</key><true/>

@@ -7,7 +7,7 @@ final class GrokProvider: ProviderRuntime {
         displayName: "Grok",
         icon: .providerMark("grok"),
         links: [
-            .init(label: "Usage", url: "https://grok.com/?_s=usage")
+            .init(label: String(localized: "link.usage", defaultValue: "Usage"), url: "https://grok.com/?_s=usage")
         ]
     )
 
@@ -33,14 +33,16 @@ final class GrokProvider: ProviderRuntime {
 
     var widgetDescriptors: [WidgetDescriptor] {
         [
-            .percent(id: "grok.weekly", provider: provider, title: "Weekly", metricLabel: "Weekly limit")
+            .percent(id: "grok.weekly", provider: provider,
+                     title: String(localized: "metric.weekly", defaultValue: "Weekly"), metricLabel: "Weekly limit")
                 .exportingLimit("weekly", unit: "percent"),
-            .badge(id: "grok.payAsYouGo", provider: provider, title: "Extra Usage", metricLabel: "Pay as you go"),
+            .badge(id: "grok.payAsYouGo", provider: provider,
+                   title: String(localized: "metric.extraUsage", defaultValue: "Extra Usage"), metricLabel: "Pay as you go"),
             .usageTrend(provider: provider)
                 .exportingHistory(
                     scope: .machineLocal,
                     estimatedCost: true,
-                    sourceNote: "From your Grok logs (estimated)"
+                    sourceNote: String(localized: "sourceNote.grok", defaultValue: "From your Grok logs (estimated)")
                 )
             // Local spend tiles, estimated from the Grok CLI log (see GrokLogUsageScanner).
         ] + WidgetDescriptor.spendTiles(provider: provider)

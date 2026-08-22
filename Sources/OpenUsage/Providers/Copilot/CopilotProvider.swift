@@ -11,8 +11,8 @@ final class CopilotProvider: ProviderRuntime {
         displayName: "Copilot",
         icon: .providerMark("copilot"),
         links: [
-            .init(label: "Status", url: "https://www.githubstatus.com/"),
-            .init(label: "Dashboard", url: "https://github.com/settings/billing")
+            .init(label: String(localized: "link.status", defaultValue: "Status"), url: "https://www.githubstatus.com/"),
+            .init(label: String(localized: "link.dashboard", defaultValue: "Dashboard"), url: "https://github.com/settings/billing")
         ]
     )
 
@@ -38,17 +38,29 @@ final class CopilotProvider: ProviderRuntime {
 
     var widgetDescriptors: [WidgetDescriptor] {
         [
-            .percent(id: "copilot.premium", provider: provider, title: "Credits")
+            // `metricLabel` stays literal English — the lookup key matched against `CopilotUsageMapper` /
+            // `CopilotOrgBillingMapper`'s emitted `MetricLine.label` (never localized); only `title`
+            // (what renders on screen) is translated.
+            .percent(id: "copilot.premium", provider: provider,
+                     title: String(localized: "metric.credits", defaultValue: "Credits"), metricLabel: "Credits")
                 .exportingLimit("premiumCredits", unit: "credits", source: .progressOrValue(kind: .count)),
-            .values(id: "copilot.extra", provider: provider, title: "Extra Usage", selection: .kind(.count))
+            .values(id: "copilot.extra", provider: provider,
+                    title: String(localized: "metric.extraUsage", defaultValue: "Extra Usage"),
+                    metricLabel: "Extra Usage", selection: .kind(.count))
                 .exportingLimit("extraUsage", unit: "count", source: .value(kind: .count)),
-            .values(id: "copilot.orgCredits", provider: provider, title: "Org Credits", selection: .kind(.count))
+            .values(id: "copilot.orgCredits", provider: provider,
+                    title: String(localized: "metric.orgCredits", defaultValue: "Org Credits"),
+                    metricLabel: "Org Credits", selection: .kind(.count))
                 .exportingLimit("orgCredits", unit: "credits", source: .value(kind: .count, label: "credits")),
-            .values(id: "copilot.orgSpend", provider: provider, title: "Org Spend", selection: .kind(.dollars), valueWord: "spent")
+            .values(id: "copilot.orgSpend", provider: provider,
+                    title: String(localized: "metric.orgSpend", defaultValue: "Org Spend"),
+                    metricLabel: "Org Spend", selection: .kind(.dollars), valueWord: "spent")
                 .exportingLimit("orgSpend", unit: "usd", source: .value(kind: .dollars)),
-            .percent(id: "copilot.chat", provider: provider, title: "Chat")
+            .percent(id: "copilot.chat", provider: provider,
+                     title: String(localized: "metric.chat", defaultValue: "Chat"), metricLabel: "Chat")
                 .exportingLimit("chat", unit: "percent"),
-            .percent(id: "copilot.completions", provider: provider, title: "Completions")
+            .percent(id: "copilot.completions", provider: provider,
+                     title: String(localized: "metric.completions", defaultValue: "Completions"), metricLabel: "Completions")
                 .exportingLimit("completions", unit: "percent")
         ]
     }

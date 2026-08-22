@@ -66,13 +66,19 @@ enum CursorUsageError: Error, LocalizedError, Equatable {
         case .requestFailed(let statusCode):
             return ProviderUsageErrorText.requestFailed(statusCode: statusCode)
         case .usageAfterRefreshFailed:
-            return "Usage request failed after refresh. Try again."
+            return String(
+                localized: "error.cursor.usageAfterRefreshFailed",
+                defaultValue: "Usage request failed after refresh. Try again."
+            )
         case .requestBasedUnavailable(let message):
             return message
         case .totalUsageLimitMissing:
-            return "Total usage limit missing from API response."
+            return String(
+                localized: "error.cursor.totalUsageLimitMissing",
+                defaultValue: "Total usage limit missing from API response."
+            )
         case .noActiveSubscription:
-            return "No active Cursor subscription."
+            return String(localized: "error.cursor.noActiveSubscription", defaultValue: "No active Cursor subscription.")
         }
     }
 }

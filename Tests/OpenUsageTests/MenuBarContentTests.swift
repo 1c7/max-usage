@@ -88,8 +88,11 @@ final class MenuBarContentTests: XCTestCase {
     }
 
     func testTrayLabelsShortenLongTimeWindows() {
+        // The tray abbreviation is matched on the descriptor's stable `id` suffix, not the (now
+        // localized) display label — see `MenuBarContentBuilder.trayLabel` — so these ids mirror the
+        // real ".today" / ".last30" suffixes `WidgetDescriptor+Factories` gives spend-tile descriptors.
         let content = MenuBarContentBuilder.build(
-            groups: [group("a", percent("a.today", "Today", 5), percent("a.month", "Last 30 Days", 80))],
+            groups: [group("a", percent("a.today", "Today", 5), percent("a.last30", "Last 30 Days", 80))],
             data: { $0.sample }
         )
         XCTAssertEqual(content.groups[0].metrics.map(\.label), ["T", "M"])

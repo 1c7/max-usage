@@ -55,19 +55,28 @@ enum CodexAuthError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .notLoggedIn:
-            return "Not logged in. Run `codex` to authenticate."
+            return String(localized: "error.codex.notLoggedIn", defaultValue: "Not logged in. Run `codex` to authenticate.")
         case .sessionExpired:
-            return "Session expired. Run `codex` to log in again."
+            return String(
+                localized: "error.codex.sessionExpired",
+                defaultValue: "Session expired. Run `codex` to log in again."
+            )
         case .tokenConflict:
-            return "Token conflict. Run `codex` to log in again."
+            return String(
+                localized: "error.codex.tokenConflict",
+                defaultValue: "Token conflict. Run `codex` to log in again."
+            )
         case .tokenRevoked:
-            return "Token revoked. Run `codex` to log in again."
+            return String(
+                localized: "error.codex.tokenRevoked",
+                defaultValue: "Token revoked. Run `codex` to log in again."
+            )
         case .tokenExpired:
-            return "Token expired. Run `codex` to log in again."
+            return String(localized: "error.codex.tokenExpired", defaultValue: "Token expired. Run `codex` to log in again.")
         case .usageAPIKey:
-            return "Usage not available for API key."
+            return String(localized: "error.codex.usageAPIKey", defaultValue: "Usage not available for API key.")
         case .invalidAuthPayload:
-            return "Codex auth data is invalid."
+            return String(localized: "error.codex.invalidAuthPayload", defaultValue: "Codex auth data is invalid.")
         }
     }
 

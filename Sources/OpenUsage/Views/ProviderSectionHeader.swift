@@ -95,7 +95,10 @@ struct ProviderSectionHeader: View {
             Spacer(minLength: 8)
             if let onCopyScreenshot {
                 CopyFeedbackButton(
-                    accessibilityLabel: "Copy \(provider.displayName) Screenshot",
+                    accessibilityLabel: String(
+                        localized: "providerSectionHeader.copyScreenshotAccessibilityLabel",
+                        defaultValue: "Copy \(provider.displayName) Screenshot"
+                    ),
                     isRevealed: isHovered,
                     action: onCopyScreenshot
                 )

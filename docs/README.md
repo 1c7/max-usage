@@ -12,6 +12,7 @@ What the app does and how it behaves. These pages describe **behavior, not visua
 - [Model pricing](pricing.md) — how spend tiles price tokens, and where the rates come from
 - [Updates](updates.md) — automatic updates, manual checks, and the beta channel
 - [Privacy & usage data](privacy.md) — what anonymous data is shared, and how to turn it off
+- [Localization](localization.md) — supported languages and how the display language is chosen
 
 ## Integrations
 

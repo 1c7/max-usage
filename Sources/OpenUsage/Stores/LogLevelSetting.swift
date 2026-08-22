@@ -26,10 +26,10 @@ enum LogLevelSetting: String, Hashable, Sendable, CaseIterable, UserDefaultsBack
     /// Title-case label for the Settings picker.
     var label: String {
         switch self {
-        case .error: "Error"
-        case .warn: "Warning"
-        case .info: "Info"
-        case .debug: "Debug"
+        case .error: String(localized: "logLevelSetting.error", defaultValue: "Error")
+        case .warn: String(localized: "logLevelSetting.warn", defaultValue: "Warning")
+        case .info: String(localized: "logLevelSetting.info", defaultValue: "Info")
+        case .debug: String(localized: "logLevelSetting.debug", defaultValue: "Debug")
         }
     }
 

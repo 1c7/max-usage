@@ -36,7 +36,8 @@ enum Formatters {
         guard let when = whenLabel(at: date, mode: mode, now: now, calendar: calendar) else { return nil }
         if when == imminent { return "\(prefix) \(when)" }
         switch mode {
-        case .relative: return "\(prefix) in \(when)"
+        case .relative:
+            return String(localized: "formatters.deadlinePrefixIn", defaultValue: "\(prefix) in \(when)")
         case .absolute: return "\(prefix) \(when)"
         }
     }
@@ -65,22 +66,29 @@ enum Formatters {
             ).day ?? 0
             // The wall-clock part honors the user's Auto/12h/24h time-format setting.
             let time = TimeFormatSetting.current.shortTime(date)
-            if dayDiff <= 0 { return "today at \(time)" }
-            if dayDiff == 1 { return "tomorrow at \(time)" }
-            return "\(monthDayLabel(date)) at \(time)"
+            if dayDiff <= 0 {
+                return String(localized: "formatters.todayAt", defaultValue: "today at \(time)")
+            }
+            if dayDiff == 1 {
+                return String(localized: "formatters.tomorrowAt", defaultValue: "tomorrow at \(time)")
+            }
+            let day = monthDayLabel(date)
+            return String(localized: "formatters.dateAt", defaultValue: "\(day) at \(time)")
         }
     }
 
     /// The collapsed phrase for a deadline that's past-due or within ~5 minutes — too close to print a
     /// useful countdown. Shared so `deadlineLabel` and any bare-`whenLabel` caller agree on the wording.
-    static let imminent = "soon"
+    static let imminent = String(localized: "formatters.soon", defaultValue: "soon")
+
+    private static let resetsPrefix = String(localized: "formatters.resets", defaultValue: "Resets")
 
     static func resetRelativeLabel(until resetsAt: Date, now: Date = Date()) -> String? {
-        deadlineLabel("Resets", at: resetsAt, mode: .relative, now: now)
+        deadlineLabel(resetsPrefix, at: resetsAt, mode: .relative, now: now)
     }
 
     static func resetAbsoluteLabel(at resetsAt: Date, now: Date = Date(), calendar: Calendar = .current) -> String? {
-        deadlineLabel("Resets", at: resetsAt, mode: .absolute, now: now, calendar: calendar)
+        deadlineLabel(resetsPrefix, at: resetsAt, mode: .absolute, now: now, calendar: calendar)
     }
 
     /// Compact "Xd Yh" / "Xh Ym" / "Xm" duration. At the day scale it always shows two units — the
@@ -94,11 +102,13 @@ enum Formatters {
         let minutes = totalMinutes % 60
 
         if days > 0 {
-            return "\(days)d \(hours)h"
+            return String(localized: "formatters.duration.daysHours", defaultValue: "\(days)d \(hours)h")
         }
         if hours > 0 {
-            return minutes > 0 ? "\(hours)h \(minutes)m" : "\(hours)h"
+            return minutes > 0
+                ? String(localized: "formatters.duration.hoursMinutes", defaultValue: "\(hours)h \(minutes)m")
+                : String(localized: "formatters.duration.hours", defaultValue: "\(hours)h")
         }
-        return "\(minutes)m"
+        return String(localized: "formatters.duration.minutes", defaultValue: "\(minutes)m")
     }
 }

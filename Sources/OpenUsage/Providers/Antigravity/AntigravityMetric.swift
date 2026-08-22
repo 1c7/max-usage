@@ -17,8 +17,17 @@ enum AntigravityMetric {
     static let claudeID = "antigravity.claude"
     static let claudeWeeklyID = "antigravity.claudeWeekly"
 
+    /// Exact-string match keys shared with `AntigravityUsageMapper` — never localized, since both sides
+    /// of the label binding (and the mapper's own pool-label comparisons) depend on this literal text.
     static let sessionLabel = "Session"
     static let weeklyLabel = "Weekly"
     static let claudeLabel = "Claude"
     static let claudeWeeklyLabel = "Claude Weekly"
+
+    /// Display-only counterparts — what `AntigravityProvider.widgetDescriptors` passes as `title`
+    /// (localized). "Claude" / "Claude Weekly" are brand names and stay the same as their match keys.
+    static var sessionTitle: String { String(localized: "metric.session", defaultValue: "Session") }
+    static var weeklyTitle: String { String(localized: "metric.weekly", defaultValue: "Weekly") }
+    static let claudeTitle = claudeLabel
+    static let claudeWeeklyTitle = claudeWeeklyLabel
 }

@@ -104,6 +104,14 @@ struct UsageSparkline: View {
     private var accessibilityLabel: String {
         guard let peak = points.max(by: { $0.value < $1.value }),
               let first = points.first, let last = points.last else { return data.title }
-        return "\(data.title): \(points.count) days, \(first.label) to \(last.label), peak \(peak.readout)."
+        let title = data.title
+        let count = points.count
+        let firstLabel = first.label
+        let lastLabel = last.label
+        let peakReadout = peak.readout
+        return String(
+            localized: "usageSparkline.accessibilityLabel",
+            defaultValue: "\(title): \(count) days, \(firstLabel) to \(lastLabel), peak \(peakReadout)."
+        )
     }
 }

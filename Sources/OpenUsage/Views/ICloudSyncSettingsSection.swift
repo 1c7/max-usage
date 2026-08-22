@@ -13,11 +13,10 @@ struct ICloudSyncSettingsSection: View {
                 Image(systemName: "info.circle")
                     .imageScale(.small)
                     .foregroundStyle(.secondary)
-                    .hoverTooltip(
-                        "OpenUsage calculates costs and tokens for Claude, Codex, and other providers "
-                            + "from files stored on each Mac. Account limits, credentials, and logs are "
-                            + "never shared."
-                    )
+                    .hoverTooltip(String(
+                        localized: "iCloudSync.infoTooltip",
+                        defaultValue: "OpenUsage calculates costs and tokens for Claude, Codex, and other providers from files stored on each Mac. Account limits, credentials, and logs are never shared."
+                    ))
             }
             .padding(.horizontal, 8)
 
@@ -113,9 +112,18 @@ struct ICloudSyncSettingsSection: View {
 
     private func relativeAge(_ date: Date, now: Date) -> String {
         let seconds = max(0, now.timeIntervalSince(date))
-        if seconds < 60 { return "just now" }
-        if seconds < 3_600 { return "\(max(1, Int(seconds / 60)))m ago" }
-        if seconds < 86_400 { return "\(max(1, Int(seconds / 3_600)))h ago" }
-        return "\(max(1, Int(seconds / 86_400)))d ago"
+        if seconds < 60 {
+            return String(localized: "iCloudSync.relativeAge.justNow", defaultValue: "just now")
+        }
+        if seconds < 3_600 {
+            let minutes = max(1, Int(seconds / 60))
+            return String(localized: "iCloudSync.relativeAge.minutes", defaultValue: "\(minutes)m ago")
+        }
+        if seconds < 86_400 {
+            let hours = max(1, Int(seconds / 3_600))
+            return String(localized: "iCloudSync.relativeAge.hours", defaultValue: "\(hours)h ago")
+        }
+        let days = max(1, Int(seconds / 86_400))
+        return String(localized: "iCloudSync.relativeAge.days", defaultValue: "\(days)d ago")
     }
 }

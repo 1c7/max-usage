@@ -1,3 +1,4 @@
+import Foundation
 import Observation
 import ServiceManagement
 
@@ -6,7 +7,10 @@ import ServiceManagement
 @MainActor
 @Observable
 final class LaunchAtLoginSetting {
-    static let failureMessage = "macOS wouldn't update Launch at Login. Check System Settings → Login Items."
+    static let failureMessage = String(
+        localized: "launchAtLogin.failure",
+        defaultValue: "macOS wouldn't update Launch at Login. Check System Settings → Login Items."
+    )
 
     private(set) var isEnabled: Bool
     private(set) var errorMessage: String?

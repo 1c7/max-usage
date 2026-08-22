@@ -46,11 +46,20 @@ enum OpenRouterUsageError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .connectionFailed:
-            return "Couldn't reach OpenRouter. Check your connection."
+            return String(
+                localized: "error.openrouter.connectionFailed",
+                defaultValue: "Couldn't reach OpenRouter. Check your connection."
+            )
         case .invalidResponse:
-            return "OpenRouter usage data unavailable. Try again later."
+            return String(
+                localized: "error.openrouter.invalidResponse",
+                defaultValue: "OpenRouter usage data unavailable. Try again later."
+            )
         case .requestFailed(let status):
-            return "OpenRouter request failed (HTTP \(status))."
+            return String(
+                localized: "error.openrouter.requestFailed",
+                defaultValue: "OpenRouter request failed (HTTP \(status))."
+            )
         }
     }
 }

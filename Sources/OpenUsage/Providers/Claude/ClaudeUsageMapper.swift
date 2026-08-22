@@ -56,9 +56,16 @@ enum ClaudeUsageMapper {
     /// dashboard showed bare "No data" rows with no hint of why. Also warns the
     /// user off manual refreshes, which extend Anthropic's rate limiting.
     static func rateLimitedWarning(retryAfterSeconds: Int?) -> String {
-        let base = "Updates blocked by Anthropic. Be patient — manual refreshes will make it worse."
-        guard let retryText = retryAfterSeconds.map(formatRateLimitMinutes) else { return base }
-        return "\(base) Retrying in ~\(retryText)."
+        guard let retryText = retryAfterSeconds.map(formatRateLimitMinutes) else {
+            return String(
+                localized: "warning.claude.rateLimited",
+                defaultValue: "Updates blocked by Anthropic. Be patient — manual refreshes will make it worse."
+            )
+        }
+        return String(
+            localized: "warning.claude.rateLimited.withRetry",
+            defaultValue: "Updates blocked by Anthropic. Be patient — manual refreshes will make it worse. Retrying in ~\(retryText)."
+        )
     }
 
     /// Provider warning shown on the Claude header (the amber triangle + tooltip, like Z.ai's "no coding
@@ -66,13 +73,18 @@ enum ClaudeUsageMapper {
     /// (an inference-only token, e.g. from `claude setup-token`). Without it the Session / Weekly bars just
     /// read "No data" with no hint that a re-login restores them. The scanned spend tiles are unaffected
     /// and still load.
-    static let missingProfileScopeWarning = "Re-login for live usage. Run `claude` and sign in again to restore session and weekly limits."
+    static let missingProfileScopeWarning = String(
+        localized: "warning.claude.missingProfileScope",
+        defaultValue: "Re-login for live usage. Run `claude` and sign in again to restore session and weekly limits."
+    )
 
     /// The "live usage is rate limited" note appended to a last-good snapshot so the still-shown bars are
     /// flagged as possibly stale. Shared with `rateLimitedUsage` so the wording stays in one place.
     static func rateLimitedNote(retryAfterSeconds: Int?) -> MetricLine {
         let retryText = retryAfterSeconds.map(formatRateLimitMinutes)
-        let noteText = retryText.map { "Live usage rate limited - retry in ~\($0)" } ?? "Live usage rate limited - data may be stale"
+        let noteText = retryText.map {
+            String(localized: "note.claude.rateLimited.retry", defaultValue: "Live usage rate limited - retry in ~\($0)")
+        } ?? String(localized: "note.claude.rateLimited.stale", defaultValue: "Live usage rate limited - data may be stale")
         return .text(label: "Note", value: noteText)
     }
 

@@ -32,7 +32,9 @@ enum GrokUsageMapper {
         // Disabled badge, same as a present cap of 0.
         lines.append(.badge(
             label: "Pay as you go",
-            text: config.onDemandCap > 0 ? "\(formatUnits(config.onDemandCap)) cap" : "Disabled",
+            text: config.onDemandCap > 0
+                ? String(localized: "grok.payAsYouGo.cap", defaultValue: "\(formatUnits(config.onDemandCap)) cap")
+                : String(localized: "grok.payAsYouGo.disabled", defaultValue: "Disabled"),
             colorHex: config.onDemandCap > 0 ? "#22c55e" : "#a3a3a3"
         ))
         return GrokMappedUsage(lines: lines)

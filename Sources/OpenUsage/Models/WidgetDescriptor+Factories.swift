@@ -100,10 +100,19 @@ extension WidgetDescriptor {
     /// Days — each a combined "cost · tokens" row, backed by `SpendTileMapper`. Ids are
     /// `<provider>.today|yesterday|last30`, so the set is identical across Claude / Codex / Cursor / Grok.
     static func spendTiles(provider: Provider, valueTooltipNote: String? = nil) -> [WidgetDescriptor] {
+        // `metricLabel` stays literal English — it's the lookup key matched against `SpendTileMapper`'s
+        // emitted `MetricLine.label` and `UsageHistoryAggregator.historyLabels` (never localized); only
+        // `title` (what renders on screen) is translated.
         let descriptors: [WidgetDescriptor] = [
-            .combined(id: "\(provider.id).today", provider: provider, title: "Today", isUsagePeriod: true),
-            .combined(id: "\(provider.id).yesterday", provider: provider, title: "Yesterday", isUsagePeriod: true),
-            .combined(id: "\(provider.id).last30", provider: provider, title: "Last 30 Days", isUsagePeriod: true)
+            .combined(id: "\(provider.id).today", provider: provider,
+                      title: String(localized: "metric.today", defaultValue: "Today"),
+                      metricLabel: "Today", isUsagePeriod: true),
+            .combined(id: "\(provider.id).yesterday", provider: provider,
+                      title: String(localized: "metric.yesterday", defaultValue: "Yesterday"),
+                      metricLabel: "Yesterday", isUsagePeriod: true),
+            .combined(id: "\(provider.id).last30", provider: provider,
+                      title: String(localized: "metric.last30Days", defaultValue: "Last 30 Days"),
+                      metricLabel: "Last 30 Days", isUsagePeriod: true)
         ]
         // Mark the whole set as the local spend tiles — the Total Spend card's capability and
         // contribution signal.
@@ -153,8 +162,11 @@ extension WidgetDescriptor {
     /// pinnable — the tray can't draw a chart — but otherwise a normal Customize metric (toggle,
     /// reorder, hide). `isChart` tells the dashboard how to render live chart points.
     static func usageTrend(provider: Provider) -> WidgetDescriptor {
-        var sample = WidgetData(title: "Usage Trend", icon: provider.icon, kind: .count, used: 0, limit: nil)
+        let title = String(localized: "metric.usageTrend", defaultValue: "Usage Trend")
+        var sample = WidgetData(title: title, icon: provider.icon, kind: .count, used: 0, limit: nil)
         sample.isChart = true
+        // `metricLabel` stays literal English "Usage Trend" — matched against `SpendTileMapper`'s
+        // `.chart(label:...)` and `UsageHistoryAggregator.historyLabels` (never localized).
         return make(id: "\(provider.id).trend", provider: provider, metricLabel: "Usage Trend",
                     sample: sample, pinnable: false)
     }

@@ -159,9 +159,9 @@ struct APIKeysSection: View {
     /// declutter, living inside the field instead of as a label beside it.
     private var sourceHint: String {
         switch status {
-        case .fromEnvironment: "From Your Environment"
-        case .saved: "Saved in App"
-        case .overrideActive: "Custom Key"
+        case .fromEnvironment: String(localized: "apiKeys.sourceHint.fromEnvironment", defaultValue: "From Your Environment")
+        case .saved: String(localized: "apiKeys.sourceHint.saved", defaultValue: "Saved in App")
+        case .overrideActive: String(localized: "apiKeys.sourceHint.override", defaultValue: "Custom Key")
         case .notSet: ""
         }
     }
@@ -170,14 +170,14 @@ struct APIKeysSection: View {
         !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    private func primaryButton(_ title: String, disabled: Bool, action: @escaping () -> Void) -> some View {
+    private func primaryButton(_ title: LocalizedStringKey, disabled: Bool, action: @escaping () -> Void) -> some View {
         Button(title, action: action)
             .buttonStyle(.borderedProminent)
             .controlSize(.small)
             .disabled(disabled)
     }
 
-    private func ghostButton(_ title: String, action: @escaping () -> Void) -> some View {
+    private func ghostButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
         Button(title, action: action)
             .buttonStyle(.borderless)
             .controlSize(.small)

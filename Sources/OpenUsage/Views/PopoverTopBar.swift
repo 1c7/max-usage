@@ -34,7 +34,7 @@ struct PopoverTopBar: View {
                 }
             }
         case .settings:
-            navigationBar(title: "Settings") {
+            navigationBar(title: String(localized: "popoverTopBar.settings", defaultValue: "Settings")) {
                 withAnimation(Motion.modeSwitch) { layout.screen = .dashboard }
             } trailing: {
                 EmptyView()
@@ -43,7 +43,8 @@ struct PopoverTopBar: View {
     }
 
     private var customizeTitle: String {
-        layout.customizeProviderID.flatMap { layout.provider(id: $0)?.displayName } ?? "Customize"
+        layout.customizeProviderID.flatMap { layout.provider(id: $0)?.displayName }
+            ?? String(localized: "popoverTopBar.customize", defaultValue: "Customize")
     }
 
     private func customizeBack() {
@@ -86,7 +87,7 @@ struct PopoverTopBar: View {
         .glassButtonStyle()
         .buttonBorderShape(.circle)
         .controlSize(.large)
-        .hoverTooltip("Back")
+        .hoverTooltip(String(localized: "popoverTopBar.back", defaultValue: "Back"))
         .accessibilityLabel("Back")
     }
 
@@ -102,7 +103,10 @@ struct PopoverTopBar: View {
         .glassButtonStyle()
         .buttonBorderShape(.circle)
         .controlSize(.large)
-        .hoverTooltip("Reset \(layout.provider(id: providerID)?.displayName ?? providerID)")
+        .hoverTooltip(String(
+            localized: "popoverTopBar.resetProvider",
+            defaultValue: "Reset \(layout.provider(id: providerID)?.displayName ?? providerID)"
+        ))
         .accessibilityLabel("Reset")
     }
 
@@ -118,7 +122,7 @@ struct PopoverTopBar: View {
         .glassButtonStyle()
         .buttonBorderShape(.circle)
         .controlSize(.large)
-        .hoverTooltip("Reset All Customization")
+        .hoverTooltip(String(localized: "popoverTopBar.resetAllCustomization", defaultValue: "Reset All Customization"))
         .accessibilityLabel("Reset All Customization")
     }
 }

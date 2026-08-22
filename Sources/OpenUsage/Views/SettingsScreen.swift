@@ -62,8 +62,11 @@ struct SettingsScreen: View {
             // Mirror of the Customize cross-link — the layout controls live on the other screen.
             ScreenCrossLinkRow(
                 systemImage: "slider.horizontal.3",
-                title: "Customize",
-                subtitle: "Choose what's visible and where",
+                title: String(localized: "settingsScreen.customizeLink.title", defaultValue: "Customize"),
+                subtitle: String(
+                    localized: "settingsScreen.customizeLink.subtitle",
+                    defaultValue: "Choose what's visible and where"
+                ),
                 destination: .customize
             )
         }
@@ -98,7 +101,10 @@ struct SettingsScreen: View {
             row("Global Shortcut") {
                 ShortcutRecorderField(name: .togglePopover)
                     .id(shortcutFieldGeneration)
-                    .hoverTooltip("Open OpenUsage from anywhere")
+                    .hoverTooltip(String(
+                        localized: "settingsScreen.globalShortcutTooltip",
+                        defaultValue: "Open OpenUsage from anywhere"
+                    ))
             }
         }
     }
@@ -140,9 +146,15 @@ struct SettingsScreen: View {
             // Egg first: while Party runs it overrides the toggle regardless of the system flags, so
             // its notice takes precedence over the accessibility one.
             if transparency.secretCodeActive {
-                inlineNotice("Party mode is on, so this stays paused.")
+                inlineNotice(String(
+                    localized: "settingsScreen.partyModePaused",
+                    defaultValue: "Party mode is on, so this stays paused."
+                ))
             } else if transparency.isPaused {
-                inlineNotice("macOS Reduce Transparency or Increase Contrast is on, so this stays paused.")
+                inlineNotice(String(
+                    localized: "settingsScreen.transparencyPaused",
+                    defaultValue: "macOS Reduce Transparency or Increase Contrast is on, so this stays paused."
+                ))
             }
             // Both rows surface only after the secret code has been entered. Party Mode is the egg's
             // own switch: turning it off (like re-typing the code) exits the egg and hides both rows,
@@ -161,7 +173,10 @@ struct SettingsScreen: View {
                 // The egg yields to the accessibility flags too: when one is on the panel stays
                 // opaque, so explain why the party looks normal rather than leaving it a mystery.
                 if transparency.partyPaused {
-                    inlineNotice("macOS Reduce Transparency or Increase Contrast is on, so the party stays paused.")
+                    inlineNotice(String(
+                        localized: "settingsScreen.partyTransparencyPaused",
+                        defaultValue: "macOS Reduce Transparency or Increase Contrast is on, so the party stays paused."
+                    ))
                 }
             }
         }
@@ -181,7 +196,10 @@ struct SettingsScreen: View {
             row("Always Show Pacing") {
                 Toggle("", isOn: $store.alwaysShowPacing)
                     .settingsSwitchStyle()
-                    .hoverTooltip("Show how you're pacing on every metric, not just ones near their limit")
+                    .hoverTooltip(String(
+                        localized: "settingsScreen.alwaysShowPacingTooltip",
+                        defaultValue: "Show how you're pacing on every metric, not just ones near their limit"
+                    ))
             }
         }
     }
@@ -231,7 +249,10 @@ struct SettingsScreen: View {
                 row("Beta Updates") {
                     Toggle("", isOn: $updater.betaChannelEnabled)
                         .settingsSwitchStyle()
-                        .hoverTooltip("Receive pre-release builds before they ship to everyone")
+                        .hoverTooltip(String(
+                            localized: "settingsScreen.betaUpdatesTooltip",
+                            defaultValue: "Receive pre-release builds before they ship to everyone"
+                        ))
                 }
                 // No version label here — the footer already shows it. The frame goes on the label so
                 // the glass background stretches the full row width instead of hugging the text.
@@ -267,8 +288,14 @@ struct SettingsScreen: View {
                         .font(.caption)
                         .foregroundStyle(.orange)
                         .hoverTooltip(notificationsAuth == .denied
-                            ? "Notifications are turned off for OpenUsage. Enable them in System Settings."
-                            : "OpenUsage needs permission to send alerts.")
+                            ? String(
+                                localized: "settingsScreen.notificationsDenied",
+                                defaultValue: "Notifications are turned off for OpenUsage. Enable them in System Settings."
+                            )
+                            : String(
+                                localized: "settingsScreen.notificationsNeedsPermission",
+                                defaultValue: "OpenUsage needs permission to send alerts."
+                            ))
                 }
             }
             .padding(.horizontal, 8)
@@ -375,7 +402,10 @@ struct SettingsScreen: View {
                 .padding(.bottom, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
             if commandLineTool.status == .conflict {
-                inlineNotice("\(commandLineTool.destinationPath) already exists and wasn't installed by OpenUsage.")
+                inlineNotice(String(
+                    localized: "commandLineTool.conflict",
+                    defaultValue: "\(commandLineTool.destinationPath) already exists and wasn't installed by OpenUsage."
+                ))
             } else if let errorMessage = commandLineTool.errorMessage {
                 inlineNotice(errorMessage)
             }
@@ -401,7 +431,10 @@ struct SettingsScreen: View {
                 let pasteboard = NSPasteboard.general
                 pasteboard.clearContents()
                 guard pasteboard.setString(LogFile.url.path, forType: .string) else {
-                    logActionError = "Couldn't copy the log path to the clipboard."
+                    logActionError = String(
+                        localized: "settingsScreen.copyLogPathFailed",
+                        defaultValue: "Couldn't copy the log path to the clipboard."
+                    )
                     AppLog.warn(.config, "Copy log path failed")
                     return
                 }
@@ -445,7 +478,7 @@ struct SettingsScreen: View {
 
     /// A full-width glass button row, matching the "Check for Updates…" idiom.
     /// Glass on macOS 26+, bordered fallback on macOS 15.
-    private func logButton(_ title: String, action: @escaping () -> Void) -> some View {
+    private func logButton(_ title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title).frame(maxWidth: .infinity)
         }
@@ -461,7 +494,7 @@ struct SettingsScreen: View {
     /// inset 8pt so it aligns with the rows' content, matching how Customize lines its provider
     /// headers up with the card rows.
     private func section(
-        _ title: String,
+        _ title: LocalizedStringKey,
         @ViewBuilder rows: () -> some View
     ) -> some View {
         VStack(alignment: .leading, spacing: density.headerToCardSpacing) {
@@ -478,7 +511,7 @@ struct SettingsScreen: View {
 
     /// One settings row: label on the leading edge, the control on the trailing edge. Same insets
     /// as a Customize metric row so the cards share one rhythm.
-    private func row(_ label: String, @ViewBuilder control: () -> some View) -> some View {
+    private func row(_ label: LocalizedStringKey, @ViewBuilder control: () -> some View) -> some View {
         HStack(spacing: 10) {
             Text(label)
             Spacer(minLength: 8)

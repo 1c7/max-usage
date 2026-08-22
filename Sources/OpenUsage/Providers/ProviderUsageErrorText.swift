@@ -5,11 +5,18 @@ import Foundation
 /// intentionally differs — e.g. Grok's "billing" phrasing — keep their own strings.
 enum ProviderUsageErrorText {
     /// The request never completed (network/transport failure).
-    static let connectionFailed = "Usage request failed. Check your connection."
+    static var connectionFailed: String {
+        String(localized: "error.shared.connectionFailed", defaultValue: "Usage request failed. Check your connection.")
+    }
     /// The response came back but could not be parsed.
-    static let invalidResponse = "Usage response invalid. Try again later."
+    static var invalidResponse: String {
+        String(localized: "error.shared.invalidResponse", defaultValue: "Usage response invalid. Try again later.")
+    }
     /// The server returned a non-2xx status.
     static func requestFailed(statusCode: Int) -> String {
-        "Usage request failed (HTTP \(statusCode)). Try again later."
+        String(
+            localized: "error.shared.requestFailed",
+            defaultValue: "Usage request failed (HTTP \(statusCode)). Try again later."
+        )
     }
 }

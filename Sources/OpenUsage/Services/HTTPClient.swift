@@ -88,7 +88,7 @@ enum HTTPClientError: Error, LocalizedError {
     case invalidResponse
 
     var errorDescription: String? {
-        "Invalid HTTP response."
+        String(localized: "error.http.invalidResponse", defaultValue: "Invalid HTTP response.")
     }
 }
 

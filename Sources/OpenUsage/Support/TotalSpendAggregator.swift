@@ -17,9 +17,9 @@ enum TotalSpendPeriod: String, CaseIterable, Identifiable, Sendable {
     /// in the 320pt popover without shrinking every segment.
     var shortLabel: String {
         switch self {
-        case .today: "Today"
-        case .yesterday: "Yesterday"
-        case .last30: "30 Days"
+        case .today: String(localized: "totalSpendPeriod.today", defaultValue: "Today")
+        case .yesterday: String(localized: "totalSpendPeriod.yesterday", defaultValue: "Yesterday")
+        case .last30: String(localized: "totalSpendPeriod.last30", defaultValue: "30 Days")
         }
     }
 }
@@ -37,18 +37,21 @@ enum TotalSpendMetric: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .cost: "Cost"
-        case .costPerMtok: "Cost/MTok"
-        case .tokens: "Tokens"
+        case .cost: String(localized: "totalSpendMetric.cost", defaultValue: "Cost")
+        case .costPerMtok: String(localized: "totalSpendMetric.costPerMtok", defaultValue: "Cost/MTok")
+        case .tokens: String(localized: "totalSpendMetric.tokens", defaultValue: "Tokens")
         }
     }
 
     /// Empty-state copy when no provider qualifies for this metric in the selected period.
     var emptyMessage: String {
         switch self {
-        case .cost: "No cost data for this period"
-        case .costPerMtok: "No cost-per-token data for this period"
-        case .tokens: "No token data for this period"
+        case .cost: String(localized: "totalSpendMetric.emptyMessage.cost", defaultValue: "No cost data for this period")
+        case .costPerMtok: String(
+            localized: "totalSpendMetric.emptyMessage.costPerMtok",
+            defaultValue: "No cost-per-token data for this period"
+        )
+        case .tokens: String(localized: "totalSpendMetric.emptyMessage.tokens", defaultValue: "No token data for this period")
         }
     }
 

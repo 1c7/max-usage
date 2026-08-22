@@ -493,7 +493,7 @@ final class WidgetDataStore {
     private static func errorMessage(in snapshot: ProviderSnapshot) -> String? {
         guard !snapshot.lines.isEmpty, snapshot.lines.allSatisfy(\.isError) else { return nil }
         if case .badge(_, let text, _, _) = snapshot.lines[0] { return text }
-        return "Refresh failed"
+        return String(localized: "store.refreshFailed", defaultValue: "Refresh failed")
     }
 
     func data(for descriptor: WidgetDescriptor) -> WidgetData {
