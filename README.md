@@ -22,6 +22,29 @@ It also provides an instant overview of all your subscription limits, 5-hour/wee
 
 ---
 
+## Why MaxUsage?
+
+I subscribe to 5 different AI coding tools. Before writing code, I constantly faced the same dilemma: **Which subscription should I use right now to maximize my quota before it resets?**
+
+Checking 5 separate usage pages every day is tedious:
+
+<p align="center">
+  <img src="docs/images/claude-code.jpg" alt="Claude Code Usage" width="31%" />
+  &nbsp;
+  <img src="docs/images/codex.jpg" alt="Codex Usage" width="31%" />
+  &nbsp;
+  <img src="docs/images/agy.jpg" alt="Antigravity Usage" width="31%" />
+</p>
+<p align="center">
+  <img src="docs/images/opencode%20go.jpg" alt="OpenCode Usage" width="31%" />
+  &nbsp;
+  <img src="docs/images/z.ai.jpg" alt="Z.ai Usage" width="31%" />
+</p>
+
+**MaxUsage solves this in 1 click** — it analyzes remaining quotas and reset windows across all your plans, and instantly tells you exactly which one to use next.
+
+
+
 ## Installation
 
 ### Homebrew (Recommended)

@@ -22,6 +22,29 @@
 
 ---
 
+## 为什么需要 MaxUsage？
+
+我同时订阅了 5 个不同的 AI 编程工具。每次开始写代码前，我总要纠结：**“现在该用哪一个，才能在重置前把额度用满，避免浪费？”**
+
+每天手动去查 5 个服务的网页后台非常繁琐耗时：
+
+<p align="center">
+  <img src="docs/images/claude-code.jpg" alt="Claude Code 用量" width="31%" />
+  &nbsp;
+  <img src="docs/images/codex.jpg" alt="Codex 用量" width="31%" />
+  &nbsp;
+  <img src="docs/images/agy.jpg" alt="Antigravity 用量" width="31%" />
+</p>
+<p align="center">
+  <img src="docs/images/opencode%20go.jpg" alt="OpenCode 用量" width="31%" />
+  &nbsp;
+  <img src="docs/images/z.ai.jpg" alt="Z.ai 用量" width="31%" />
+</p>
+
+**MaxUsage 让这一切只需 1 秒** —— 它在本地自动分析你所有订阅的剩余额度与重置窗口，直接告诉你下一刻最该打开谁。
+
+---
+
 ## 安装方式
 
 ### Homebrew 一键安装（推荐）
