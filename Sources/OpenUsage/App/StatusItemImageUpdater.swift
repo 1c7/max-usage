@@ -66,10 +66,23 @@ final class StatusItemImageUpdater {
                 ?? MenuBarIcon.image
                 ?? MenuBarStripRenderer.fallbackIcon
         }
-        let content = MenuBarContentBuilder.build(
-            groups: container.layout.pinnedGroups,
-            data: { container.dataStore.data(for: $0) }
+        // The tray shows only the recommendation panel's current pick, not the old pinned-metrics
+        // strip — see `docs/1- 额度推荐算法.md`. `container.enablement`/`container.dataStore` reads
+        // inside this observation-tracked closure re-arm the render on the inputs that can change the
+        // pick (provider on/off, fresh snapshots); a pick that goes stale purely from time passing
+        // (no snapshot write) catches up on the next refresh cycle.
+        let candidates = QuotaCandidateSource.makeCandidates(
+            registry: container.registry,
+            dataStore: container.dataStore,
+            enablement: container.enablement
         )
+        let recommended: QuotaCandidate?
+        if case .recommended(let recommendation) = RecommendationEngine.evaluate(candidates: candidates) {
+            recommended = recommendation.candidate
+        } else {
+            recommended = nil
+        }
+        let content = MenuBarContentBuilder.buildFromRecommendation(recommended)
         return MenuBarStripRenderer.image(for: content, style: container.layout.menuBarStyle)
             ?? MenuBarIcon.image
             ?? MenuBarStripRenderer.fallbackIcon

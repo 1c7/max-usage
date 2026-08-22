@@ -395,16 +395,7 @@ struct DashboardView: View {
     private func scrollBody(for screen: PopoverScreen) -> some View {
         switch screen {
         case .dashboard:
-            DashboardContentView(
-                container: container,
-                layout: layout,
-                updater: updater,
-                reorderSpaceName: Self.reorderSpace,
-                horizontalPadding: Self.outerPadding,
-                bottomGap: Self.contentBottomGap,
-                reorderLift: $reorderLift,
-                scrollPosition: $dashboardScrollPosition
-            )
+            QuotaPanelView(container: container)
         case .customize:
             CustomizeView(
                 reorderSpaceName: Self.reorderSpace,

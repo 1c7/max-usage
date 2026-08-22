@@ -16,7 +16,9 @@ struct PopoverFooter: View {
                 EmptyView()
             } else {
                 HStack(alignment: .center, spacing: 8) {
-                    footerIdentity
+                    nextUpdateButton
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                     Spacer(minLength: 8)
                     HeaderView(screen: screen)
                 }
@@ -46,22 +48,6 @@ struct PopoverFooter: View {
             tint: Theme.positive,
             trigger: layout.shareConfirmationTrigger
         )
-    }
-
-    private var footerIdentity: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("OpenUsage \(AppInfo.version)")
-            if let notice = layout.pinLimitNotice {
-                Text(notice)
-                    .foregroundStyle(Theme.notice)
-                    .denyShake(trigger: layout.pinNoticeShakeTrigger, shakeOnAppear: true)
-            } else {
-                nextUpdateButton
-            }
-        }
-        .font(.caption2)
-        .foregroundStyle(.secondary)
-        .animation(Motion.spring, value: layout.pinLimitNotice)
     }
 
     private var nextUpdateButton: some View {

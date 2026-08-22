@@ -1,5 +1,6 @@
-# OpenUsage
+# OpenUsage macOS menu bar
 
+"I have multiple AI coding subscription, which one should I use? which one close to refresh time?"
 Track your AI coding subscriptions from the macOS menu bar — native Swift edition.
 
 OpenUsage shows how much of your AI coding plans you've used: session and weekly limits, credits, and spend, all in one popover. Pin your most important metrics straight into the menu bar.

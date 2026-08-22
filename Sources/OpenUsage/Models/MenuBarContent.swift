@@ -78,6 +78,29 @@ enum MenuBarContentBuilder {
         return MenuBarContent(groups: resolvedGroups, bars: Array(bars))
     }
 
+    /// The menu bar shows exactly one thing: whichever subscription the recommendation panel currently
+    /// points at, with its weekly-quota-remaining percentage — not a pinned multi-provider strip. `nil`
+    /// (no current recommendation) renders nothing, so the caller falls back to the plain app icon.
+    static func buildFromRecommendation(_ candidate: QuotaCandidate?) -> MenuBarContent {
+        guard let candidate else { return MenuBarContent(groups: [], bars: []) }
+        let remainingFraction = min(max(candidate.weeklyRemainingPct / 100, 0), 1)
+        let metric = MenuBarContent.Metric(
+            id: candidate.id,
+            label: String(localized: "quotaList.weekly", defaultValue: "Weekly"),
+            value: "\(Int(candidate.weeklyRemainingPct.rounded()))%",
+            fraction: remainingFraction,
+            isBounded: true,
+            hasData: true
+        )
+        let group = MenuBarContent.Group(
+            providerID: candidate.id,
+            displayName: candidate.displayName,
+            icon: candidate.icon,
+            metrics: [metric]
+        )
+        return MenuBarContent(groups: [group], bars: [metric])
+    }
+
     private static func resolve(_ descriptor: WidgetDescriptor, _ data: WidgetData) -> MenuBarContent.Metric {
         MenuBarContent.Metric(
             id: descriptor.id,

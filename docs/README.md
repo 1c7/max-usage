@@ -4,7 +4,7 @@ What the app does and how it behaves. These pages describe **behavior, not visua
 
 ## The app
 
-- [Dashboard](dashboard.md) — the popover: rows, toggles, reordering, keyboard shortcuts
+- [Dashboard](dashboard.md) — the popover: the Recommended / Quotas tabs, keyboard shortcuts
 - [Menu bar](menu-bar.md) — pinning metrics into the menu bar
 - [Settings](settings.md) — every option, what it changes
 - [Refreshing & caching](refreshing.md) — when data updates and what happens when a fetch fails

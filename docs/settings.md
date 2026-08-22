@@ -6,7 +6,6 @@ Settings lives inside the popover — there is no separate window. Open it from 
 
 | Setting | Options | What it does |
 |---|---|---|
-| Show Total Spend | on/off | Whether the cross-provider [Total Spend](dashboard.md#total-spend) card shows at the top of the dashboard. On by default; the card appears whenever at least one enabled provider tracks spend (Claude, Codex, Cursor, Grok, OpenCode). |
 | Launch at Login | on/off | Registers the app as a login item (the system's login-item registry is the source of truth). |
 | Global Shortcut | record a shortcut | Global shortcut that toggles the popover from anywhere. Click the field and press a combo; the ⓧ clears it and disables the shortcut. |
 
@@ -24,9 +23,9 @@ time; it also reports unavailable iCloud, loading, write, and malformed-file sta
 
 | Setting | Options | What it does |
 |---|---|---|
-| Icon Style | Text / Bars | How starred metrics render in the menu bar. See [Menu bar](menu-bar.md). |
+| Icon Style | Text / Bars | How the recommended subscription renders in the menu bar. See [Menu bar](menu-bar.md). |
 | Theme | System / Light / Dark | App-wide appearance override for the popover. |
-| Density | Default / Compact | Default breathes; Compact is a real information-dense mode — text steps down one size, rows and provider sections pull together, and Customize / Settings rows tighten with them. In both, consecutive one-line metrics (Today / Yesterday / …) pull together; Compact pulls harder. |
+| Density | Default / Compact | Default breathes; Compact is a real information-dense mode — text steps down one size and Customize / Settings rows tighten. (Doesn't affect the Recommended/Quotas dashboard tabs, which stay fixed-size.) |
 | Reduce Animations | Off / On | Off by default. On removes transitions, motion effects, and continuous decorative animation throughout the popover. The app also honors the macOS Reduce Motion accessibility setting. |
 | Time Format | Auto / 12-hour / 24-hour | How exact times read (e.g. "Resets today at 6:38 PM" vs "18:38"). Auto follows the system. |
 | Increase Transparency | Off / On | Off (default) keeps the popover a solid panel. On makes it translucent so your desktop shows through, while keeping the numbers and Options control legible with adaptive surfaces. It pauses automatically when you have the macOS **Reduce Transparency** or **Increase Contrast** accessibility setting turned on (a note explains why), so it never works against those preferences. |
@@ -57,7 +56,7 @@ All three alerts default off. The first time you turn one on, OpenUsage asks for
 
 | Setting | Options | What it does |
 |---|---|---|
-| Hide From Screen Share | On / Off | Off (default). On replaces the menu bar strip with the OpenUsage icon and wordmark while your screen is being shared or recorded, and restores your starred metrics the moment the capture ends. See [Menu bar](menu-bar.md#hiding-usage-while-screen-sharing). |
+| Hide From Screen Share | On / Off | Off (default). On replaces the menu bar strip with the OpenUsage icon and wordmark while your screen is being shared or recorded, and restores the recommendation the moment the capture ends. See [Menu bar](menu-bar.md#hiding-usage-while-screen-sharing). |
 | Share Anonymous Usage | On / Off | On (default) shares anonymous, daily usage summaries — no account details, credentials, or usage values. Off stops all sharing immediately. See [Privacy & Usage Data](privacy.md) for exactly what is and isn't sent. |
 
 ## Advanced
@@ -94,4 +93,4 @@ The app version shows in the popover footer.
 
 Your settings carry across updates — layout, stars, preferences, and the menu-bar shortcut all stay put. When an update changes how a setting is stored, the app upgrades it in place on launch, stepping through any in-between versions if you skipped a few. Nothing is reset. (Earlier betas wiped all settings on every update; that no longer happens.)
 
-Which providers you have on also carries across updates — your choices are never overridden. A brand-new install picks its starting set by detecting the AI tools on your Mac (see [Dashboard § First launch](dashboard.md#first-launch)). When an update ships a provider you've never seen, the same local detection runs once for just that provider and turns it on only if you actually have the tool; everything you've already decided about stays exactly as you set it. See [Which Providers Are On](provider-enablement.md).
+Which providers you have on also carries across updates — your choices are never overridden. A brand-new install picks its starting set by detecting the AI tools on your Mac (see [Which Providers Are On](provider-enablement.md)). When an update ships a provider you've never seen, the same local detection runs once for just that provider and turns it on only if you actually have the tool; everything you've already decided about stays exactly as you set it. See [Which Providers Are On](provider-enablement.md).

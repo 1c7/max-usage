@@ -16,7 +16,6 @@ struct SettingsScreen: View {
 
     @State private var launchAtLogin = LaunchAtLoginSetting()
     @State private var commandLineTool = CommandLineToolInstaller()
-    @AppStorage(TotalSpendSetting.key) private var showTotalSpend = true
     @AppStorage(AppearanceSetting.key) private var appearance = AppearanceSetting.system
     @AppStorage(TimeFormatSetting.key) private var timeFormat = TimeFormatSetting.auto
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
@@ -81,12 +80,6 @@ struct SettingsScreen: View {
 
     private var generalSection: some View {
         section("General") {
-            // The dashboard's cross-provider Total Spend card; at least one enabled spend-capable
-            // provider must exist, so this toggle can't conjure it up alone.
-            row("Show Total Spend") {
-                Toggle("", isOn: $showTotalSpend)
-                    .settingsSwitchStyle()
-            }
             row("Launch at Login") {
                 Toggle("", isOn: Binding(
                     get: { launchAtLogin.isEnabled },

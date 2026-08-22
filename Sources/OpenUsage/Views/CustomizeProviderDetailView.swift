@@ -4,9 +4,7 @@ import SwiftUI
 /// dashboard card) and **On Demand** (tucked behind the card's caret). Drag a metric by its grip
 /// onto a row in the other card to move it across; an empty card shows a small dashed "Drag metrics
 /// here" drop zone that's also the drop target for moving a metric into it. Each metric row is
-/// grip · name · star · toggle (drag left, toggle right — same shape as the provider rows). The star
-/// is always visible: outline when not starred, filled accent when starred; tapping it pops a
-/// transient confirmation pill (and an orange denial pill over the per-provider cap). Providers that
+/// grip · name · toggle (drag left, toggle right — same shape as the provider rows). Providers that
 /// need an API key get their own "API Key" section here too.
 ///
 /// The drag gesture lives on the container, not on each row. With a per-row gesture, SwiftUI tears
@@ -100,7 +98,6 @@ struct CustomizeProviderDetailView: View {
                 AnyView(grip.reorderFrame(id: "grip:\(metric.id)", in: .named(reorderSpaceName)))
             },
             trailing: {
-                StarButton(metric: metric)
                 Toggle("", isOn: Binding(
                     get: { layout.isMetricEnabled(metric.id) },
                     set: { layout.setMetricEnabled(metric.id, $0) }
@@ -167,47 +164,5 @@ struct CustomizeProviderDetailView: View {
     private func makeLift(metricID: String, value: DragGesture.Value) -> ReorderLift? {
         let title = layout.customizeDetail(for: providerID)?.metrics.first { $0.id == metricID }?.title ?? ""
         return ReorderLift.make(id: metricID, payload: .customizeMetric(title: title), value: value, frames: rowFrames)
-    }
-}
-
-/// The star (menu-bar pin) control on a metric row — always visible: an outline star when not
-/// starred, a filled accent star when starred. Tapping it pops a transient confirmation pill (green
-/// "Starred for menu bar" / "Removed from menu bar"); a denied tap over the per-provider cap shakes
-/// the star and pops an orange denial pill. No tooltips.
-private struct StarButton: View {
-    let metric: WidgetDescriptor
-    @Environment(LayoutStore.self) private var layout
-    @State private var shakeTrigger = 0
-
-    var body: some View {
-        if metric.pinnable {
-            let pinned = layout.isPinned(metric.id)
-            Button {
-                if layout.canPin(metric.id) {
-                    layout.togglePin(metric.id)
-                    layout.presentCustomizationNotice(pinned
-                        ? String(localized: "customizeProviderDetail.removedFromMenuBar", defaultValue: "Removed from menu bar")
-                        : String(localized: "customizeProviderDetail.starredForMenuBar", defaultValue: "Starred for menu bar"))
-                } else {
-                    shakeTrigger += 1
-                    layout.presentCustomizationNotice(
-                        layout.pinDenialReason(metric.id) ?? String(
-                            localized: "customizeProviderDetail.upToTwoStars",
-                            defaultValue: "Up to 2 stars per provider"
-                        ),
-                        tone: .notice
-                    )
-                }
-            } label: {
-                Image(systemName: pinned ? "star.fill" : "star")
-                    .font(.system(size: 11, weight: .semibold))
-                    .frame(width: 18, height: 18)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(pinned ? Color.accentColor : Color.secondary)
-            .denyShake(trigger: shakeTrigger)
-            .animation(Motion.spring, value: pinned)
-        }
     }
 }
