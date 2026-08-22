@@ -20,6 +20,14 @@ It also provides an instant overview of all your subscription limits, 5-hour/wee
 
 ## Installation
 
+### Homebrew
+
+```sh
+brew install --cask max-usage
+```
+
+### Direct Download
+
 Download the latest universal DMG from the [GitHub Releases](https://github.com/1c7/max-usage/releases/latest) page, open it, and drag **MaxUsage** into your `Applications` folder.
 
 > **Requirements:** macOS 15 (Sequoia) or later. Runs natively on both Apple Silicon and Intel Macs.
