@@ -35,6 +35,7 @@
 "Immediately reset your usage limits. This can't be undone." = "Immediately reset your usage limits. This can't be undone.";
 "Increase Transparency" = "Increase Transparency";
 "Install…" = "Install…";
+"Language" = "Language";
 "Launch at Login" = "Launch at Login";
 "Log Level" = "Log Level";
 "Monitor Your AI Subscriptions with MaxUsage" = "Monitor Your AI Subscriptions with MaxUsage";
@@ -102,6 +103,9 @@
 "appearanceSetting.dark" = "Dark";
 "appearanceSetting.light" = "Light";
 "appearanceSetting.system" = "System";
+"languageSetting.en" = "English";
+"languageSetting.system" = "System";
+"languageSetting.zhHans" = "Chinese (Simplified)";
 "commandLineTool.action.install" = "install";
 "commandLineTool.action.remove" = "remove";
 "commandLineTool.actionFailed" = "Couldn't %1$@ the terminal helper: %2$@";

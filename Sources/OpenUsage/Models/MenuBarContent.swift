@@ -86,8 +86,8 @@ enum MenuBarContentBuilder {
         let remainingFraction = min(max(candidate.weeklyRemainingPct / 100, 0), 1)
         let metric = MenuBarContent.Metric(
             id: candidate.id,
-            label: String(localized: "quotaList.weekly", defaultValue: "Weekly"),
-            value: "\(Int(candidate.weeklyRemainingPct.rounded()))%",
+            label: "",
+            value: candidate.displayName,
             fraction: remainingFraction,
             isBounded: true,
             hasData: true

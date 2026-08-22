@@ -16,6 +16,7 @@ struct SettingsScreen: View {
 
     @State private var launchAtLogin = LaunchAtLoginSetting()
     @State private var commandLineTool = CommandLineToolInstaller()
+    @AppStorage(LanguageSetting.key) private var language = LanguageSetting.fallback
     @AppStorage(AppearanceSetting.key) private var appearance = AppearanceSetting.system
     @AppStorage(TimeFormatSetting.key) private var timeFormat = TimeFormatSetting.auto
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
@@ -78,6 +79,12 @@ struct SettingsScreen: View {
 
     private var generalSection: some View {
         section("General") {
+            row("Language") {
+                picker($language, options: LanguageSetting.allCases, label: \.label)
+                    .onChange(of: language) {
+                        LanguageSetting.applyCurrent()
+                    }
+            }
             row("Launch at Login") {
                 Toggle("", isOn: Binding(
                     get: { launchAtLogin.isEnabled },

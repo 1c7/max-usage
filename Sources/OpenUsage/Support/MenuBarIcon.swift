@@ -6,20 +6,17 @@ import SwiftUI
 /// asset catalog or second SVG parser to maintain.
 @MainActor
 enum MenuBarIcon {
-    /// Side length (points) of the menu bar glyph.
     private static let side: CGFloat = 18
 
-    /// Cached template image, or `nil` if the brand mark fails to load/parse.
     static let image: NSImage? = render()
 
     private static func render() -> NSImage? {
-        guard let mark = ProviderMarks.mark(for: "openusage") else { return nil }
         let renderer = ImageRenderer(
-            // Smaller inset than the provider default so the brand gauge keeps its prior menu-bar size
-            // (its art already carries ~8% margin inside the source viewBox).
-            content: ProviderIconShape(pathData: mark.path, inset: 0.08)
-                .fill(Color.black)
-                .frame(width: side, height: side)
+            content: Image(systemName: "hare.fill")
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(.black)
+                .frame(width: 15, height: 15)
         )
         renderer.scale = 2
         guard let nsImage = renderer.nsImage else { return nil }

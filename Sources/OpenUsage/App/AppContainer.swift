@@ -249,13 +249,14 @@ final class AppContainer {
         // Removing an `@AppStorage` key restores its declared default; the Settings screen's
         // `@AppStorage` properties observe the change. New settings must be added here.
         for key in [
-            AppearanceSetting.key, TimeFormatSetting.key, DensitySetting.key,
+            LanguageSetting.key, AppearanceSetting.key, TimeFormatSetting.key, DensitySetting.key,
             ReduceAnimationsSetting.key, LogLevelSetting.key, TotalSpendSetting.key,
             TotalSpendSetting.periodKey, TotalSpendSetting.metricKey,
         ] {
             UserDefaults.standard.removeObject(forKey: key)
         }
         KeyboardShortcuts.reset(.togglePopover)
+        LanguageSetting.applyCurrent()
         AppearanceSetting.applyCurrent()
         AppLog.reloadLevel()
         AppLog.info(.config, "All settings reset to defaults")

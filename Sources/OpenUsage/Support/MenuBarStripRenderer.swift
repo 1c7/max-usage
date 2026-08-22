@@ -133,21 +133,17 @@ enum MenuBarStripRenderer {
     }()
 }
 
-/// The brand gauge mark plus wordmark drawn in place of the strip while screen-share privacy is
-/// concealing usage. Same black-on-clear template treatment, glyph box, and type size as a
-/// single-metric Text strip, so the swap doesn't jump the menu bar's rhythm.
+/// The app bunny mark plus wordmark drawn in place of the strip while screen-share privacy is
+/// concealing usage.
 private struct MenuBarPrivacyLabel: View {
     var body: some View {
         HStack(spacing: 5) {
-            // The same mark and inset as `MenuBarIcon` (the art carries its own margin), sized to the
-            // strip's glyph box so the swap keeps the provider-glyph scale.
-            if let mark = ProviderMarks.mark(for: "openusage") {
-                ProviderIconShape(pathData: mark.path, inset: 0.08)
-                    .fill(Color.black)
-                    .frame(width: 16, height: 16)
-            }
+            Image(systemName: "hare.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 14, height: 14)
             Text("MaxUsage")
-                .font(.system(size: 12, weight: .bold))
+                .font(.system(size: 12, weight: .semibold))
         }
         .foregroundStyle(.black)
         .padding(.horizontal, 2)
@@ -160,54 +156,22 @@ private struct MenuBarTextStrip: View {
     let content: MenuBarContent
 
     var body: some View {
-        HStack(spacing: 11) {
+        HStack(spacing: 6) {
             ForEach(content.groups, id: \.providerID) { group in
-                HStack(spacing: 4) {
-                    glyph(group.icon)
-                    metricsView(group.metrics)
+                HStack(spacing: 5) {
+                    Image(systemName: "hare.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 14, height: 14)
+                    Text(group.displayName)
+                        .font(.system(size: 12, weight: .semibold))
                 }
             }
         }
         .foregroundStyle(.black)
-        .monospacedDigit()
         .padding(.horizontal, 2)
         .padding(.vertical, 1)
         .fixedSize()
-    }
-
-    /// A provider's pinned values, no labels: one metric as a single large number, two stacked on two
-    /// tight lines (much narrower than side-by-side), read positionally.
-    @ViewBuilder
-    private func metricsView(_ metrics: [MenuBarContent.Metric]) -> some View {
-        if metrics.count <= 1 {
-            Text(metrics.first?.value ?? "")
-                .font(.system(size: 12, weight: .bold))
-        } else {
-            VStack(alignment: .trailing, spacing: -2) {
-                ForEach(metrics, id: \.id) { metric in
-                    Text(metric.value)
-                }
-            }
-            .font(.system(size: 9, weight: .semibold))
-            .fixedSize()
-        }
-    }
-
-    /// Side length of the glyph box. Sized to fill the strip's height so the mark reads at the same
-    /// scale as the dual-line metric block beside it (the single number is shorter), instead of
-    /// floating small in the middle. `ProviderIconShape` already normalizes every mark to its true
-    /// bounding box, so a near-zero `inset` here makes each provider fill this box uniformly.
-    private static let glyphSide: CGFloat = 16
-
-    @ViewBuilder
-    private func glyph(_ icon: IconSource) -> some View {
-        if let mark = ProviderMarks.mark(for: icon.providerID) {
-            ProviderIconShape(pathData: mark.path, inset: 0.04)
-                .fill(Color.black)
-                .frame(width: Self.glyphSide, height: Self.glyphSide)
-        } else {
-            Circle().fill(Color.black).frame(width: Self.glyphSide - 1, height: Self.glyphSide - 1)
-        }
     }
 }
 

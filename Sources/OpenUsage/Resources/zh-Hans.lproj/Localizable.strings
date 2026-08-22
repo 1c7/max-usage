@@ -35,6 +35,7 @@
 "Immediately reset your usage limits. This can't be undone." = "立即重置你的用量限制，此操作无法撤销。";
 "Increase Transparency" = "提高透明度";
 "Install…" = "安装…";
+"Language" = "语言";
 "Launch at Login" = "登录时启动";
 "Log Level" = "日志级别";
 "Monitor Your AI Subscriptions with MaxUsage" = "使用 MaxUsage 监控你的 AI 订阅";
@@ -101,6 +102,9 @@
 "appearanceSetting.dark" = "深色";
 "appearanceSetting.light" = "浅色";
 "appearanceSetting.system" = "跟随系统";
+"languageSetting.en" = "English";
+"languageSetting.system" = "跟随系统";
+"languageSetting.zhHans" = "简体中文";
 "commandLineTool.action.install" = "安装";
 "commandLineTool.action.remove" = "移除";
 "commandLineTool.actionFailed" = "无法%@终端助手：%@";

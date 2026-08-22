@@ -22,6 +22,7 @@ struct DashboardView: View {
     @Environment(PopoverTransparencyStore.self) private var transparency
     @Environment(UpdaterController.self) private var updater
     @Environment(\.reduceAnimations) private var reduceAnimations
+    @AppStorage(LanguageSetting.key) private var language = LanguageSetting.fallback
     @State private var reorderLift: ReorderLift?
     /// The panel height SwiftUI drives — the single animation clock. `PanelHeightModifier` follows it
     /// frame-by-frame onto the AppKit panel, so the window resize rides the same spring as the screen
@@ -248,6 +249,7 @@ struct DashboardView: View {
             // Sourced from the controller's show/hide chokepoints (`popoverShown`), not occlusion — a
             // `.canJoinAllSpaces` panel is briefly occluded mid Space-switch while still on-screen.
             .environment(\.popoverIsVisible, transparency.popoverShown)
+            .environment(\.locale, LanguageSetting.current.effectiveLocale)
     }
 
     private func resetTransientState() {
