@@ -352,3 +352,6 @@
 "widgetRow.expiryStatus.warning" = "A reset credit expires within 7 days";
 "widgetRow.limitReached" = "Limit reached";
 "widgetRow.willReachLimit" = "Will reach limit";
+"widgetData.meterState.spare" = "~%lld%% spare";
+"Show Pace Prediction" = "Show Pace Prediction";
+"settingsScreen.showPacePredictionTooltip" = "Predict when you'll hit a limit based on your usage rate, not just how much is left";

@@ -29,6 +29,11 @@ struct WidgetData: Hashable {
     /// the blue/healthy row also shows the even-pace tick and its projection copy. Yellow and red rows
     /// always show the tick when a reset window exists; this toggle only adds it on blue.
     var alwaysShowPacing: Bool = false
+    /// Global "show pace prediction" opt-in, stamped by `WidgetDataStore` (like `displayMode`). Off by
+    /// default — a burn-rate projection assumes steady usage across the window, which reads as noise
+    /// for a bursty usage pattern, so every bounded row falls back to absolute level bands (yellow at
+    /// 80% used, red at ≤10% left) with no flame/spare copy or tick until the user opts in.
+    var showPacePrediction: Bool = false
     var resetsAt: Date?
     /// Zero or more future expiry instants surfaced in the row's hover tooltip (Codex rate-limit-reset
     /// credits — one entry per still-available credit). Empty for every other row. Kept as raw `Date`s so
@@ -494,6 +499,8 @@ extension WidgetData {
         // A "Not started" session has nothing to pace yet — present a calm bar with no projection
         // copy or tick, so the bar and its hover never contradict the trailing "Not started" label.
         if isFreshSessionWindow(now: now) { return absoluteLevelState(used: used, limit: limit) }
+        // Off by default: a linear burn-rate projection can't model a bursty usage pattern meaningfully.
+        if !showPacePrediction { return absoluteLevelState(used: used, limit: limit) }
 
         if let ctx = paceContext,
            let result = Pace.evaluate(used: used, limit: ctx.limit, resetsAt: ctx.resetsAt,
@@ -508,7 +515,10 @@ extension WidgetData {
                 let projected = result.projectedUsage / ctx.limit
                 let spare = Int(((1 - projected) * 100).rounded())
                 guard spare >= 1 else { return .runningOut(eta: nil, projectedFraction: projected) }
-                return .closeToLimit(spare: "~\(spare)% spare", projectedFraction: projected)
+                return .closeToLimit(
+                    spare: String(localized: "widgetData.meterState.spare", defaultValue: "~\(spare)% spare"),
+                    projectedFraction: projected
+                )
             case .behind:
                 // Coarse whole-percent meters can read 1% used very early in a window; linear
                 // extrapolation then projects a bogus blow-out while the headline still shows ~99%

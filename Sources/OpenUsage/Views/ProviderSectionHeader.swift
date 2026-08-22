@@ -24,6 +24,14 @@ struct ProviderSectionHeader: View {
     /// Dashboard-only screenshot action. The reorder preview omits it, while Customize uses its own
     /// row type and is unaffected by this header.
     var onCopyScreenshot: (() -> Bool)?
+    /// Whether the provider's On Demand section is currently expanded. Only meaningful when
+    /// `onToggleExpand` is supplied — the reorder preview and Customize's own header omit both.
+    var isExpanded: Bool = false
+    /// Dashboard-only expand/collapse action, rendered as a small chevron right after the name (moved
+    /// off its own full-width row at the bottom of the card to save vertical space — issue: user
+    /// wants denser cards to fit more providers). `nil` hides the control entirely, for a provider with
+    /// no On Demand metrics or quick links to reveal.
+    var onToggleExpand: (() -> Void)?
 
     /// Header type and icon track the density setting like the rows do, so Compact shrinks the
     /// whole section anatomy — not just the rows under it.
@@ -38,7 +46,9 @@ struct ProviderSectionHeader: View {
         warning: String? = nil,
         refreshing: Bool = false,
         staleness: StalenessHint? = nil,
-        onCopyScreenshot: (() -> Bool)? = nil
+        onCopyScreenshot: (() -> Bool)? = nil,
+        isExpanded: Bool = false,
+        onToggleExpand: (() -> Void)? = nil
     ) {
         self.provider = provider
         self.plan = plan
@@ -46,6 +56,8 @@ struct ProviderSectionHeader: View {
         self.refreshing = refreshing
         self.staleness = staleness
         self.onCopyScreenshot = onCopyScreenshot
+        self.isExpanded = isExpanded
+        self.onToggleExpand = onToggleExpand
     }
 
     var body: some View {
@@ -81,6 +93,17 @@ struct ProviderSectionHeader: View {
                         .lineLimit(1)
                         .hoverTooltip(staleness.tooltip)
                 }
+            }
+            if let onToggleExpand {
+                Button(action: onToggleExpand) {
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 16, height: 16)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(isExpanded ? "Show less" : "Show more")
             }
             if refreshing {
                 MotionAwareProgressView(controlSize: .mini)

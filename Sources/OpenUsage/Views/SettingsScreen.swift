@@ -191,11 +191,23 @@ struct SettingsScreen: View {
             row("Reset Times") {
                 picker($store.resetDisplayMode, options: ResetDisplayMode.allCases, label: \.label)
             }
-            // Off (default) leaves pacing on yellow and red only. On also surfaces projection
-            // and the even-pace tick on blue rows.
+            // Off by default: a linear burn-rate projection reads as noise for a bursty usage pattern,
+            // so every row starts out with plain absolute-level coloring only (yellow at 80% used, red
+            // at ≤10% left) — no flame/spare copy, no even-pace tick — until explicitly turned on.
+            row("Show Pace Prediction") {
+                Toggle("", isOn: $store.showPacePrediction)
+                    .settingsSwitchStyle()
+                    .hoverTooltip(String(
+                        localized: "settingsScreen.showPacePredictionTooltip",
+                        defaultValue: "Predict when you'll hit a limit based on your usage rate, not just how much is left"
+                    ))
+            }
+            // Dimmed (has no effect) while pace prediction itself is off above — there's no pace verdict
+            // to surface on the blue row yet.
             row("Always Show Pacing") {
                 Toggle("", isOn: $store.alwaysShowPacing)
                     .settingsSwitchStyle()
+                    .disabled(!store.showPacePrediction)
                     .hoverTooltip(String(
                         localized: "settingsScreen.alwaysShowPacingTooltip",
                         defaultValue: "Show how you're pacing on every metric, not just ones near their limit"

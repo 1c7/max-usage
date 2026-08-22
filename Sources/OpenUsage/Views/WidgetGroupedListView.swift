@@ -45,13 +45,21 @@ struct WidgetGroupedListView: View {
     }
 
     private func header(_ group: ProviderGroup) -> some View {
-        ProviderSectionHeader(
+        let providerID = group.provider.id
+        let hasExpandedContent = group.hasExpandedMetrics || !group.provider.visibleLinks.isEmpty
+        return ProviderSectionHeader(
             provider: group.provider,
-            plan: dataStore.plan(for: group.provider.id),
-            warning: dataStore.headerNotice(for: group.provider.id),
-            refreshing: dataStore.refreshingProviderIDs.contains(group.provider.id),
-            staleness: dataStore.stalenessHint(for: group.provider.id),
-            onCopyScreenshot: { shareCard(group) }
+            plan: dataStore.plan(for: providerID),
+            warning: dataStore.headerNotice(for: providerID),
+            refreshing: dataStore.refreshingProviderIDs.contains(providerID),
+            staleness: dataStore.stalenessHint(for: providerID),
+            onCopyScreenshot: { shareCard(group) },
+            isExpanded: layout.isProviderExpanded(providerID),
+            onToggleExpand: hasExpandedContent ? {
+                withAnimation(Motion.spring) {
+                    _ = layout.setProviderExpanded(!layout.isProviderExpanded(providerID), for: providerID)
+                }
+            } : nil
         )
         // Keep the provider mark and hover-revealed copy control aligned with the card's content edges.
         .padding(.horizontal, 8)
@@ -150,7 +158,7 @@ struct WidgetGroupedListView: View {
                 case .links(let links):
                     ProviderLinksView(links: links)
                 case .divider:
-                    expandToggle(providerID: providerID, isExpanded: isExpanded)
+                    expandToggle(providerID: providerID)
                 }
             }
         }
@@ -182,26 +190,16 @@ struct WidgetGroupedListView: View {
             + (isExpanded && hasLinks ? [.links(links)] : [])
     }
 
-    /// The centered caret at the bottom of a provider card that reveals or hides its On Demand metrics
-    /// and quick links. Rendered whenever the provider has either kind of expanded content.
-    private func expandToggle(providerID: String, isExpanded: Bool) -> some View {
-        Button {
-            withAnimation(Motion.spring) {
-                _ = layout.setProviderExpanded(!isExpanded, for: providerID)
-            }
-        } label: {
-            Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(.secondary)
-                .frame(width: 14, height: 14)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 5)
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .reorderFrame(id: expandedDividerID(for: providerID), in: .named(reorderSpaceName))
-        .accessibilityLabel(isExpanded ? "Show less" : "Show more")
+    /// The boundary between Always Visible and On Demand rows. The toggle control itself now lives in
+    /// `ProviderSectionHeader` (a small chevron beside the provider name) to save vertical space per
+    /// card; this stays only as the drag-reorder target a metric crosses to move between the two
+    /// sections (`metricTargetIDs` / `applyMetricDividerOrder`), so it's a hairline, not a tappable row.
+    private func expandToggle(providerID: String) -> some View {
+        Rectangle()
+            .fill(.clear)
+            .frame(height: 1)
+            .reorderFrame(id: expandedDividerID(for: providerID), in: .named(reorderSpaceName))
+            .accessibilityHidden(true)
     }
 
     private func expandedDividerID(for providerID: String) -> String {

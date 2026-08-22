@@ -352,3 +352,6 @@
 "widgetRow.limitReached" = "已达上限";
 "widgetRow.willReachLimit" = "即将达到上限";
 "Updated %@" = "%@更新";
+"widgetData.meterState.spare" = "剩余约 %lld%%";
+"Show Pace Prediction" = "显示进度预测";
+"settingsScreen.showPacePredictionTooltip" = "根据消耗速度预测何时会达到上限，而不只是显示剩余量";
