@@ -15,10 +15,10 @@ It also provides an instant overview of all your subscription limits, 5-hour/wee
 ## Screenshots
 
 <p align="center">
-  <img src="assets/recommendation-en.jpg" alt="MaxUsage Smart Recommendation" />
+  <img src="assets/recommendation-en-v2.jpg" alt="MaxUsage Smart Recommendation" />
 </p>
 <p align="center">
-  <img src="assets/quotas-en.jpg" alt="MaxUsage Quotas Overview" />
+  <img src="assets/quotas-en-v2.jpg" alt="MaxUsage Quotas Overview" />
 </p>
 
 ---
