@@ -4,9 +4,9 @@ OpenUsage ships in English and Simplified Chinese (简体中文).
 
 ## Which language shows
 
-The app follows the standard macOS rule: it uses the first language in **System Settings → General → Language & Region → Preferred Languages** that OpenUsage supports. If your top preferred language is Chinese, the app opens in Simplified Chinese automatically — no in-app toggle is needed. If none of your preferred languages are supported, it falls back to English.
+The app defaults to your system language: if your top preferred language is Chinese (any variant: `zh-Hans`, `zh-Hant`, `zh-CN`, etc.), OpenUsage opens in Simplified Chinese automatically; for English and any other language, it defaults to English.
 
-There is currently no in-app language override; to force a different language, reorder your preferred languages in System Settings (or launch the app with `AppleLanguages` set, the standard macOS override for testing).
+You can also explicitly select your preferred language (System, English, or 简体中文) in **Settings → General → Language**. Choosing an option applies immediately across the app and persists across launches.
 
 ## What's translated
 
