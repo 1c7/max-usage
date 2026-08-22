@@ -249,7 +249,8 @@ struct DashboardView: View {
             // Sourced from the controller's show/hide chokepoints (`popoverShown`), not occlusion — a
             // `.canJoinAllSpaces` panel is briefly occluded mid Space-switch while still on-screen.
             .environment(\.popoverIsVisible, transparency.popoverShown)
-            .environment(\.locale, LanguageSetting.current.effectiveLocale)
+            .environment(\.locale, language.effectiveLocale)
+            .id(language)
     }
 
     private func resetTransientState() {

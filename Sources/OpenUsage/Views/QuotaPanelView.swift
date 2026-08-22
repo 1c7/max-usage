@@ -45,6 +45,8 @@ struct QuotaPanelView: View {
                 }
             }
         }
+        .id(language)
+        .environment(\.locale, language.effectiveLocale)
     }
 
     /// The selected tab gets a filled pill behind its label plus a green underline beneath it — two

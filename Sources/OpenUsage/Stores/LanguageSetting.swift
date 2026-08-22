@@ -52,13 +52,19 @@ enum LanguageSetting: String, Hashable, Sendable, CaseIterable, UserDefaultsBack
         return lower.hasPrefix("zh") ? "zh-Hans" : "en"
     }
 
-    /// Applies the current language setting app-wide (updates AppleLanguages, bundle localization,
+    /// Applies the specified language setting app-wide (updates AppleLanguages, bundle localization,
     /// and posts change notification).
     @MainActor
-    static func applyCurrent() {
-        let code = current.effectiveLanguageCode
+    static func apply(_ setting: LanguageSetting) {
+        let code = setting.effectiveLanguageCode
         UserDefaults.standard.set([code], forKey: "AppleLanguages")
         Bundle.setLanguage(code)
         NotificationCenter.default.post(name: didChangeNotification, object: nil)
+    }
+
+    /// Applies the current language setting app-wide.
+    @MainActor
+    static func applyCurrent() {
+        apply(current)
     }
 }

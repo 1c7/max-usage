@@ -81,8 +81,8 @@ struct SettingsScreen: View {
         section("General") {
             row("Language") {
                 picker($language, options: LanguageSetting.allCases, label: \.label)
-                    .onChange(of: language) {
-                        LanguageSetting.applyCurrent()
+                    .onChange(of: language) { _, newLanguage in
+                        LanguageSetting.apply(newLanguage)
                     }
             }
             row("Launch at Login") {
