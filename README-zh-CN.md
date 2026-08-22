@@ -16,7 +16,8 @@
 
 <p align="center">
   <img src="assets/recommendation-2.jpg" alt="MaxUsage 智能推荐" width="360" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
+</p>
+<p align="center">
   <img src="assets/quotas-2.jpg" alt="MaxUsage 额度总览" width="360" />
 </p>
 
