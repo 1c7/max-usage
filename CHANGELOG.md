@@ -1,5 +1,44 @@
 # Changelog
 
+## v1.1.0
+
+### English
+
+#### Smarter Usage Recommendations
+- Replace tiered ranking with strict Earliest Deadline First (EDF), so the usable subscription whose weekly quota resets first is recommended by @1c7.
+- Prefer Antigravity resetting in 4 days over Codex resetting in 6 days, even when Codex has slightly more quota remaining, by @1c7.
+
+#### Clearer Quota Display
+- Replace the empty 0% weekly meter with **Weekly quota used up** and an exact local reset date and time by @1c7.
+- Temporarily move providers with exhausted weekly quota to the bottom while preserving the user's custom order by @1c7.
+
+#### MaxUsage Identity and Distribution
+- Align user-facing product, CLI, documentation, package, and GitHub Release naming under MaxUsage by @1c7.
+- Ship one universal `MaxUsage-1.1.0.dmg` for Apple Silicon and Intel Macs by @1c7.
+- Publish this release with ad-hoc signing and no automatic update feed. It is not notarized by Apple; on first launch, right-click MaxUsage and choose **Open**, or allow it in **System Settings → Privacy & Security** by @1c7.
+
+### 中文
+
+#### 更合理的用量推荐
+- 将原来的分层排序改为严格的最早截止时间优先算法 EDF，优先推荐周额度最早重置且当前可用的服务商，由 @1c7 完成。
+- 当 Antigravity 4 天后重置、Codex 6 天后重置时，即使 Codex 剩余额度略高，也会正确推荐 Antigravity，由 @1c7 完成。
+
+#### 更清晰的额度显示
+- 周额度耗尽时不再显示空的 0% 进度条，改为 **周额度已用光**，并显示精确的本地重置日期和时间，由 @1c7 完成。
+- 周额度用光的服务商临时移到列表末尾，同时保留用户设置的相对顺序，由 @1c7 完成。
+
+#### MaxUsage 品牌与分发
+- 将用户可见的产品名、CLI、文档、安装包和 GitHub Release 统一为 MaxUsage，由 @1c7 完成。
+- 发布同时支持 Apple Silicon 和 Intel Mac 的 universal `MaxUsage-1.1.0.dmg`，由 @1c7 完成。
+- 此版本使用 ad-hoc 签名，不包含自动更新源，且尚未经过 Apple 公证。首次启动时，请右键 MaxUsage 选择 **打开**，或在 **系统设置 → 隐私与安全性** 中允许打开，由 @1c7 完成。
+
+---
+
+### Changelog
+**Full Changelog**: [v1.0.0...v1.1.0](https://github.com/1c7/max-usage/compare/v1.0.0...v1.1.0)
+
+- [8a9a3e0](https://github.com/1c7/max-usage/commit/8a9a3e0) Maximize quota usage, improve exhausted-quota presentation, and align the MaxUsage release pipeline by @1c7.
+
 ## v0.7.10-beta.1
 
 ### Bug Fixes
