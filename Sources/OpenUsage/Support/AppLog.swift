@@ -78,7 +78,7 @@ enum AppLog {
     private nonisolated(unsafe) static var loggers: [String: Logger] = [:]
 
     /// The file sink. Injectable so tests can point it at a temp directory and assert what the level
-    /// gate actually writes; production uses the shared `~/Library/Logs/OpenUsage/OpenUsage.log` appender.
+    /// gate actually writes; production uses the shared `~/Library/Logs/MaxUsage/MaxUsage.log` appender.
     nonisolated(unsafe) static var sink: LogFile = .shared
 
     // MARK: - Lifecycle
@@ -93,7 +93,7 @@ enum AppLog {
         // and the startup line actually self-documents where the log lives.
         let displayPath = (LogFile.url.path as NSString).abbreviatingWithTildeInPath
         info(LogTag.config.rawValue,
-             "OpenUsage v\(AppInfo.version) starting (level=\(level.rawValue), log=\(displayPath))")
+             "MaxUsage v\(AppInfo.version) starting (level=\(level.rawValue), log=\(displayPath))")
     }
 
     /// Re-read the persisted level into the cache. Invoked from the Settings picker `.onChange` so a

@@ -14,7 +14,7 @@ OpenCode's logs already on your Mac.
 | Today / Yesterday / Last 30 Days | Local cost and tokens across all your OpenCode-hosted usage (Go + Zen) |
 | Usage Trend | A day-by-day sparkline of tokens over the last month |
 
-When you have the Go subscription, OpenUsage shows "Go" beside the provider name.
+When you have the Go subscription, MaxUsage shows "Go" beside the provider name.
 
 The Session / Weekly / Monthly meters are **account-wide** — the same percents the OpenCode dashboard
 shows, including usage from other machines. If you only use the Zen pay-as-you-go gateway (no Go
@@ -22,7 +22,7 @@ subscription), the cap meters are hidden and you'll just see the spend tiles.
 
 ## Where credentials come from
 
-Use OpenCode as usual. OpenUsage reads the `opencode-go` API key from OpenCode's local data directory
+Use OpenCode as usual. MaxUsage reads the `opencode-go` API key from OpenCode's local data directory
 (`~/.local/share/opencode/auth.json`, or `$OPENCODE_DATA_DIR` / `$XDG_DATA_HOME` if you've set them) and
 sends it as a Bearer token to the usage API. There's no login prompt and no token to paste. Spend tiles
 still read the local SQLite logs in that same directory.
@@ -46,7 +46,7 @@ usage reads "No data" rather than a misleading `$0.00`. No log data leaves your 
   spend tiles still work if you use Zen locally.
 - **"Couldn't read OpenCode's auth.json"** — the file exists but is unreadable or not valid JSON. Check
   its permissions, or log into OpenCode Go again to rewrite it.
-- **Spend tiles show "No data"** — OpenUsage needs OpenCode's local database at
+- **Spend tiles show "No data"** — MaxUsage needs OpenCode's local database at
   `~/.local/share/opencode/opencode*.db`. Run an OpenCode session, then refresh.
 - **"Couldn't read OpenCode's local database"** — the database (or data directory) exists but couldn't be
   read this refresh. If you're on Go, the percent meters still refresh; quit OpenCode and refresh to

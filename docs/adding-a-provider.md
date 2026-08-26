@@ -1,6 +1,6 @@
 # Adding a Provider
 
-How to add a new AI provider to OpenUsage. Read the [architecture overview](architecture.md) first so the
+How to add a new AI provider to MaxUsage. Read the [architecture overview](architecture.md) first so the
 pieces below make sense.
 
 ## What a provider is
@@ -12,8 +12,8 @@ A provider is a small Swift module under `Sources/OpenUsage/Providers/<Name>/` t
 - a **usage client** that calls the provider's API,
 - a **mapper** that turns the response into the app's metric vocabulary.
 
-OpenUsage never asks the user to paste a token — if the provider's own CLI or app has already logged in,
-OpenUsage reads those existing credentials.
+MaxUsage never asks the user to paste a token — if the provider's own CLI or app has already logged in,
+MaxUsage reads those existing credentials.
 
 Besides `refresh()`, every provider implements `hasLocalCredentials()` — a cheap, local-only check
 (files, keychain; never the network) for whether those credentials exist at all. A fresh install probes

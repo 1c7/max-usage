@@ -26,7 +26,7 @@ final class CommandLineToolInstaller {
 
     init(
         sourcePath: String = Bundle.main.bundleURL
-            .appendingPathComponent("Contents/Helpers/openusage").path,
+            .appendingPathComponent("Contents/Helpers/maxusage").path,
         destinationPath: String = "/usr/local/bin/maxusage",
         fileManager: FileManager = .default,
         performPrivileged: (@MainActor (Operation, String, String) -> OperationResult)? = nil

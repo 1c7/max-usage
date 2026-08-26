@@ -56,9 +56,20 @@ enum QuotaCandidateSource {
     static func makeCandidates(
         registry: WidgetRegistry,
         dataStore: WidgetDataStore,
-        enablement: ProviderEnablementStore
+        enablement: ProviderEnablementStore,
+        orderedProviderIDs: [String]
     ) -> [QuotaCandidate] {
-        specs.compactMap { spec in
+        let providerRank = Dictionary(
+            orderedProviderIDs.enumerated().map { ($0.element, $0.offset) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        let orderedSpecs = specs.enumerated().sorted { lhs, rhs in
+            let lhsRank = providerRank[lhs.element.providerID] ?? Int.max
+            let rhsRank = providerRank[rhs.element.providerID] ?? Int.max
+            return lhsRank == rhsRank ? lhs.offset < rhs.offset : lhsRank < rhsRank
+        }.map(\.element)
+
+        return orderedSpecs.compactMap { spec in
             guard enablement.isEnabled(spec.providerID) else { return nil }
             guard let provider = registry.provider(id: spec.providerID) else { return nil }
             guard let weeklyDescriptor = registry.descriptor(id: spec.weeklyDescriptorID) else { return nil }

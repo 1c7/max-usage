@@ -93,6 +93,23 @@ final class CodexAuthStoreTests: XCTestCase {
 }
 
 final class CodexUsageMapperTests: XCTestCase {
+    private var originalLanguage: String?
+
+    override func setUp() {
+        super.setUp()
+        originalLanguage = UserDefaults.standard.string(forKey: LanguageSetting.key)
+        UserDefaults.standard.set(LanguageSetting.en.rawValue, forKey: LanguageSetting.key)
+    }
+
+    override func tearDown() {
+        if let originalLanguage {
+            UserDefaults.standard.set(originalLanguage, forKey: LanguageSetting.key)
+        } else {
+            UserDefaults.standard.removeObject(forKey: LanguageSetting.key)
+        }
+        super.tearDown()
+    }
+
     func testFreshSessionWindowPreservesReportedOnePercent() throws {
         let now = Date(timeIntervalSince1970: 1_800_000_000)
         let body = Data("""
@@ -410,7 +427,7 @@ final class CodexUsageMapperTests: XCTestCase {
         SpendTileMapper.appendTokenUsage(
             usage,
             to: &lines,
-            now: makeDate("2026-02-20T16:00:00.000Z")
+            now: makeDate("2026-02-20T08:00:00.000Z")
         )
 
         XCTAssertEqual(values(lines, "Today"),
@@ -432,7 +449,7 @@ final class CodexUsageMapperTests: XCTestCase {
         SpendTileMapper.appendTokenUsage(
             DailyUsageSeries(daily: [DailyUsageEntry(date: "2026-02-19", totalTokens: 0, costUSD: nil)]),
             to: &lines,
-            now: makeDate("2026-02-20T16:00:00.000Z")
+            now: makeDate("2026-02-20T08:00:00.000Z")
         )
 
         XCTAssertTrue(lines.isEmpty, "an all-zero window appends no spend tiles")
@@ -445,7 +462,7 @@ final class CodexUsageMapperTests: XCTestCase {
         SpendTileMapper.appendTokenUsage(
             DailyUsageSeries(daily: [DailyUsageEntry(date: "2026-02-20", totalTokens: 1_200_000, costUSD: nil)]),
             to: &lines,
-            now: makeDate("2026-02-20T16:00:00.000Z")
+            now: makeDate("2026-02-20T08:00:00.000Z")
         )
 
         XCTAssertEqual(values(lines, "Today"), [MetricValue(number: 1_200_000, kind: .count, label: "tokens")])
@@ -654,15 +671,32 @@ final class CodexUsageMapperTests: XCTestCase {
 
 @MainActor
 final class CodexProviderTests: XCTestCase {
+    private var originalLanguage: String?
+
+    override func setUp() {
+        super.setUp()
+        originalLanguage = UserDefaults.standard.string(forKey: LanguageSetting.key)
+        UserDefaults.standard.set(LanguageSetting.en.rawValue, forKey: LanguageSetting.key)
+    }
+
+    override func tearDown() {
+        if let originalLanguage {
+            UserDefaults.standard.set(originalLanguage, forKey: LanguageSetting.key)
+        } else {
+            UserDefaults.standard.removeObject(forKey: LanguageSetting.key)
+        }
+        super.tearDown()
+    }
+
     func testNoUsageDataBadgeIsDroppedWhenLocalLogsHaveSpend() async throws {
-        let now = OpenUsageISO8601.date(from: "2026-02-20T16:00:00.000Z")!
+        let now = OpenUsageISO8601.date(from: "2026-02-20T08:00:00.000Z")!
         // The live usage API returns nothing mappable (empty body -> no metric lines)...
         let httpClient = FakeHTTPClient(response: HTTPResponse(statusCode: 200, headers: [:], body: Data("{}".utf8)))
         let home = try CodexLogFixture.makeHome(files: [
             "sessions/rollout-1.jsonl": [
-                CodexLogFixture.turnContext(timestamp: "2026-02-20T14:00:00.000Z", model: "gpt-5.2"),
+                CodexLogFixture.turnContext(timestamp: "2026-02-20T06:00:00.000Z", model: "gpt-5.2"),
                 CodexLogFixture.tokenCount(
-                    timestamp: "2026-02-20T14:01:00.000Z",
+                    timestamp: "2026-02-20T06:01:00.000Z",
                     last: CodexLogFixture.usage(input: 100, output: 50)
                 )
             ].joined(separator: "\n")

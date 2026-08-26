@@ -9,6 +9,10 @@ struct AppBundleLocator: Sendable {
         executableURL: URL = Bundle.main.executableURL ?? URL(fileURLWithPath: CommandLine.arguments[0]),
         environment: [String: String] = ProcessInfo.processInfo.environment
     ) -> AppBundleLocator {
+        if let suite = environment["MAXUSAGE_DEFAULTS_SUITE"], !suite.isEmpty {
+            return AppBundleLocator(bundleIdentifier: suite, version: nil)
+        }
+        // Keep the original variable as a compatibility bridge for existing scripts and tests.
         if let suite = environment["OPENUSAGE_DEFAULTS_SUITE"], !suite.isEmpty {
             return AppBundleLocator(bundleIdentifier: suite, version: nil)
         }
@@ -22,6 +26,6 @@ struct AppBundleLocator: Sendable {
             )
         }
 
-        return AppBundleLocator(bundleIdentifier: "com.robinebers.openusage", version: nil)
+        return AppBundleLocator(bundleIdentifier: "com.1c7.maxusage", version: nil)
     }
 }

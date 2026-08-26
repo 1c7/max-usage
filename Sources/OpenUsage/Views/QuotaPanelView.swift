@@ -24,7 +24,8 @@ struct QuotaPanelView: View {
                 let candidates = QuotaCandidateSource.makeCandidates(
                     registry: container.registry,
                     dataStore: dataStore,
-                    enablement: container.enablement
+                    enablement: container.enablement,
+                    orderedProviderIDs: container.layout.orderedProviderIDs()
                 )
                 VStack(alignment: .leading, spacing: 0) {
                     tabBar

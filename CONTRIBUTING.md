@@ -1,10 +1,10 @@
-# Contributing to OpenUsage
+# Contributing to MaxUsage
 
-OpenUsage accepts contributions through a strict, issue-first workflow, and the quality bar is deliberately high. **By design, most external pull requests are closed** — automation closes any that don't follow the rules below. Read this entire document before opening a PR.
+MaxUsage accepts contributions through an issue-first workflow. Read this document before opening a PR.
 
 ## Philosophy
 
-OpenUsage is highly opinionated. It focuses on clean design, fast performance, and a great user experience. The feature set is intentionally limited to core functionality: tracking AI coding subscription usage, nothing more. Contributions that try to expand that scope, add unnecessary complexity, or compromise the UX will be closed.
+MaxUsage focuses on clean design, fast performance, and a great user experience. Its core scope is tracking and intelligently recommending AI coding subscriptions.
 
 If you're unsure whether your idea fits, open an issue first. External pull requests without a linked, maintainer-approved issue are closed automatically — without review.
 
@@ -17,7 +17,7 @@ If you're unsure whether your idea fits, open an issue first. External pull requ
 - Test your changes. If it touches UI, include before/after screenshots.
 - Keep it simple. Don't over-engineer.
 - One PR per concern. Don't bundle unrelated changes.
-- Match the existing design language. OpenUsage has a specific look and feel — [AGENTS.md](AGENTS.md) documents the display conventions.
+- Match the existing MaxUsage design language — [AGENTS.md](AGENTS.md) documents the display conventions.
 
 ## Pull Request Policy
 
@@ -67,7 +67,7 @@ You can also [open an issue](https://github.com/1c7/max-usage/issues/new?templat
 
 ### Request a feature
 
-Don't open a PR for a feature without an approved issue first. [Open an issue](https://github.com/robinebers/openusage/issues/new?template=feature_request.yml), make your case, and wait for the `approved` label.
+For substantial features, [open an issue](https://github.com/1c7/max-usage/issues/new?template=feature_request.yml) first so the direction can be discussed before implementation.
 
 ## What Gets Accepted
 

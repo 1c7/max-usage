@@ -6,8 +6,8 @@ import XCTest
 final class CommandLineToolInstallerTests: XCTestCase {
     private func fixture() throws -> (root: URL, source: String, destination: String) {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        let source = root.appendingPathComponent("OpenUsage.app/Contents/Helpers/openusage")
-        let destination = root.appendingPathComponent("bin/openusage")
+        let source = root.appendingPathComponent("MaxUsage.app/Contents/Helpers/maxusage")
+        let destination = root.appendingPathComponent("bin/maxusage")
         try FileManager.default.createDirectory(at: source.deletingLastPathComponent(), withIntermediateDirectories: true)
         try Data().write(to: source)
         try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: source.path)

@@ -1,10 +1,10 @@
 # Localization
 
-OpenUsage ships in English and Simplified Chinese (简体中文).
+MaxUsage ships in English and Simplified Chinese (简体中文).
 
 ## Which language shows
 
-The app defaults to your system language: if your top preferred language is Chinese (any variant: `zh-Hans`, `zh-Hant`, `zh-CN`, etc.), OpenUsage opens in Simplified Chinese automatically; for English and any other language, it defaults to English.
+The app defaults to your system language: if your top preferred language is Chinese (any variant: `zh-Hans`, `zh-Hant`, `zh-CN`, etc.), MaxUsage opens in Simplified Chinese automatically; for English and any other language, it defaults to English.
 
 You can also explicitly select your preferred language (System, English, or 简体中文) in **Settings → General → Language**. Choosing an option applies immediately across the app and persists across launches.
 

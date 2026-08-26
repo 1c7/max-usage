@@ -7,6 +7,10 @@ struct QuotaListTabView: View {
     let now: Date
     @AppStorage(LanguageSetting.key) private var language = LanguageSetting.fallback
 
+    private var orderedCandidates: [QuotaCandidate] {
+        QuotaListOrdering.exhaustedLast(candidates)
+    }
+
     var body: some View {
         if candidates.isEmpty {
             Text(AppLocalization.string(
@@ -20,9 +24,9 @@ struct QuotaListTabView: View {
             .padding(.vertical, 24)
         } else {
             VStack(alignment: .leading, spacing: 0) {
-                ForEach(candidates) { candidate in
+                ForEach(orderedCandidates) { candidate in
                     QuotaCandidateRow(candidate: candidate, now: now)
-                    if candidate.id != candidates.last?.id {
+                    if candidate.id != orderedCandidates.last?.id {
                         Divider()
                     }
                 }
@@ -42,17 +46,26 @@ private struct QuotaCandidateRow: View {
             HStack(alignment: .firstTextBaseline) {
                 Text(candidate.displayName)
                     .font(.title3.weight(.bold))
-                if let hours = candidate.weeklyHoursUntilReset(now: now) {
+                if let resetText {
                     Spacer()
-                    Text(ResetTimeFormatter.format(hoursUntilReset: hours))
+                    Text(resetText)
                         .font(.body)
                         .foregroundStyle(.tertiary)
                 }
             }
-            QuotaMeterRow(
-                label: AppLocalization.string("quotaList.weekly", defaultValue: "Weekly"),
-                remainingPct: candidate.weeklyRemainingPct
-            )
+            if candidate.weeklyRemainingPct <= 0 {
+                Text(AppLocalization.string(
+                    "quotaList.weeklyExhausted",
+                    defaultValue: "Weekly quota used up"
+                ))
+                .font(.body.weight(.semibold))
+                .foregroundStyle(Theme.notice)
+            } else {
+                QuotaMeterRow(
+                    label: AppLocalization.string("quotaList.weekly", defaultValue: "Weekly"),
+                    remainingPct: candidate.weeklyRemainingPct
+                )
+            }
             // A spent weekly quota makes the short window moot — the subscription can't be used
             // either way, so showing "5-Hour 100%" next to "Weekly 0%" would read as usable when
             // it isn't. Only surface the short window when there's still weekly quota to spend it.
@@ -61,6 +74,27 @@ private struct QuotaCandidateRow: View {
             }
         }
         .padding(.vertical, 14)
+    }
+
+    private var resetText: String? {
+        guard let resetsAt = candidate.weeklyResetsAt else { return nil }
+        if candidate.weeklyRemainingPct <= 0 {
+            guard let when = Formatters.whenLabel(at: resetsAt, mode: .absolute, now: now) else { return nil }
+            let tmpl = AppLocalization.string("quotaList.resetsAt", defaultValue: "Resets %@")
+            return String(format: tmpl, when)
+        }
+        guard let hours = candidate.weeklyHoursUntilReset(now: now) else { return nil }
+        return ResetTimeFormatter.format(hoursUntilReset: hours)
+    }
+}
+
+/// The saved provider order remains authoritative inside each group. Exhausted weekly pools form a
+/// temporary group at the bottom because they cannot satisfy the panel's "what can I use now?" job;
+/// when a pool resets it naturally returns to its saved position without rewriting the preference.
+enum QuotaListOrdering {
+    static func exhaustedLast(_ candidates: [QuotaCandidate]) -> [QuotaCandidate] {
+        candidates.filter { $0.weeklyRemainingPct > 0 }
+            + candidates.filter { $0.weeklyRemainingPct <= 0 }
     }
 }
 

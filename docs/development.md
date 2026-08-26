@@ -29,26 +29,15 @@ For full details on stores, providers, caching, and AppKit integration, see [Arc
 
 ## Releasing
 
-Releases are automated via GitHub Actions: pushing a `v*` tag on `main` builds, signs, notarizes, and publishes a new version.
+Releases are automated via GitHub Actions: pushing a `v*` tag on `main` builds an ad-hoc signed DMG and publishes a new version.
 - A plain tag (`v0.7.1`) ships to everyone on the stable channel.
 - A pre-release suffix (`v0.7.1-beta.1`) ships to the beta channel.
 
 The release workflow is defined in [.github/workflows/release.yml](../.github/workflows/release.yml).
 
-### Required Secrets
-
-| Secret | Description |
-| --- | --- |
-| `APPLE_CERTIFICATE` | Base64 of Developer ID Application `.p12` |
-| `APPLE_CERTIFICATE_PASSWORD` | Password for the `.p12` |
-| `APPLE_ID` | Apple ID email for notarization |
-| `APPLE_PASSWORD` | App-specific password |
-| `APPLE_TEAM_ID` | Apple Developer Team ID |
-| `APPLE_DEVELOPER_ID_ICLOUD_PROFILE` | Base64 Developer ID provisioning profile |
-| `SPARKLE_PUBLIC_KEY` | Base64 EdDSA public key (`SUPublicEDKey`) |
-| `SPARKLE_PRIVATE_KEY` | Base64 EdDSA private key to sign DMG |
-| `POSTHOG_CLI_API_KEY` | (Optional) PostHog API key for dSYM upload |
-| `POSTHOG_CLI_PROJECT_ID` | (Optional) PostHog project ID |
+No release secrets are currently required. These builds are not notarized, so release notes must keep
+the Gatekeeper installation notice visible. Developer ID signing, notarization, and automatic Sparkle
+updates can be restored together after the project joins the Apple Developer Program.
 
 ## Contributing
 

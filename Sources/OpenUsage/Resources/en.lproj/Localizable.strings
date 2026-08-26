@@ -5,7 +5,7 @@
 "API Key" = "API Key";
 "About MaxUsage" = "About MaxUsage";
 "Add" = "Add";
-"Adds a global `openusage` command agents can use to monitor limits." = "Adds a global `openusage` command agents can use to monitor limits.";
+"Adds a global `openusage` command agents can use to monitor limits." = "Adds a global `maxusage` command agents can use to monitor limits.";
 "Advanced" = "Advanced";
 "Always Show Pacing" = "Always Show Pacing";
 "Always Visible" = "Always Visible";
@@ -274,7 +274,9 @@
 "quotaCandidate.shortWindow.daily" = "Daily";
 "quotaCandidate.shortWindow.session" = "5-Hour";
 "quotaList.empty" = "Turn on a provider in Customize to see its quota here.";
+"quotaList.resetsAt" = "Resets %@";
 "quotaList.weekly" = "Weekly";
+"quotaList.weeklyExhausted" = "Weekly quota used up";
 "quotaPanel.tab.quota" = "Quotas";
 "quotaPanel.tab.recommend" = "Recommended";
 "rateLimitResets.banner.failed" = "Couldn't reset usage. Please try again.";

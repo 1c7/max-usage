@@ -17,14 +17,15 @@ APP_MACOS="$APP_CONTENTS/MacOS"
 APP_HELPERS="$APP_CONTENTS/Helpers"
 APP_RESOURCES="$APP_CONTENTS/Resources"
 APP_BINARY="$APP_MACOS/$APP_DISPLAY"
-CLI_BINARY="$APP_HELPERS/openusage"
+CLI_BINARY="$APP_HELPERS/maxusage"
 INFO_PLIST="$APP_CONTENTS/Info.plist"
 DMG_NAME="$APP_DISPLAY-$VERSION.dmg"
 DMG_PATH="$DIST_DIR/$DMG_NAME"
 
-echo "==> Building release binary ($VERSION)..."
-swift build -c release
-BUILD_DIR="$(swift build -c release --show-bin-path)"
+echo "==> Building universal release binaries ($VERSION)..."
+swift build -c release --arch arm64 --arch x86_64 --product "$TARGET_NAME"
+swift build -c release --arch arm64 --arch x86_64 --product openusage-cli
+BUILD_DIR="$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)"
 BUILD_BINARY="$BUILD_DIR/$TARGET_NAME"
 BUILD_CLI_BINARY="$BUILD_DIR/openusage-cli"
 
@@ -35,6 +36,12 @@ mkdir -p "$APP_MACOS" "$APP_HELPERS" "$APP_RESOURCES"
 cp "$BUILD_BINARY" "$APP_BINARY"
 cp "$BUILD_CLI_BINARY" "$CLI_BINARY"
 chmod +x "$APP_BINARY" "$CLI_BINARY"
+
+for binary in "$APP_BINARY" "$CLI_BINARY"; do
+  archs="$(lipo -archs "$binary")"
+  [[ "$archs" == *arm64* && "$archs" == *x86_64* ]] \
+    || { echo "Expected universal binary, got $archs: $binary" >&2; exit 1; }
+done
 
 install_name_tool -add_rpath "@executable_path/../Frameworks" "$CLI_BINARY" 2>/dev/null || true
 
@@ -113,21 +120,18 @@ cat >"$INFO_PLIST" <<PLIST
 </plist>
 PLIST
 
-CODESIGN_IDENTITY=$(/usr/bin/security find-identity -p codesigning -v 2>/dev/null \
-  | /usr/bin/awk -F\" '/Apple Development:/ { print $2; exit }') || CODESIGN_IDENTITY=""
+CODESIGN_IDENTITY="${MAXUSAGE_SIGNING_IDENTITY:--}"
 
 "$ROOT_DIR/script/embed_sparkle.sh" "$APP_BUNDLE" "$APP_BINARY" "$CODESIGN_IDENTITY" "--options runtime"
 
-ENTITLEMENTS="$ROOT_DIR/script/OpenUsage.local.entitlements.plist"
-
-if [ -n "$CODESIGN_IDENTITY" ]; then
+if [ "$CODESIGN_IDENTITY" != "-" ]; then
   echo "==> Signing with $CODESIGN_IDENTITY..."
   /usr/bin/codesign --force --options runtime --sign "$CODESIGN_IDENTITY" "$CLI_BINARY" >/dev/null 2>&1 || true
-  /usr/bin/codesign --force --options runtime --sign "$CODESIGN_IDENTITY" --entitlements "$ENTITLEMENTS" "$APP_BUNDLE" >/dev/null 2>&1 || true
+  /usr/bin/codesign --force --options runtime --sign "$CODESIGN_IDENTITY" "$APP_BUNDLE" >/dev/null
 else
   echo "==> Ad-hoc signing..."
-  /usr/bin/codesign --force --sign - "$CLI_BINARY" >/dev/null 2>&1 || true
-  /usr/bin/codesign --force --sign - --entitlements "$ENTITLEMENTS" "$APP_BUNDLE" >/dev/null 2>&1 || true
+  /usr/bin/codesign --force --sign - "$CLI_BINARY" >/dev/null
+  /usr/bin/codesign --force --sign - "$APP_BUNDLE" >/dev/null
 fi
 
 echo "==> Packaging DMG..."

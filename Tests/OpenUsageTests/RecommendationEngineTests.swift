@@ -1,7 +1,7 @@
 import XCTest
 @testable import OpenUsage
 
-/// Covers `docs/1- 额度推荐算法.md`'s gate, tier ladder, and "no recommendation" cases.
+/// Covers `docs/1- 额度推荐算法.md`'s gate, strict EDF ranking, and "no recommendation" cases.
 final class RecommendationEngineTests: XCTestCase {
     private let now = Date(timeIntervalSince1970: 1_700_000_000)
 
@@ -51,11 +51,9 @@ final class RecommendationEngineTests: XCTestCase {
         XCTAssertEqual(rec.candidate.id, "A")
     }
 
-    // MARK: - Tiering
+    // MARK: - Strict EDF ranking
 
-    func testTier1PreferredOverLaterTiersRegardlessOfRemaining() {
-        // Doc example: within a tier, remaining wins; across tiers, the earliest non-empty tier wins
-        // outright even if a later tier has more remaining.
+    func testEarliestResetWinsRegardlessOfRemaining() {
         let soon = candidate(id: "soon", weeklyRemainingPct: 5, weeklyHours: 3)      // tier 1
         let later = candidate(id: "later", weeklyRemainingPct: 95, weeklyHours: 50)  // tier 3
         let result = RecommendationEngine.evaluate(candidates: [soon, later], now: now)
@@ -63,31 +61,41 @@ final class RecommendationEngineTests: XCTestCase {
         XCTAssertEqual(rec.candidate.id, "soon")
     }
 
-    func testWithinTierPicksHighestRemainingNotSoonestReset() {
-        // Doc's own example: both in tier 3 (24-72h); A=20%/47h, B=95%/49h → B wins.
+    func testExactResetTimeStillWinsInsideFormerTier() {
         let a = candidate(id: "A", weeklyRemainingPct: 20, weeklyHours: 47)
         let b = candidate(id: "B", weeklyRemainingPct: 95, weeklyHours: 49)
         let result = RecommendationEngine.evaluate(candidates: [a, b], now: now)
         guard case .recommended(let rec) = result else { return XCTFail("expected a recommendation") }
-        XCTAssertEqual(rec.candidate.id, "B")
+        XCTAssertEqual(rec.candidate.id, "A")
     }
 
-    func testTier4UsedWhenEarlierTiersEmpty() {
+    func testFourDaysBeatsSixDaysEvenWithLessRemaining() {
+        let antigravity = candidate(id: "antigravity", weeklyRemainingPct: 87, weeklyHours: 4 * 24)
+        let codex = candidate(id: "codex", weeklyRemainingPct: 100, weeklyHours: 6 * 24)
+        let result = RecommendationEngine.evaluate(candidates: [codex, antigravity], now: now)
+        guard case .recommended(let rec) = result else { return XCTFail("expected a recommendation") }
+        XCTAssertEqual(rec.candidate.id, "antigravity")
+    }
+
+    func testRemainingBreaksExactResetTimeTie() {
         let a = candidate(id: "A", weeklyRemainingPct: 30, weeklyHours: 100)
-        let b = candidate(id: "B", weeklyRemainingPct: 80, weeklyHours: 200)
+        let b = candidate(id: "B", weeklyRemainingPct: 80, weeklyHours: 100)
         let result = RecommendationEngine.evaluate(candidates: [a, b], now: now)
         guard case .recommended(let rec) = result else { return XCTFail("expected a recommendation") }
         XCTAssertEqual(rec.candidate.id, "B")
     }
 
-    func testTierBoundariesUseStrictLessThan() {
-        // Exactly 6h must land in tier 2, not tier 1; exactly 24h in tier 3, not tier 2.
-        let atSix = candidate(id: "atSix", weeklyRemainingPct: 10, weeklyHours: 6)
-        let earlyTier1 = candidate(id: "earlyTier1", weeklyRemainingPct: 90, weeklyHours: 5.9)
-        let result = RecommendationEngine.evaluate(candidates: [atSix, earlyTier1], now: now)
-        guard case .recommended(let rec) = result else { return XCTFail("expected a recommendation") }
-        // Tier 1 (earlyTier1, 5.9h) is non-empty, so it wins outright over tier 2's higher remaining.
-        XCTAssertEqual(rec.candidate.id, "earlyTier1")
+    func testMissingOrPastWeeklyResetIsExcluded() {
+        let missing = QuotaCandidate(
+            id: "missing", displayName: "missing", icon: .providerMark("missing"),
+            weeklyUsed: 20, weeklyLimit: 100, weeklyResetsAt: nil,
+            shortWindowUsed: 0, shortWindowLimit: 100, shortWindowResetsAt: nil,
+            shortWindowLabel: "Session"
+        )
+        let past = candidate(id: "past", weeklyRemainingPct: 80, weeklyHours: -1)
+        guard case .none = RecommendationEngine.evaluate(candidates: [missing, past], now: now) else {
+            return XCTFail("a valid future reset is required")
+        }
     }
 
     // MARK: - No recommendation

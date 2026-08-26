@@ -13,7 +13,7 @@ Tracks your [OpenRouter](https://openrouter.ai) credit balance and spend from yo
 | This Month | Spend so far this month |
 | Key Limit | Spend in the current limit window against this key's cap — shown only when the key has one configured |
 
-OpenUsage shows the reported tier (such as "Pay as you go" or "Free tier") beside the provider name.
+MaxUsage shows the reported tier (such as "Pay as you go" or "Free tier") beside the provider name.
 
 ## Where credentials come from
 

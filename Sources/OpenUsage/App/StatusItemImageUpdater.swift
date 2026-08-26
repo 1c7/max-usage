@@ -77,7 +77,8 @@ final class StatusItemImageUpdater {
         let candidates = QuotaCandidateSource.makeCandidates(
             registry: container.registry,
             dataStore: container.dataStore,
-            enablement: container.enablement
+            enablement: container.enablement,
+            orderedProviderIDs: container.layout.orderedProviderIDs()
         )
         let recommended: QuotaCandidate?
         if case .recommended(let recommendation) = RecommendationEngine.evaluate(candidates: candidates) {

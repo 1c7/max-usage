@@ -3,6 +3,22 @@ import XCTest
 
 /// Boundary coverage for `docs/2- 时间显示算法.md`'s tier ladder and rounding edge cases.
 final class ResetTimeFormatterTests: XCTestCase {
+    private var originalLanguage: String?
+
+    override func setUp() {
+        super.setUp()
+        originalLanguage = UserDefaults.standard.string(forKey: LanguageSetting.key)
+        UserDefaults.standard.set(LanguageSetting.en.rawValue, forKey: LanguageSetting.key)
+    }
+
+    override func tearDown() {
+        if let originalLanguage {
+            UserDefaults.standard.set(originalLanguage, forKey: LanguageSetting.key)
+        } else {
+            UserDefaults.standard.removeObject(forKey: LanguageSetting.key)
+        }
+        super.tearDown()
+    }
 
     func testSubMinuteFloorsToOneMinute() {
         XCTAssertEqual(ResetTimeFormatter.format(hoursUntilReset: 20.0 / 3600), "Resets in 1 min")

@@ -5,7 +5,7 @@
 "API Key" = "API 密钥";
 "About MaxUsage" = "关于 MaxUsage";
 "Add" = "添加";
-"Adds a global `openusage` command agents can use to monitor limits." = "添加一个全局 `openusage` 命令，供智能体用来监控额度。";
+"Adds a global `openusage` command agents can use to monitor limits." = "添加一个全局 `maxusage` 命令，供智能体用来监控额度。";
 "Advanced" = "高级";
 "Always Show Pacing" = "始终显示进度节奏";
 "Always Visible" = "始终显示";
@@ -273,7 +273,9 @@
 "quotaCandidate.shortWindow.daily" = "每日";
 "quotaCandidate.shortWindow.session" = "5小时";
 "quotaList.empty" = "在自定义中打开一个服务商，即可在此查看额度。";
+"quotaList.resetsAt" = "%@重置";
 "quotaList.weekly" = "周额度";
+"quotaList.weeklyExhausted" = "周额度已用光";
 "quotaPanel.tab.quota" = "查看额度";
 "quotaPanel.tab.recommend" = "推荐使用";
 "rateLimitResets.banner.failed" = "无法重置用量，请重试。";

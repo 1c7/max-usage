@@ -7,17 +7,17 @@ import os
 /// the `nonisolated`-static-`Logger` precedent in `LocalUsageServer`, plus the lock for the handle.
 ///
 /// Rotation matches the Tauri cap (`.max_file_size(10_000_000)`): when a write would exceed 10 MB the
-/// current file becomes `OpenUsage.1.log` and a fresh `OpenUsage.log` opens — bounding disk to ~20 MB
+/// current file becomes `MaxUsage.1.log` and a fresh `MaxUsage.log` opens — bounding disk to ~20 MB
 /// while keeping one archive of recent history for user-submitted reports (a deliberate, minor
 /// improvement over Tauri's KeepOne, which discards all history). On launch an already-oversize file is
 /// rotated once before the first write. If opening/rotating fails the sink fails loudly to `os.Logger`
 /// at error and disables itself for the session — never crashes, never silently spins.
 final class LogFile: @unchecked Sendable {
     /// The shared production sink. Other code logs through `AppLog`, which writes here. Resolves
-    /// `~/Library/Logs/OpenUsage/OpenUsage.log` via `FileManager`, never hardcoded from `$HOME`; the
-    /// `Logs/OpenUsage` subfolder is a literal (not bundle-id-keyed), so the dev and release builds
+    /// `~/Library/Logs/MaxUsage/MaxUsage.log` via `FileManager`, never hardcoded from `$HOME`; the
+    /// `Logs/MaxUsage` subfolder is a literal (not bundle-id-keyed), so the dev and release builds
     /// agree on the same file — acceptable since they are separate builds.
-    static let shared = LogFile(directory: defaultDirectory(), fileName: "OpenUsage.log")
+    static let shared = LogFile(directory: defaultDirectory(), fileName: "MaxUsage.log")
 
     /// The advertised log path (logged at startup, copied/revealed from Settings). Derived from the
     /// shared sink so the path shown to the user always equals where logs are actually written.
@@ -31,7 +31,7 @@ final class LogFile: @unchecked Sendable {
     private let archiveURL: URL
     private let directory: URL
     private let maxBytes: Int
-    private let fallbackLogger = Logger(subsystem: "OpenUsage", category: "logfile")
+    private let fallbackLogger = Logger(subsystem: "MaxUsage", category: "logfile")
 
     private let lock = NSLock()
     private var handle: FileHandle?
@@ -59,7 +59,7 @@ final class LogFile: @unchecked Sendable {
         // ever returned empty in an unusual container. A non-ideal-but-valid directory keeps the app alive.
         let library = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first
             ?? FileManager.default.temporaryDirectory
-        return library.appendingPathComponent("Logs/OpenUsage", isDirectory: true)
+        return library.appendingPathComponent("Logs/MaxUsage", isDirectory: true)
     }
 
     /// Create the directory and file, seed the in-memory size from disk, and perform the launch-time

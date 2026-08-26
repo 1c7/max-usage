@@ -1,6 +1,6 @@
 # Proxy
 
-OpenUsage can route all provider requests through an optional proxy.
+MaxUsage can route all provider requests through an optional proxy.
 
 - Supported: `socks5://`, `http://`, `https://`
 - Config file: `~/.openusage/config.json`
@@ -33,7 +33,7 @@ When the URL has no port, the scheme's default applies (socks5 → 1080, http �
 
 ## Behavior
 
-- The config is read once at launch — **restart OpenUsage after changing the file**.
+- The config is read once at launch — **restart MaxUsage after changing the file**.
 - `localhost`, `127.0.0.1`, and `::1` always bypass the proxy (the [local HTTP API](local-http-api.md) is unaffected).
 - A missing, disabled, invalid, or unreadable config simply leaves proxying off.
 

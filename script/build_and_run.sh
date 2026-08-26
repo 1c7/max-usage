@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Builds OpenUsage, stages a signed .app bundle under dist/, and launches it in place — no install
+# Builds MaxUsage, stages a signed .app bundle under dist/, and launches it in place — no install
 # to /Applications. The dev build:
 #   - is signed with a stable Apple Development identity, so keychain/permission grants stick across
 #     rebuilds (macOS keys those to the signing identity + bundle id, not the install location);
-#   - uses its own bundle id (com.robinebers.openusage.dev), so it never touches the real installed
+#   - uses its own bundle id (com.1c7.maxusage.dev), so it never touches the real installed
 #     app's settings or keychain. To run against the real app's data instead, set BUNDLE_ID to
-#     com.robinebers.openusage below;
+#     com.1c7.maxusage below;
 #   - ships no Sparkle feed, so it never checks for or installs updates (test updates with a real
 #     signed + notarized release build — that's the only honest way).
 #
@@ -21,9 +21,9 @@ MODE="${1:-run}"
 CONFIG="${CONFIG:-release}"
 
 TARGET_NAME="OpenUsage"                 # SwiftPM target / binary name
-APP_DISPLAY="OpenUsage"                 # user-facing app name
-BUNDLE_ID="${BUNDLE_ID:-com.robinebers.openusage.dev}"
-ICLOUD_CONTAINER_ID="iCloud.com.robinebers.openusage.dev"
+APP_DISPLAY="MaxUsage"                  # user-facing app name
+BUNDLE_ID="${BUNDLE_ID:-com.1c7.maxusage.dev}"
+ICLOUD_CONTAINER_ID="iCloud.com.1c7.maxusage.dev"
 MIN_SYSTEM_VERSION="15.0"
 APP_VERSION="0.7.0"
 APP_BUILD="0.7.0"
@@ -35,14 +35,14 @@ APP_CONTENTS="$APP_BUNDLE/Contents"
 APP_MACOS="$APP_CONTENTS/MacOS"
 APP_HELPERS="$APP_CONTENTS/Helpers"
 APP_RESOURCES="$APP_CONTENTS/Resources"
-APP_BINARY="$APP_MACOS/$TARGET_NAME"
-CLI_BINARY="$APP_HELPERS/openusage"
+APP_BINARY="$APP_MACOS/$APP_DISPLAY"
+CLI_BINARY="$APP_HELPERS/maxusage"
 INFO_PLIST="$APP_CONTENTS/Info.plist"
 RESOURCE_BUNDLE_NAME="${TARGET_NAME}_${TARGET_NAME}.bundle"
 ENTITLEMENTS="$ROOT_DIR/script/OpenUsage.dev.entitlements.plist"
 SIGN_ENTITLEMENTS="$ROOT_DIR/script/OpenUsage.local.entitlements.plist"
 
-pkill -x "$TARGET_NAME" >/dev/null 2>&1 || true
+pkill -x "$APP_DISPLAY" >/dev/null 2>&1 || true
 
 echo "==> swift build ($CONFIG)"
 swift build -c "$CONFIG"
@@ -133,7 +133,7 @@ cat >"$INFO_PLIST" <<PLIST
 <plist version="1.0">
 <dict>
   <key>CFBundleExecutable</key>
-  <string>$TARGET_NAME</string>
+  <string>$APP_DISPLAY</string>
   <key>CFBundleIdentifier</key>
   <string>$BUNDLE_ID</string>
   <key>CFBundleName</key>
@@ -165,12 +165,12 @@ cat >"$INFO_PLIST" <<PLIST
   <true/>
   <key>NSUbiquitousContainers</key>
   <dict>
-    <key>iCloud.com.robinebers.openusage.dev</key>
+    <key>iCloud.com.1c7.maxusage.dev</key>
     <dict>
       <key>NSUbiquitousContainerIsDocumentScopePublic</key>
       <false/>
       <key>NSUbiquitousContainerName</key>
-      <string>OpenUsage</string>
+      <string>MaxUsage</string>
       <key>NSUbiquitousContainerSupportedFolderLevels</key>
       <string>None</string>
     </dict>
@@ -241,12 +241,12 @@ case "$MODE" in
     ;;
   logs)
     launch_app
-    /usr/bin/log stream --info --style compact --predicate "process == \"$TARGET_NAME\""
+    /usr/bin/log stream --info --style compact --predicate "process == \"$APP_DISPLAY\""
     ;;
   verify)
     launch_app
     sleep 1
-    pgrep -x "$TARGET_NAME" >/dev/null && echo "==> running"
+    pgrep -x "$APP_DISPLAY" >/dev/null && echo "==> running"
     ;;
   *)
     echo "usage: $0 [run|build|logs|verify]" >&2
