@@ -1,16 +1,16 @@
 # MaxUsage
 
 <p align="left">
-  <a href="README.md">English</a> | <strong>简体中文</strong>
+  <a href="../../README.md">English</a> | <strong>简体中文</strong>
 </p>
 
 根据实时剩余额度与重置时间，智能推荐当前最该使用的 AI 编程订阅（Claude、Codex、Antigravity 等）。
 
 <p align="center">
-  <img src="assets/recommendation-zh-v2.jpg" alt="MaxUsage 智能推荐" />
+  <img src="../assets/recommendation-zh-v2.jpg" alt="MaxUsage 智能推荐" />
 </p>
 <p align="center">
-  <img src="assets/quotas-zh-v2.jpg" alt="MaxUsage 额度总览" />
+  <img src="../assets/quotas-zh-v2.jpg" alt="MaxUsage 额度总览" />
 </p>
 
 ---
@@ -22,11 +22,11 @@
 每天手动去查 5 个服务的网页后台非常繁琐耗时：
 
 <p align="center">
-  <img src="docs/images/claude-code.jpg" alt="Claude Code 用量" width="700" /><br/><br/>
-  <img src="docs/images/codex.jpg" alt="Codex 用量" width="700" /><br/><br/>
-  <img src="docs/images/agy.jpg" alt="Antigravity 用量" width="700" /><br/><br/>
-  <img src="docs/images/opencode%20go.jpg" alt="OpenCode 用量" width="700" /><br/><br/>
-  <img src="docs/images/z.ai.jpg" alt="Z.ai 用量" width="700" />
+  <img src="images/claude-code.jpg" alt="Claude Code 用量" width="700" /><br/><br/>
+  <img src="images/codex.jpg" alt="Codex 用量" width="700" /><br/><br/>
+  <img src="images/agy.jpg" alt="Antigravity 用量" width="700" /><br/><br/>
+  <img src="images/opencode%20go.jpg" alt="OpenCode 用量" width="700" /><br/><br/>
+  <img src="images/z.ai.jpg" alt="Z.ai 用量" width="700" />
 </p>
 
 **MaxUsage 让这一切只需 1 秒** —— 它在本地自动分析你所有订阅的剩余额度与重置窗口，直接告诉你下一刻最该打开谁。
@@ -51,8 +51,8 @@ brew install 1c7/tap/max-usage
 
 ## 文档与开发指引
 
-- **功能与使用文档**：查阅 [完整文档中心](docs/README.md) 了解支持的服务商、快捷键、代理设置、CLI 命令行以及本地 HTTP API。
-- **开发者指引**：查阅 [开发与架构指南](docs/development.md) 了解本地编译、运行测试、发布流程与架构设计。
+- **功能与使用文档**：查阅 [完整文档中心](README.md) 了解支持的服务商、快捷键、代理设置、CLI 命令行以及本地 HTTP API。
+- **开发者指引**：查阅 [开发与架构指南](development.md) 了解本地编译、运行测试、发布流程与架构设计。
 
 ---
 
@@ -66,4 +66,4 @@ brew install 1c7/tap/max-usage
 
 ## 开源协议
 
-[MIT](LICENSE)
+[MIT](../../LICENSE)

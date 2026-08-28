@@ -47,14 +47,17 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Test
+        working-directory: app
         run: swift test
 
       - name: Build ad-hoc signed DMG
+        working-directory: app
         env:
           MAXUSAGE_SIGNING_IDENTITY: "-"
         run: ./script/package_release.sh "${{ steps.meta.outputs.version }}"
 
       - name: Verify package identity
+        working-directory: app
         env:
           VERSION: ${{ steps.meta.outputs.version }}
         run: |
@@ -70,5 +73,5 @@ jobs:
           tag_name: ${{ steps.meta.outputs.tag }}
           name: MaxUsage ${{ steps.meta.outputs.version }}
           prerelease: ${{ steps.meta.outputs.prerelease }}
-          files: dist/MaxUsage-${{ steps.meta.outputs.version }}.dmg
+          files: app/dist/MaxUsage-${{ steps.meta.outputs.version }}.dmg
           fail_on_unmatched_files: true

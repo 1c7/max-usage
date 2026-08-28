@@ -13,7 +13,7 @@ on:
   push:
     branches: [main]
     paths:
-      - Sources/OpenUsage/Resources/pricing_supplement.json
+      - app/Sources/OpenUsage/Resources/pricing_supplement.json
       - .github/workflows/pricing-supplement.yml
   workflow_dispatch:
 
@@ -34,7 +34,7 @@ jobs:
         run: |
           python3 - << 'PY'
           import json, re, sys
-          with open("Sources/OpenUsage/Resources/pricing_supplement.json") as f:
+          with open("app/Sources/OpenUsage/Resources/pricing_supplement.json") as f:
               supplement = json.load(f)
           problems = []
           for model, entry in supplement["pricing"].items():
@@ -60,7 +60,7 @@ jobs:
       - name: Assemble Pages directory
         run: |
           mkdir -p public
-          cp Sources/OpenUsage/Resources/pricing_supplement.json public/pricing_supplement.json
+          cp app/Sources/OpenUsage/Resources/pricing_supplement.json public/pricing_supplement.json
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
