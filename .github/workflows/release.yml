@@ -75,3 +75,31 @@ jobs:
           prerelease: ${{ steps.meta.outputs.prerelease }}
           files: app/dist/MaxUsage-${{ steps.meta.outputs.version }}.dmg
           fail_on_unmatched_files: true
+
+      - name: Update Homebrew tap
+        env:
+          # Fine-grained PAT with Contents read/write on 1c7/homebrew-tap; the
+          # workflow-scoped GITHUB_TOKEN cannot push to another repository.
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          if [ -z "$TAP_TOKEN" ]; then
+            echo "::warning::TAP_TOKEN is not set; skipping Homebrew tap update."
+            exit 0
+          fi
+          SHA=$(shasum -a 256 "app/dist/MaxUsage-$VERSION.dmg" | cut -d' ' -f1)
+          git clone "https://x-access-token:$TAP_TOKEN@github.com/1c7/homebrew-tap.git" tap
+          cd tap
+          sed -i '' \
+            -e "s/^  version \".*\"/  version \"$VERSION\"/" \
+            -e "s/^  sha256 \".*\"/  sha256 \"$SHA\"/" \
+            Casks/max-usage.rb
+          if git diff --quiet; then
+            echo "Tap already points at $VERSION; nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Casks/max-usage.rb
+          git commit -m "max-usage $VERSION"
+          git push
