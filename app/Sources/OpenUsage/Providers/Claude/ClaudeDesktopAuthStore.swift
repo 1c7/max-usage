@@ -226,10 +226,22 @@ struct ClaudeDesktopAuthStore: Sendable {
         else {
             return nil
         }
+        // Decoded independently: Swift evaluates every element of a tuple literal before returning
+        // it, so `(v2: try ..., v1: try ...)` would let a corrupt/legacy v1 blob throw away an
+        // already-valid v2 result. A slot that fails to decode is just missing, not fatal.
         return (
-            v2: try Self.decodeCache(root[Self.cacheV2Key], key: key),
-            v1: try Self.decodeCache(root[Self.cacheV1Key], key: key)
+            v2: Self.decodeCacheLogging(root[Self.cacheV2Key], key: key, slot: "v2"),
+            v1: Self.decodeCacheLogging(root[Self.cacheV1Key], key: key, slot: "v1")
         )
+    }
+
+    private static func decodeCacheLogging(_ stored: Any?, key: Data, slot: String) -> [String: Any]? {
+        do {
+            return try decodeCache(stored, key: key)
+        } catch {
+            AppLog.warn(LogTag.auth("claude"), "Claude Desktop \(slot) cache unreadable, ignoring: \(error.localizedDescription)")
+            return nil
+        }
     }
 
     private static func decodeCache(_ stored: Any?, key: Data) throws -> [String: Any]? {

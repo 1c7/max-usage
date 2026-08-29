@@ -103,6 +103,21 @@ final class ClaudeDesktopAuthStoreTests: XCTestCase {
         XCTAssertEqual(oauth.accessToken, "full-scope-token")
     }
 
+    /// A corrupt/legacy v1 cache blob must not discard an already-valid v2 login: `loadCaches`
+    /// decodes each slot independently rather than letting one `try` in a tuple literal abort both.
+    func testCorruptV1CacheDoesNotDiscardValidV2Login() throws {
+        let fixture = try makeFixture(
+            activeOrganization: organization,
+            v2: [cacheKey(organization: organization): tokenEntry("desktop-token", expiresIn: 3_600)],
+            corruptV1: true
+        )
+
+        let result = fixture.store.load(allowInteraction: false)
+
+        XCTAssertEqual(result.status, .available)
+        XCTAssertEqual(result.oauth?.accessToken, "desktop-token")
+    }
+
     func testBackgroundReadDoesNotPromptButManualReadCan() throws {
         let fixture = try makeFixture(
             activeOrganization: organization,
@@ -390,7 +405,8 @@ final class ClaudeDesktopAuthStoreTests: XCTestCase {
         activeOrganization: String,
         v2: [String: Any],
         v1: [String: Any]? = nil,
-        requiresInteraction: Bool = false
+        requiresInteraction: Bool = false,
+        corruptV1: Bool = false
     ) throws -> DesktopFixture {
         let key = try ClaudeDesktopAuthStore.deriveKey(password: password)
         let cookieHost = ".claude.ai"
@@ -399,7 +415,10 @@ final class ClaudeDesktopAuthStoreTests: XCTestCase {
         let v2Data = try JSONSerialization.data(withJSONObject: v2)
         let encryptedV2 = try encrypt(v2Data, key: key)
         var config: [String: Any] = ["oauth:tokenCacheV2": encryptedV2.base64EncodedString()]
-        if let v1 {
+        if corruptV1 {
+            // Not valid base64 — decodeCache throws `.invalidCiphertext` for this slot.
+            config["oauth:tokenCache"] = "not-valid-base64!!!"
+        } else if let v1 {
             let v1Data = try JSONSerialization.data(withJSONObject: v1)
             config["oauth:tokenCache"] = try encrypt(v1Data, key: key).base64EncodedString()
         }

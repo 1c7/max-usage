@@ -48,14 +48,16 @@ final class ModelPricingStoreTests: XCTestCase {
 
     private func makeStore(
         handler: @escaping @Sendable (HTTPRequest) async throws -> HTTPResponse,
-        now: @escaping @Sendable () -> Date = Date.init
+        now: @escaping @Sendable () -> Date = Date.init,
+        bundleInstalledAt: @escaping @Sendable () -> Date = { .distantPast }
     ) -> (ModelPricingStore, RoutingHTTPClient) {
         let http = RoutingHTTPClient(handler: handler)
         let store = ModelPricingStore(
             http: http,
             cacheDirectory: tempDir,
             now: now,
-            bundledData: Self.bundledFixtures
+            bundledData: Self.bundledFixtures,
+            bundleInstalledAt: bundleInstalledAt
         )
         return (store, http)
     }
@@ -220,6 +222,28 @@ final class ModelPricingStoreTests: XCTestCase {
                 name == "pricing_supplement" ? Data(json.utf8) : Self.bundledFixtures(name)
             }
         )
+    }
+
+    /// An app update ships a bundle that's newer than a stale LiteLLM/models.dev cache left on disk
+    /// from before the update. Unlike the supplement, these compact catalogs carry no per-entry
+    /// `updated_at`, so the cache must be ignored until the next successful refresh re-stamps it —
+    /// otherwise a corrected bundled price never surfaces for anyone offline or firewalled.
+    func testCacheFetchedBeforeBundleInstallIsIgnoredForCatalogs() async throws {
+        let (store, _) = makeStore(handler: { Self.respond(to: $0) }, bundleInstalledAt: { .distantFuture })
+        await store.refreshNow()
+
+        let pricing = await store.current()
+        XCTAssertNil(pricing.resolve(model: "fetched-model"), "cache predates this build, must not override bundled")
+        XCTAssertEqual(pricing.resolve(model: "bundled-model")?.inputPerMillion, 1, "bundled entries still serve")
+    }
+
+    /// The usual case: the cache was fetched by this same build, so it keeps winning as before.
+    func testCacheFetchedAfterBundleInstallStillWinsForCatalogs() async throws {
+        let (store, _) = makeStore(handler: { Self.respond(to: $0) }, bundleInstalledAt: { .distantPast })
+        await store.refreshNow()
+
+        let pricing = await store.current()
+        XCTAssertEqual(pricing.resolve(model: "fetched-model")?.inputPerMillion, 5)
     }
 
     func testFailureRetryIntervalPreventsHammering() async throws {

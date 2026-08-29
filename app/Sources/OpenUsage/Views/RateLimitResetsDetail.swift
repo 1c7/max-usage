@@ -383,8 +383,10 @@ struct RateLimitResetsDetail: View {
     private func runClaim(_ date: Date) {
         guard let claim else { return }
         // Reuse the key minted at confirm time; minting here as a fallback covers only a state loss
-        // between confirm and click (popover teardown re-runs confirm first).
+        // between confirm and click (popover teardown re-runs confirm first). Persisted immediately
+        // so a retry after this fallback path reuses the same key instead of minting a second one.
         let redeemRequestID = redeemRequestIDs[date] ?? UUID().uuidString
+        redeemRequestIDs[date] = redeemRequestID
         withAnimation(Self.flowAnimation) {
             confirmingExpiry = nil
             claimingExpiry = date

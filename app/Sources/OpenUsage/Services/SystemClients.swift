@@ -325,23 +325,43 @@ struct SecurityKeychainAccessor: KeychainAccessing {
     }
 
     func writeGenericPassword(service: String, value: String) throws {
-        try writePassword(["add-generic-password", "-U", "-s", service, "-w", value])
+        try writePassword(service: service, account: nil, value: value)
     }
 
     func writeGenericPasswordForCurrentUser(service: String, value: String) throws {
-        try writePassword(["add-generic-password", "-U", "-a", currentUserAccount(), "-s", service, "-w", value])
+        try writePassword(service: service, account: currentUserAccount(), value: value)
     }
 
-    private func writePassword(_ arguments: [String]) throws {
-        let result = try processRunner.run(
-            executable: "/usr/bin/security",
-            arguments: arguments,
-            environment: [:],
-            timeout: 5
-        )
-        if !result.succeeded {
-            throw KeychainError.writeFailed(result.stderr)
+    // In-process (SecItemAdd/SecItemUpdate), unlike the read paths above: a subprocess invocation
+    // would pass the secret as a plaintext argument, readable by any other process owned by the same
+    // user via `ps`/`sysctl KERN_PROCARGS2` for the subprocess's lifetime. Reads don't have this
+    // exposure (the secret comes back on stdout, never in argv), so they're left on `security` for now.
+    private func writePassword(service: String, account: String?, value: String) throws {
+        guard let secretData = value.data(using: .utf8) else {
+            throw KeychainError.writeFailed("Unable to encode secret.")
         }
+        var query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+        ]
+        if let account {
+            query[kSecAttrAccount as String] = account
+        }
+
+        let updateStatus = SecItemUpdate(query as CFDictionary, [kSecValueData as String: secretData] as CFDictionary)
+        if updateStatus == errSecItemNotFound {
+            query[kSecValueData as String] = secretData
+            let addStatus = SecItemAdd(query as CFDictionary, nil)
+            guard addStatus == errSecSuccess else {
+                throw KeychainError.writeFailed(Self.errorMessage(addStatus))
+            }
+        } else if updateStatus != errSecSuccess {
+            throw KeychainError.writeFailed(Self.errorMessage(updateStatus))
+        }
+    }
+
+    private static func errorMessage(_ status: OSStatus) -> String {
+        (SecCopyErrorMessageString(status, nil) as String?) ?? "Keychain write failed (status \(status))."
     }
 
     private func currentUserAccount() -> String {

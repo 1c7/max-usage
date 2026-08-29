@@ -5,7 +5,16 @@ import Foundation
 /// OpenUsage pricing supplement on gh-pages). `current()` never blocks on the network — it serves
 /// the freshest data on hand and revalidates in the background (stale-while-revalidate).
 actor ModelPricingStore {
-    static let shared = ModelPricingStore()
+    static let shared = ModelPricingStore(bundleInstalledAt: ModelPricingStore.currentBundleInstallDate)
+
+    private static func currentBundleInstallDate() -> Date {
+        guard let path = Bundle.main.executablePath,
+              let attributes = try? FileManager.default.attributesOfItem(atPath: path),
+              let date = attributes[.modificationDate] as? Date else {
+            return .distantPast
+        }
+        return date
+    }
 
     /// Refetch a source this long after its last success.
     private static let refreshInterval: TimeInterval = 60 * 60
@@ -29,6 +38,7 @@ actor ModelPricingStore {
     private let now: @Sendable () -> Date
     private let sourceURLs: [SourceID: URL]
     private let bundledData: @Sendable (String) -> Data?
+    private let bundleInstalledAt: @Sendable () -> Date
 
     private var loaded = false
     private var pricing: ModelPricing = .empty
@@ -40,13 +50,17 @@ actor ModelPricingStore {
         cacheDirectory: URL? = nil,
         now: @escaping @Sendable () -> Date = Date.init,
         sourceURLs: [SourceID: URL] = ModelPricingStore.defaultSourceURLs,
-        bundledData: @escaping @Sendable (String) -> Data? = ModelPricingStore.bundledResourceData
+        bundledData: @escaping @Sendable (String) -> Data? = ModelPricingStore.bundledResourceData,
+        // Defaults to "never stale" so callers that don't care about this (every existing test)
+        // keep today's behavior; `.shared` below opts in with the real app-bundle install time.
+        bundleInstalledAt: @escaping @Sendable () -> Date = { .distantPast }
     ) {
         self.http = http
         self.cacheDirectory = cacheDirectory ?? Self.defaultCacheDirectory
         self.now = now
         self.sourceURLs = sourceURLs
         self.bundledData = bundledData
+        self.bundleInstalledAt = bundleInstalledAt
     }
 
     static let defaultSourceURLs: [SourceID: URL] = [
@@ -157,7 +171,11 @@ actor ModelPricingStore {
     }
 
     /// A catalog is the bundled snapshot with the fetched cache merged on top — cached entries win,
-    /// but snapshot-only models survive if the live feed ever drops them.
+    /// but snapshot-only models survive if the live feed ever drops them. Unlike the supplement,
+    /// these compact catalogs carry no per-entry `updated_at` of their own, so a cache fetched
+    /// before this app bundle was installed (predating whatever pricing fix shipped in this build)
+    /// is treated as untrustworthy until the next successful network refresh re-stamps it — otherwise
+    /// an offline or firewalled user is stuck on a pre-update price forever.
     private func loadCatalog(_ source: SourceID, parse: (Data) throws -> PricingCatalog) -> PricingCatalog {
         var catalog = PricingCatalog()
         let resourceName = source == .litellm ? "pricing_litellm_snapshot" : "pricing_models_dev_snapshot"
@@ -170,7 +188,10 @@ actor ModelPricingStore {
         } else {
             AppLog.error("pricing", "bundled \(resourceName).json missing")
         }
-        if let cached = readCache(source) {
+        let cacheIsStale = (sourceStates[source]?.fetchedAt).map { $0 < bundleInstalledAt() } ?? false
+        if cacheIsStale {
+            AppLog.info("pricing", "\(source.rawValue) cache predates this app build, using bundled until next refresh")
+        } else if let cached = readCache(source) {
             do {
                 catalog = catalog.merging(try parse(cached))
             } catch {
