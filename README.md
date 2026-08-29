@@ -48,6 +48,14 @@ MaxUsage shows all remaining quotas and reset times, and tells you which one to 
 brew install 1c7/tap/max-usage
 ```
 
+> **"Apple could not verify..." on first launch?** The DMG is ad-hoc signed, not notarized, so macOS blocks it by default. Go to **System Settings → Privacy & Security**, scroll to the blocked-app notice, and click **Open Anyway** — then open MaxUsage again and confirm. (Or run `xattr -cr /Applications/MaxUsage.app` in Terminal.)
+
+---
+
+## Privacy
+
+MaxUsage is open source and 100% local — it reads credentials already on your Mac and talks only to each provider's own official API, the same one your CLI already uses. Read the full breakdown in [Privacy & Usage Data](app/docs/privacy.md).
+
 ---
 
 ## Acknowledgements

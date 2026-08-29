@@ -48,6 +48,32 @@ brew install 1c7/tap/max-usage
 
 [前往下载页](https://github.com/1c7/max-usage/releases/latest) 下载 .dmg 安装包，打开后将 **MaxUsage** 拖入 `/Applications`（应用程序）文件夹即可。
 
+## 打不开？"Apple 无法验证" 怎么解决
+
+双击打开 App 时，如果看到下面这个提示，不用担心，这是因为当前的安装包是 ad-hoc 签名、还没经过 Apple 公证（notarization），macOS 默认会拦一下，不是软件本身有问题：
+
+<p align="center">
+  <img src="images/gatekeeper-blocked-dialog.png" alt="Apple 无法验证提示" width="400" />
+</p>
+
+解决方法：
+
+1. 打开 **系统设置 → 隐私与安全性**
+2. 往下滑到"安全性"区域，会看到一条"已阻止「最大用量.app」以保护 Mac"的提示，点击右边的 **仍要打开**
+
+<p align="center">
+  <img src="images/gatekeeper-open-anyway.jpg" alt="在隐私与安全性中点击仍要打开" width="700" />
+</p>
+
+3. 输入你的 Mac 密码确认
+4. 再双击一次 App，会弹出第二次确认框，点 **打开** 即可正常启动
+
+也可以用终端一条命令解决（效果一样，去掉下载文件的"隔离标记"）：
+
+```sh
+xattr -cr "/Applications/最大用量.app"
+```
+
 ## 备注
 
 **MaxUsage** 由 [郑诚 (Cheng Zheng)](https://github.com/1c7) 开发与维护。
