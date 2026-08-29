@@ -4,7 +4,7 @@
   <a href="../../README.md">English</a> | <strong>简体中文</strong>
 </p>
 
-根据实时剩余额度与重置时间，智能推荐当前最该使用的 AI 编程订阅（Claude、Codex、Antigravity 等）。
+如果你订阅了 2 个以上 AI 套餐，想最大化用量，本软件会根据剩余额度与重置时间，智能推荐应该用哪一个 AI 订阅套餐来最大化用量。
 
 <p align="center">
   <img src="../assets/recommendation-zh-v2.jpg" alt="MaxUsage 智能推荐" />
