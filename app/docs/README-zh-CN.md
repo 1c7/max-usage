@@ -34,7 +34,7 @@
   <img src="images/grok-usage.jpg" alt="Grok 用量" width="700" />
 </p>
 
-MaxUsage 分析所有订阅的剩余额度与重置时间，直接告诉你应该先用哪一个
+MaxUsage 显示所有剩余额度和重置时间，告诉你先用哪一个
 
 ---
 
@@ -46,13 +46,7 @@ brew install 1c7/tap/max-usage
 
 ### 安装方式 2：下载安装包
 
-前往 [GitHub Releases](https://github.com/1c7/max-usage/releases/latest) 下载最新的 Universal DMG 安装包，打开后将 **MaxUsage** 拖入 `/Applications`（应用程序）文件夹即可。
-
-> **系统要求**：macOS 15 (Sequoia) 或更高版本。原生支持 Apple Silicon (M系列芯片) 与 Intel 架构 Mac。
-
----
-
----
+[前往下载页](https://github.com/1c7/max-usage/releases/latest) 下载 .dmg 安装包，打开后将 **MaxUsage** 拖入 `/Applications`（应用程序）文件夹即可。
 
 ## 备注
 
