@@ -4,9 +4,7 @@ MaxUsage is open source and reads credentials that provider tools already keep o
 
 ## Anonymous usage sharing
 
-On by default; turn off anytime in **Settings → Privacy → Share Anonymous Usage**. When on, MaxUsage sends small daily summaries — that the app was active, which providers/metrics you enabled, and per-provider success/failure counts and error *categories* (e.g. "not logged in", "network") — plus crash stack traces if MaxUsage crashes. A random, non-identifying ID counts daily active users.
-
-**Never shared:** account details, credentials, actual usage values (spend, tokens, limits), error messages, or file paths. Turn the toggle off and nothing further is sent.
+Currently disabled — no analytics project is wired up yet, so MaxUsage sends nothing and the toggle for it is hidden from Settings. The app ships with an anonymous, opt-out analytics path already built (small daily summaries — that the app was active, which providers/metrics you enabled, per-provider success/failure counts and error *categories* like "not logged in" or "network", plus crash stack traces) for when that's turned on; it would never include account details, credentials, actual usage values (spend, tokens, limits), error messages, or file paths.
 
 ## Other network requests
 

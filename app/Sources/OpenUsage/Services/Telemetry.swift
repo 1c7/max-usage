@@ -10,16 +10,24 @@ enum TelemetryConfig {
     /// the resolved token equals this. Do NOT change this value.
     static let placeholderToken = "phc_REPLACE_ME"
 
-    /// The project token baked into the build. Replace `phc_REPLACE_ME` with the real US-region
-    /// `phc_…` key (safe to commit — it's a client write-only key), or leave it and set
-    /// `OPENUSAGE_POSTHOG_TOKEN` at runtime for local testing.
-    private static let bakedToken = "phc_vGEqXEpQNwViyKnMNWvmKWpv8XxMT3yaeYi6gfidr4nf"
+    /// The project token baked into the build. Inherited from the upstream OpenUsage fork point as
+    /// Robin Ebers' own PostHog project key — MaxUsage never had its own, so this is intentionally
+    /// reset to the placeholder rather than shipping user telemetry into a project this project's
+    /// maintainer can't see. Replace with a MaxUsage-owned `phc_…` key when one exists, or leave it
+    /// and set `OPENUSAGE_POSTHOG_TOKEN` at runtime for local testing.
+    private static let bakedToken = placeholderToken
 
     static var token: String {
         let env = ProcessInfo.processInfo.environment["OPENUSAGE_POSTHOG_TOKEN"]?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         if let env, !env.isEmpty { return env }
         return bakedToken
+    }
+
+    /// Whether a real project token is configured. Drives whether the Settings "Share Anonymous
+    /// Usage" row appears at all — no point showing a toggle for a sink that stays inert either way.
+    static var isConfigured: Bool {
+        token.hasPrefix("phc_") && token != placeholderToken
     }
 
     /// US cloud. Switch to "https://eu.i.posthog.com" only with an EU-region project token.
