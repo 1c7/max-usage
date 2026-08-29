@@ -17,16 +17,23 @@
 
 ## 为什么需要 MaxUsage？
 
-我同时订阅了 5 个不同的 AI 编程工具。每次开始写代码前，我总要纠结：**“现在该用哪一个，才能在重置前把额度用满，避免浪费？”**
+我同时订阅了 6 个不同的 AI 编程工具。每次开始写代码前，我总要纠结：**“现在该用哪一个，才能在重置前把额度用满，避免浪费？”**
 
-每天手动去查 5 个服务的网页后台非常繁琐耗时：
+每天手动去查 6 个服务的网页后台非常繁琐耗时：
 
 <p align="center">
+  <strong>Claude Code</strong><br/>
   <img src="images/claude-code.jpg" alt="Claude Code 用量" width="700" /><br/><br/>
+  <strong>Codex</strong><br/>
   <img src="images/codex.jpg" alt="Codex 用量" width="700" /><br/><br/>
+  <strong>agy（Antigravity，Google 出品）</strong><br/>
   <img src="images/agy.jpg" alt="Antigravity 用量" width="700" /><br/><br/>
+  <strong>OpenCode</strong><br/>
   <img src="images/opencode%20go.jpg" alt="OpenCode 用量" width="700" /><br/><br/>
-  <img src="images/z.ai.jpg" alt="Z.ai 用量" width="700" />
+  <strong>GLM Coding Plan</strong><br/>
+  <img src="images/z.ai.jpg" alt="Z.ai 用量" width="700" /><br/><br/>
+  <strong>SuperGrok</strong><br/>
+  <img src="images/grok-usage.jpg" alt="Grok 用量" width="700" />
 </p>
 
 **MaxUsage 让这一切只需 1 秒** —— 它在本地自动分析你所有订阅的剩余额度与重置窗口，直接告诉你下一刻最该打开谁。
