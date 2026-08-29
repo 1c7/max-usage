@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.1
+
+### Bug Fixes
+- Fixed Keychain writes leaking secrets in process args, a stale pricing-cache bug, a Claude login cache bug, and an unsaved retry key by @1c7
+
+### Chores
+- Simplified README, made the DMG download link permanently stable across releases, and improved Homebrew tap automation by @1c7
+
+---
+
+**Full Changelog**: [v1.1.0...v1.1.1](https://github.com/1c7/max-usage/compare/v1.1.0...v1.1.1)
+
 ## v1.1.0
 
 ### English
