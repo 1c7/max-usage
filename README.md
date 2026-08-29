@@ -17,16 +17,23 @@ Intelligently recommends which AI coding subscription (Claude, Codex, Antigravit
 
 ## Why MaxUsage?
 
-I subscribe to 5 different AI coding tools. Before writing code, I constantly faced the same dilemma: **Which subscription should I use right now to maximize my quota before it resets?**
+I subscribe to 6 different AI coding tools. Before writing code, I constantly faced the same dilemma: **Which subscription should I use right now to maximize my quota before it resets?**
 
-Checking 5 separate usage pages every day is tedious:
+Checking 6 separate usage pages every day is tedious:
 
 <p align="center">
+Claude Code
   <img src="app/docs/images/claude-code.jpg" alt="Claude Code Usage" width="700" /><br/><br/>
+Codex
   <img src="app/docs/images/codex.jpg" alt="Codex Usage" width="700" /><br/><br/>
+agy (Antigravity, by Google)
   <img src="app/docs/images/agy.jpg" alt="Antigravity Usage" width="700" /><br/><br/>
+OpenCode
   <img src="app/docs/images/opencode%20go.jpg" alt="OpenCode Usage" width="700" /><br/><br/>
+GLM Coding Plan
   <img src="app/docs/images/z.ai.jpg" alt="Z.ai Usage" width="700" />
+SuperGrok
+  <img src="app/docs/images/grok-usage.jpg" alt="Grok Usage" width="700" />
 </p>
 
 **MaxUsage solves this in 1 click** — it analyzes remaining quotas and reset windows across all your plans, and instantly tells you exactly which one to use next.
