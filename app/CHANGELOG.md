@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.2
+
+### Bug Fixes
+- Fixed anonymous telemetry silently reporting into the upstream project's own analytics instead of nowhere — now fully disabled until MaxUsage has its own project by @1c7
+
+### Chores
+- Audited and fixed stale documentation left over from the OpenUsage fork (wrong paths, wrong URLs, non-existent settings) by @1c7
+
+---
+
+**Full Changelog**: [v1.1.1...v1.1.2](https://github.com/1c7/max-usage/compare/v1.1.1...v1.1.2)
+
 ## v1.1.1
 
 ### Bug Fixes
