@@ -78,4 +78,54 @@ void main() {
 
     expect(find.text('No data yet'), findsOneWidget);
   });
+
+  testWidgets('ProviderCard shows only the highest-utilization resource until expanded', (
+    tester,
+  ) async {
+    final provider = ProviderLimits(
+      id: 'codex',
+      displayName: 'Codex',
+      plan: 'Plus',
+      stale: false,
+      resources: {
+        'session': ResourceLimit(
+          key: 'session',
+          kind: 'consumption',
+          unit: 'percent',
+          used: 10,
+          limit: 100,
+          remaining: 90,
+          utilization: 0.1,
+        ),
+        'weekly': ResourceLimit(
+          key: 'weekly',
+          kind: 'consumption',
+          unit: 'percent',
+          used: 80,
+          limit: 100,
+          remaining: 20,
+          utilization: 0.8,
+        ),
+        'credits': ResourceLimit(key: 'credits', kind: 'balance', unit: 'credits', available: 0),
+      },
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(home: Scaffold(body: ProviderCard(provider: provider))),
+    );
+
+    // Only the highest-utilization resource (Weekly, 80%) shows by default.
+    expect(find.text('Weekly'), findsOneWidget);
+    expect(find.text('80%'), findsOneWidget);
+    expect(find.text('Session'), findsNothing);
+    expect(find.text('Credits'), findsNothing);
+    expect(find.text('+2 more'), findsOneWidget);
+
+    await tester.tap(find.text('+2 more'));
+    await tester.pump();
+
+    expect(find.text('Session'), findsOneWidget);
+    expect(find.text('Credits'), findsOneWidget);
+    expect(find.text('Show less'), findsOneWidget);
+  });
 }

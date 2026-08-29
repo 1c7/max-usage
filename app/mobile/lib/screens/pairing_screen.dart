@@ -3,17 +3,25 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../localization/strings.dart';
 import '../services/mac_client.dart';
 import '../services/pairing_storage.dart';
 
 /// The only setup step this app ever asks for: scan the QR code MaxUsage shows on the Mac
 /// (Settings → Allow Phone Sync → Add Phone…) to exchange it for a bearer token. No account, no
-/// server address to type in.
+/// server address to type in. Instructions sit above the scanner — a first-time user needs to read
+/// them and go do something on their Mac before the camera is useful at all.
 class PairingScreen extends StatefulWidget {
   final PairingStorage storage;
+  final Strings strings;
   final void Function(PairedMac mac) onPaired;
 
-  const PairingScreen({super.key, required this.storage, required this.onPaired});
+  const PairingScreen({
+    super.key,
+    required this.storage,
+    required this.strings,
+    required this.onPaired,
+  });
 
   @override
   State<PairingScreen> createState() => _PairingScreenState();
@@ -59,31 +67,18 @@ class _PairingScreenState extends State<PairingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = widget.strings;
     return Scaffold(
-      appBar: AppBar(title: const Text('Pair with Mac')),
+      appBar: AppBar(title: Text(strings.pairTitle)),
       body: Column(
         children: [
-          Expanded(
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                MobileScanner(controller: _controller, onDetect: _handleDetect),
-                if (_isPairing)
-                  Container(
-                    color: Colors.black54,
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-              ],
-            ),
-          ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
             child: Column(
               children: [
-                const Text(
-                  'On your Mac: Settings → Allow Phone Sync → Add Phone…\nThen scan the code shown there.',
-                  textAlign: TextAlign.center,
-                ),
+                Icon(Icons.qr_code_scanner, size: 40, color: Colors.grey[500]),
+                const SizedBox(height: 12),
+                Text(strings.pairIntro, textAlign: TextAlign.center),
                 if (_error != null) ...[
                   const SizedBox(height: 12),
                   Text(
@@ -92,6 +87,28 @@ class _PairingScreenState extends State<PairingScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ],
+              ],
+            ),
+          ),
+          Expanded(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                MobileScanner(controller: _controller, onDetect: _handleDetect),
+                if (_isPairing)
+                  Container(
+                    color: Colors.black54,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const CircularProgressIndicator(),
+                          const SizedBox(height: 12),
+                          Text(strings.pairing, style: const TextStyle(color: Colors.white)),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

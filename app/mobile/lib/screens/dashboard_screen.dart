@@ -2,25 +2,21 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../localization/strings.dart';
 import '../models/limits_response.dart';
 import '../services/mac_client.dart';
 import '../services/pairing_storage.dart';
 import '../widgets/provider_card.dart';
 
-/// The main (only) screen once paired: polls the Mac every 30s and shows the last-known snapshot
-/// even while disconnected, rather than clearing the screen — the phone is a read-only mirror,
-/// not a live guarantee.
+/// The paired-Mac quota view: polls every 30s and shows the last-known snapshot even while
+/// disconnected, rather than clearing the screen — the phone is a read-only mirror, not a live
+/// guarantee. Body content only (no Scaffold/AppBar) — `MainScreen` owns those so the bottom tab bar
+/// and title stay put while this tab's content refreshes underneath.
 class DashboardScreen extends StatefulWidget {
   final PairedMac mac;
-  final PairingStorage storage;
-  final VoidCallback onUnpaired;
+  final Strings strings;
 
-  const DashboardScreen({
-    super.key,
-    required this.mac,
-    required this.storage,
-    required this.onUnpaired,
-  });
+  const DashboardScreen({super.key, required this.mac, required this.strings});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -68,49 +64,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Future<void> _confirmUnpair() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Unpair this phone?'),
-        content: const Text(
-          "You'll need to scan a new QR code from your Mac to reconnect.",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Unpair'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-    await widget.storage.clear();
-    widget.onUnpaired();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('MaxUsage'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.link_off),
-            tooltip: 'Unpair',
-            onPressed: _confirmUnpair,
-          ),
-        ],
-      ),
-      body: RefreshIndicator(onRefresh: _refresh, child: _buildBody()),
-    );
+    return RefreshIndicator(onRefresh: _refresh, child: _buildBody());
   }
 
   Widget _buildBody() {
+    final strings = widget.strings;
     if (_isLoading) return const Center(child: CircularProgressIndicator());
 
     final limits = _limits;
@@ -121,10 +81,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Icon(Icons.wifi_off, size: 48, color: Colors.grey[500]),
           const SizedBox(height: 16),
           Center(
-            child: Text(
-              _error ?? 'Not connected',
-              textAlign: TextAlign.center,
-            ),
+            child: Text(_error ?? strings.notConnected, textAlign: TextAlign.center),
           ),
         ],
       );
@@ -140,14 +97,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return ListView(
       padding: const EdgeInsets.all(12),
       children: [
-        if (_error != null) _connectionBanner(),
-        _lastUpdatedLabel(),
+        if (_error != null) _connectionBanner(strings),
+        _lastUpdatedLabel(strings),
         if (providers.isEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 40),
             child: Center(
               child: Text(
-                'No quotas yet — check back once your Mac finishes its first refresh.',
+                strings.noQuotasYet,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[600]),
               ),
@@ -197,7 +154,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _connectionBanner() {
+  Widget _connectionBanner(Strings strings) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -210,22 +167,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const Icon(Icons.wifi_off, color: Colors.orange),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              'Not connected — showing the last known data.',
-              style: TextStyle(color: Colors.orange[900]),
-            ),
+            child: Text(strings.notConnectedBanner, style: TextStyle(color: Colors.orange[900])),
           ),
         ],
       ),
     );
   }
 
-  Widget _lastUpdatedLabel() {
+  Widget _lastUpdatedLabel(Strings strings) {
     final lastSuccessAt = _lastSuccessAt;
     if (lastSuccessAt == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, left: 4),
-      child: _LiveRelativeTime(macName: widget.mac.macName, since: lastSuccessAt),
+      child: _LiveRelativeTime(since: lastSuccessAt, strings: strings),
     );
   }
 }
@@ -234,10 +188,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 /// "just now" for the entire minute before it would otherwise change — that read as broken even
 /// though the data really was fresh.
 class _LiveRelativeTime extends StatefulWidget {
-  final String macName;
   final DateTime since;
+  final Strings strings;
 
-  const _LiveRelativeTime({required this.macName, required this.since});
+  const _LiveRelativeTime({required this.since, required this.strings});
 
   @override
   State<_LiveRelativeTime> createState() => _LiveRelativeTimeState();
@@ -261,16 +215,17 @@ class _LiveRelativeTimeState extends State<_LiveRelativeTime> {
   @override
   Widget build(BuildContext context) {
     return Text(
-      '${widget.macName} · Updated ${_relativeTime(widget.since)}',
+      widget.strings.updated(_relativeTime(widget.since)),
       style: TextStyle(color: Colors.grey[600], fontSize: 12),
     );
   }
 
   String _relativeTime(DateTime time) {
+    final strings = widget.strings;
     final seconds = DateTime.now().difference(time).inSeconds;
-    if (seconds < 5) return 'just now';
-    if (seconds < 60) return '${seconds}s ago';
-    if (seconds < 3600) return '${seconds ~/ 60}m ago';
-    return '${seconds ~/ 3600}h ago';
+    if (seconds < 5) return strings.justNow;
+    if (seconds < 60) return strings.secondsAgo(seconds);
+    if (seconds < 3600) return strings.minutesAgo(seconds ~/ 60);
+    return strings.hoursAgo(seconds ~/ 3600);
   }
 }
