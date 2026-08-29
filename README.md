@@ -22,17 +22,17 @@ I subscribe to 6 different AI coding tools. Before writing code, I constantly fa
 Checking 6 separate usage pages every day is tedious:
 
 <p align="center">
-Claude Code
+  <strong>Claude Code</strong><br/>
   <img src="app/docs/images/claude-code.jpg" alt="Claude Code Usage" width="700" /><br/><br/>
-Codex
+  <strong>Codex</strong><br/>
   <img src="app/docs/images/codex.jpg" alt="Codex Usage" width="700" /><br/><br/>
-agy (Antigravity, by Google)
+  <strong>agy (Antigravity, by Google)</strong><br/>
   <img src="app/docs/images/agy.jpg" alt="Antigravity Usage" width="700" /><br/><br/>
-OpenCode
+  <strong>OpenCode</strong><br/>
   <img src="app/docs/images/opencode%20go.jpg" alt="OpenCode Usage" width="700" /><br/><br/>
-GLM Coding Plan
-  <img src="app/docs/images/z.ai.jpg" alt="Z.ai Usage" width="700" />
-SuperGrok
+  <strong>GLM Coding Plan</strong><br/>
+  <img src="app/docs/images/z.ai.jpg" alt="Z.ai Usage" width="700" /><br/><br/>
+  <strong>SuperGrok</strong><br/>
   <img src="app/docs/images/grok-usage.jpg" alt="Grok Usage" width="700" />
 </p>
 
