@@ -1,13 +1,13 @@
 version: 2
 updates:
   - package-ecosystem: swift
-    directory: /
+    directory: /app/macos
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
 
   - package-ecosystem: github-actions
-    directory: /
+    directory: /app/macos
     schedule:
       interval: weekly
     open-pull-requests-limit: 5

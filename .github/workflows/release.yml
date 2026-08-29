@@ -47,17 +47,17 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Test
-        working-directory: app
+        working-directory: app/macos
         run: swift test
 
       - name: Build ad-hoc signed DMG
-        working-directory: app
+        working-directory: app/macos
         env:
           MAXUSAGE_SIGNING_IDENTITY: "-"
         run: ./script/package_release.sh "${{ steps.meta.outputs.version }}"
 
       - name: Verify package identity
-        working-directory: app
+        working-directory: app/macos
         env:
           VERSION: ${{ steps.meta.outputs.version }}
         run: |
@@ -68,7 +68,7 @@ jobs:
           /usr/bin/codesign --verify --deep --strict --verbose=2 dist/MaxUsage.app
 
       - name: Create stable-named DMG alias
-        working-directory: app
+        working-directory: app/macos
         env:
           VERSION: ${{ steps.meta.outputs.version }}
         run: cp "dist/MaxUsage-$VERSION.dmg" "dist/MaxUsage.dmg"
@@ -80,8 +80,8 @@ jobs:
           name: MaxUsage ${{ steps.meta.outputs.version }}
           prerelease: ${{ steps.meta.outputs.prerelease }}
           files: |
-            app/dist/MaxUsage-${{ steps.meta.outputs.version }}.dmg
-            app/dist/MaxUsage.dmg
+            app/macos/dist/MaxUsage-${{ steps.meta.outputs.version }}.dmg
+            app/macos/dist/MaxUsage.dmg
           fail_on_unmatched_files: true
 
       - name: Update Homebrew tap
@@ -96,7 +96,7 @@ jobs:
             echo "::warning::TAP_TOKEN is not set; skipping Homebrew tap update."
             exit 0
           fi
-          SHA=$(shasum -a 256 "app/dist/MaxUsage-$VERSION.dmg" | cut -d' ' -f1)
+          SHA=$(shasum -a 256 "app/macos/dist/MaxUsage-$VERSION.dmg" | cut -d' ' -f1)
           git clone "https://x-access-token:$TAP_TOKEN@github.com/1c7/homebrew-tap.git" tap
           cd tap
           sed -i '' \

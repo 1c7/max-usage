@@ -1,14 +1,14 @@
 provider:
   - changed-files:
-      - any-glob-to-any-file: "app/Sources/OpenUsage/Providers/**"
+      - any-glob-to-any-file: "app/macos/Sources/OpenUsage/Providers/**"
 
 tests:
   - changed-files:
-      - any-glob-to-any-file: "app/Tests/**"
+      - any-glob-to-any-file: "app/macos/Tests/**"
 
 docs:
   - changed-files:
-      - any-glob-to-any-file: "app/docs/**"
+      - any-glob-to-any-file: "app/macos/docs/**"
 
 ci:
   - changed-files:

@@ -46,14 +46,14 @@ By submitting a pull request, you agree that your contribution is licensed under
 
 ### Add a provider
 
-Each provider is a small Swift module under `app/Sources/OpenUsage/Providers/<Name>/` that conforms to `ProviderRuntime`: an auth store reads credentials already on the user's machine, a usage client calls the provider's API, and a mapper normalizes the response into metric lines. See [adding a provider](../app/docs/adding-a-provider.md) for the full walkthrough (and [architecture](../app/docs/architecture.md) for how the pieces fit together).
+Each provider is a small Swift module under `app/macos/Sources/OpenUsage/Providers/<Name>/` that conforms to `ProviderRuntime`: an auth store reads credentials already on the user's machine, a usage client calls the provider's API, and a mapper normalizes the response into metric lines. See [adding a provider](../app/macos/docs/adding-a-provider.md) for the full walkthrough (and [architecture](../app/macos/docs/architecture.md) for how the pieces fit together).
 
 1. Open an issue and get it approved (`approved` label) — include why the provider fits and how its usage data is accessible
-2. Create `app/Sources/OpenUsage/Providers/<Name>/` and implement `ProviderRuntime`
+2. Create `app/macos/Sources/OpenUsage/Providers/<Name>/` and implement `ProviderRuntime`
 3. Register the provider in `AppContainer`
-4. Add focused tests under `app/Tests/OpenUsageTests/`
-5. Add a provider page in `app/docs/providers/` (metrics, credential sources, endpoints, troubleshooting)
-6. Test it locally with `./app/script/build_and_run.sh`
+4. Add focused tests under `app/macos/Tests/OpenUsageTests/`
+5. Add a provider page in `app/macos/docs/providers/` (metrics, credential sources, endpoints, troubleshooting)
+6. Test it locally with `./app/macos/script/build_and_run.sh`
 7. Open a PR with screenshots showing it working
 
 You can also [open an issue](https://github.com/1c7/max-usage/issues/new?template=new_provider.yml) to request a provider without building it yourself.
@@ -90,8 +90,8 @@ For substantial features, [open an issue](https://github.com/1c7/max-usage/issue
 ## Code Standards
 
 - Swift 6 with strict concurrency, built with SwiftPM (no Xcode project)
-- Follow existing patterns in the codebase — [AGENTS.md](../app/AGENTS.md) is the engineering contract
-- User-visible behavior changes must update the matching `app/docs/` page(s) in the same PR
+- Follow existing patterns in the codebase — [AGENTS.md](../app/macos/AGENTS.md) is the engineering contract
+- User-visible behavior changes must update the matching `app/macos/docs/` page(s) in the same PR
 - UI copy is plain language and sentence case
 - No new dependencies without justification
 

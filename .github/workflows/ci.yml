@@ -22,7 +22,7 @@ jobs:
     runs-on: macos-26
     defaults:
       run:
-        working-directory: app
+        working-directory: app/macos
     steps:
       - uses: actions/checkout@v7
         with:
