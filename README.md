@@ -17,9 +17,7 @@ Intelligently recommends which AI coding subscription (Claude, Codex, Antigravit
 
 ## Why MaxUsage?
 
-I subscribe to 6 different AI coding tools. Before writing code, I constantly faced the same dilemma: **Which subscription should I use right now to maximize my quota before it resets?**
-
-Checking 6 separate usage pages every day is tedious:
+I subscribe to 6 different AI coding tools and wanted to maximize usage across all of them. Checking each one's usage page by hand is tedious:
 
 <p align="center">
   <strong>Claude Code</strong><br/>
@@ -36,41 +34,22 @@ Checking 6 separate usage pages every day is tedious:
   <img src="app/docs/images/grok-usage.jpg" alt="Grok Usage" width="700" />
 </p>
 
-**MaxUsage solves this in 1 click** — it analyzes remaining quotas and reset windows across all your plans, and instantly tells you exactly which one to use next.
+MaxUsage shows all remaining quotas and reset times, and tells you which one to use first.
 
+---
 
+## Download
 
-## Installation
+[Download the latest DMG](https://github.com/1c7/max-usage/releases/latest/download/MaxUsage.dmg), open it, and drag **MaxUsage** into your `/Applications` folder.
 
-### Homebrew (Recommended)
+### Homebrew
 
 ```sh
 brew install 1c7/tap/max-usage
 ```
 
-### Direct Download
-
-Download the latest universal DMG from the [GitHub Releases](https://github.com/1c7/max-usage/releases/latest) page, open it, and drag **MaxUsage** into your `/Applications` folder.
-
-> **Requirements:** macOS 15 (Sequoia) or later. Runs natively on both Apple Silicon and Intel Macs.
-
----
-
-## Documentation & Development
-
-- **User & Feature Docs:** See the full [Documentation Index](app/docs/README.md) for details on supported providers, dashboard shortcuts, proxy configuration, CLI usage, and local HTTP APIs.
-- **Developer Guide:** See [Development & Architecture Docs](app/docs/development.md) for instructions on building from source, running tests, release workflows, and codebase architecture.
-
 ---
 
 ## Acknowledgements
 
-**MaxUsage** is created and maintained by [Cheng Zheng](https://github.com/1c7).
-
-It is proudly built upon the foundational codebase of the awesome open-source project [OpenUsage](https://github.com/robinebers/openusage), originally created by [Robin Ebers](https://itsbyrob.in/x), [Mert](https://github.com/validatedev), and [David](https://github.com/davidarny). Huge thanks to their fantastic work and contribution to the developer community!
-
----
-
-## License
-
-[MIT](LICENSE)
+**MaxUsage** is created and maintained by [Cheng Zheng](https://github.com/1c7), built upon [OpenUsage](https://github.com/robinebers/openusage). Licensed under [MIT](LICENSE).

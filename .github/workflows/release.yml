@@ -67,16 +67,25 @@ jobs:
           test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' dist/MaxUsage.app/Contents/Info.plist)" = "com.1c7.maxusage"
           /usr/bin/codesign --verify --deep --strict --verbose=2 dist/MaxUsage.app
 
+      - name: Create stable-named DMG alias
+        working-directory: app
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: cp "dist/MaxUsage-$VERSION.dmg" "dist/MaxUsage.dmg"
+
       - name: Publish DMG to GitHub Releases
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
           name: MaxUsage ${{ steps.meta.outputs.version }}
           prerelease: ${{ steps.meta.outputs.prerelease }}
-          files: app/dist/MaxUsage-${{ steps.meta.outputs.version }}.dmg
+          files: |
+            app/dist/MaxUsage-${{ steps.meta.outputs.version }}.dmg
+            app/dist/MaxUsage.dmg
           fail_on_unmatched_files: true
 
       - name: Update Homebrew tap
+        if: steps.meta.outputs.prerelease != 'true'
         env:
           # Fine-grained PAT with Contents read/write on 1c7/homebrew-tap; the
           # workflow-scoped GITHUB_TOKEN cannot push to another repository.
