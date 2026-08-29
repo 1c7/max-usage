@@ -51,17 +51,18 @@ Set `ICLOUD_PROVISIONING_PROFILE=/path/to/profile.mobileprovision` only when you
 that automatic selection. An explicit missing path fails the build instead of silently producing an
 app without iCloud access.
 
-The release workflow reads the base64-encoded `MAC_APP_DIRECT` profile from the repository Actions
-secret `APPLE_DEVELOPER_ID_ICLOUD_PROFILE`. Keep the original provisioning profiles and signing `.p12`
-in a password manager, never in the repository. A provisioning profile contains certificates and
-entitlements rather than private keys, but treating it as a signing asset keeps rotation predictable.
+**Not yet implemented:** the release workflow (`.github/workflows/release.yml`) has no provisioning-profile
+or iCloud-entitlement step today — this is why "the current ad-hoc release does not include iCloud
+entitlements" above. Wiring a `MAC_APP_DIRECT` profile into CI (via a base64-encoded Actions secret) is
+the planned approach once the project has an Apple Developer ID; keep the original provisioning profiles
+and signing `.p12` in a password manager, never in the repository, when that lands.
 
 To inspect the actual history written by a running build, find the file first and only call `jq` when a
 file exists:
 
 ```bash
 file=$(find "$HOME/Library/Mobile Documents" \
-  -type f -path '*openusage*/MaxUsage/History/v1/*.json' -print -quit)
+  -type f -path '*maxusage*/OpenUsage/History/v1/*.json' -print -quit)
 
 if [[ -n "$file" ]]; then
   jq . "$file"

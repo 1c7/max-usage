@@ -60,7 +60,7 @@ factory only when there is no typed error, and never return stale or empty data 
    credential-reading path. Reuse the shared helpers in `Support/` (`ProviderParse` for
    JSON/number/percent parsing, `OpenUsageISO8601` for timestamps) instead of copying them.
 3. **Declare its widgets.** Expose the provider's metrics as `WidgetDescriptor`s using the factories in
-   `WidgetDescriptor+Factories.swift` (`percent`, `boundedDollars`, `spend`, `tokenSpend`, `combined`, `values`, `badge`, and so on).
+   `WidgetDescriptor+Factories.swift` (`percent`, `boundedDollars`, `boundedCount`, `values`, `combined`, `spendTiles`, `dollarBalance`, `badge`, `usageTrend`).
 4. **Register it.** Add the provider to the list in `AppContainer`.
 5. **Test it.** Add focused tests under `Tests/OpenUsageTests/`, including a mapper test that feeds a
    sample API response and checks the resulting metric lines.
@@ -77,8 +77,9 @@ factory only when there is no typed error, and never return stale or empty data 
 ## User-supplied API keys
 
 Most providers read credentials already on the machine (a companion CLI/app's session, the keychain).
-A provider with nothing local to read — OpenRouter is the first — conforms to `APIKeyManaging` so the
-in-app **Settings → API Keys** card manages its key with no per-provider UI work:
+A provider with nothing local to read — OpenRouter and Z.ai are current examples — conforms to
+`APIKeyManaging` so the in-app **Customize → provider detail → API Key** section manages its key with
+no per-provider UI work:
 
 - The auth store exposes a four-state `keyStatus()` (`notSet` / `fromEnvironment` / `saved` /
   `overrideActive`), a `currentAPIKey()` for the reveal toggle, and `saveAPIKey(_:)` / `deleteAPIKey()`

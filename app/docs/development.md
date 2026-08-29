@@ -33,12 +33,13 @@ Releases are automated via GitHub Actions: pushing a `v*` tag on `main` builds a
 - A plain tag (`v0.7.1`) ships to everyone on the stable channel.
 - A pre-release suffix (`v0.7.1-beta.1`) ships to the beta channel.
 
-The release workflow is defined in [.github/workflows/release.yml](../.github/workflows/release.yml).
+The release workflow is defined in [.github/workflows/release.yml](../../.github/workflows/release.yml).
 
-No release secrets are currently required. These builds are not notarized, so release notes must keep
-the Gatekeeper installation notice visible. Developer ID signing, notarization, and automatic Sparkle
-updates can be restored together after the project joins the Apple Developer Program.
+A `TAP_TOKEN` repository secret (a PAT with push access to the Homebrew tap repo) is required for the
+tap-update step; no other release secrets are needed. These builds are not notarized, so release notes
+must keep the Gatekeeper installation notice visible. Developer ID signing, notarization, and automatic
+Sparkle updates can be restored together after the project joins the Apple Developer Program.
 
 ## Contributing
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) and [AGENTS.md](../AGENTS.md) for coding conventions.
+See [CONTRIBUTING.md](../../.github/CONTRIBUTING.md) and [AGENTS.md](../AGENTS.md) for coding conventions.

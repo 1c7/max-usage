@@ -24,20 +24,11 @@ time; it also reports unavailable iCloud, loading, write, and malformed-file sta
 
 | Setting | Options | What it does |
 |---|---|---|
-| Icon Style | Text / Bars | How the recommended subscription renders in the menu bar. See [Menu bar](menu-bar.md). |
 | Theme | System / Light / Dark | App-wide appearance override for the popover. |
 | Density | Default / Compact | Default breathes; Compact is a real information-dense mode — text steps down one size and Customize / Settings rows tighten. (Doesn't affect the Recommended/Quotas dashboard tabs, which stay fixed-size.) |
 | Reduce Animations | Off / On | Off by default. On removes transitions, motion effects, and continuous decorative animation throughout the popover. The app also honors the macOS Reduce Motion accessibility setting. |
 | Time Format | Auto / 12-hour / 24-hour | How exact times read (e.g. "Resets today at 6:38 PM" vs "18:38"). Auto follows the system. |
 | Increase Transparency | Off / On | Off (default) keeps the popover a solid panel. On makes it translucent so your desktop shows through, while keeping the numbers and Options control legible with adaptive surfaces. It pauses automatically when you have the macOS **Reduce Transparency** or **Increase Contrast** accessibility setting turned on (a note explains why), so it never works against those preferences. |
-
-## Usage Display
-
-| Setting | Options | What it does |
-|---|---|---|
-| Show Usage As | Used / Left | Whether bounded metrics read "48% used" or "52% left" — same toggle as clicking a headline. |
-| Reset Times | Countdown / Exact time | "Resets in 3h 25m" vs "Resets today at 6:38 PM" — same toggle as clicking a reset label. |
-| Always Show Pacing | Off / On | Off (default) shows pacing only when a metric is close to or over its limit. On surfaces it on every metric with a reset window: on-track rows gain their projection ("~33% left at reset") and an even-pace tick marking where steady use would put you right now. Metrics without a reset window have no pace to show. |
 
 ## Notifications
 
@@ -77,8 +68,9 @@ Not touched: provider logins and API keys, cached usage data, and your Share Ano
 
 ## Updates
 
-The Updates section appears in official packaged builds that include the signed update feed. Local
-developer builds do not show it.
+The Updates section appears only in builds that embed a Sparkle update feed (`SUFeedURL`). The current
+ad-hoc-signed release builds don't embed one yet, so this section doesn't appear in any build you'd
+download today — see [Updates](updates.md).
 
 | Setting | Options | What it does |
 |---|---|---|

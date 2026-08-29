@@ -16,7 +16,8 @@ The project script owns the build/run loop. From the repo root:
 The script builds a signed app bundle under `dist/` and launches it in place — nothing is installed to
 `/Applications`. The dev build uses its own bundle id (`com.1c7.maxusage.dev`), so it keeps its
 own settings and keychain and never disturbs a released MaxUsage. It ships no update feed, so it never
-checks for updates — test updates with a real signed, notarized release build.
+checks for updates. Sparkle updates can't currently be exercised at all — release builds are ad-hoc
+signed, not notarized, and don't embed a feed yet (see [Updates](updates.md)).
 
 ## Stream logs
 

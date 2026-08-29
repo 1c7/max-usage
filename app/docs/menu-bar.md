@@ -10,10 +10,7 @@ Right-click (or control-click) the menu bar icon for a quick menu with **Setting
 
 ## Styles
 
-Settings → Appearance → Icon Style:
-
-- **Text** — the recommended provider's icon plus its weekly-remaining percentage.
-- **Bars** — the same pick as a compact single-bar glyph instead of text.
+The menu bar always renders as **Text** — the recommended provider's icon plus its weekly-remaining percentage. A compact **Bars** glyph style exists internally (`LayoutStore.menuBarStyle`) but isn't yet exposed as a user-facing setting.
 
 ## Hiding usage while screen sharing
 
