@@ -185,6 +185,8 @@ struct ClaudeAuthStore: Sendable {
     var environment: EnvironmentReading
     var files: TextFileAccessing
     var keychain: KeychainAccessing
+    /// Shared app-wide denial cooldown; inject a fresh instance in tests.
+    var keychainBackoff: KeychainReadBackoff
     var desktop: ClaudeDesktopAuthStore
     var now: @Sendable () -> Date
 
@@ -192,12 +194,14 @@ struct ClaudeAuthStore: Sendable {
         environment: EnvironmentReading = ProcessEnvironmentReader(),
         files: TextFileAccessing = LocalTextFileAccessor(),
         keychain: KeychainAccessing = SecurityKeychainAccessor(),
+        keychainBackoff: KeychainReadBackoff = .shared,
         desktop: ClaudeDesktopAuthStore? = nil,
         now: @escaping @Sendable () -> Date = Date.init
     ) {
         self.environment = environment
         self.files = files
         self.keychain = keychain
+        self.keychainBackoff = keychainBackoff
         self.desktop = desktop ?? ClaudeDesktopAuthStore(files: files, now: now)
         self.now = now
     }
@@ -450,21 +454,50 @@ struct ClaudeAuthStore: Sendable {
     }
 
     private func loadKeychainCredentials() -> ClaudeCredentialState? {
+        // One denied/unanswered keychain read is one password dialog the user saw (or is still
+        // staring at). Claude Code's keychain item currently carries a partition list that denies
+        // every reader but Anthropic's own (anthropics/claude-code #77697), so each decrypt attempt
+        // re-fires the prompt — and this loader used to walk up to two read variants per service
+        // candidate per refresh, stacking dialogs while the refresh loop kept cycling. After a
+        // denial, stay off the keychain for the cooldown window: the file fallback still loads, and
+        // the next window picks the keychain back up (e.g. once the partition list is repaired).
+        if keychainBackoff.isActive(now: now()) {
+            AppLog.debug(.keychain, "keychain skipped: denial cooldown active")
+            return nil
+        }
         // The service name is safe to log; NEVER log the returned credential blob / OAuth tokens.
         for service in keychainServiceCandidates() {
-            if let state = credentialState(
-                from: try? keychain.readGenericPasswordForCurrentUser(service: service),
-                service: service, source: .keychainCurrentUser(service: service)
-            ) {
-                return state
+            // Promptless attributes-only probe first: for a service with no item it costs zero
+            // prompts instead of the two decrypt attempts below (each of which can prompt).
+            if keychain.genericPasswordExists(service: service) == false {
+                AppLog.debug(.keychain, "probe miss service=\(service)")
+                continue
             }
-            if let state = credentialState(
-                from: try? keychain.readGenericPassword(service: service),
-                service: service, source: .keychainLegacy(service: service)
-            ) {
-                return state
+            do {
+                if let state = credentialState(
+                    from: try keychain.readGenericPasswordForCurrentUser(service: service),
+                    service: service, source: .keychainCurrentUser(service: service)
+                ) {
+                    return state
+                }
+                if let state = credentialState(
+                    from: try keychain.readGenericPassword(service: service),
+                    service: service, source: .keychainLegacy(service: service)
+                ) {
+                    return state
+                }
+                AppLog.debug(.keychain, "read miss service=\(service)")
+            } catch KeychainError.accessDenied {
+                // Denied or left unanswered: the next variant or service would just fire the next
+                // dialog. Record the cooldown and abort the whole keychain pass now.
+                keychainBackoff.recordDenial(now: now())
+                AppLog.warn(.keychain, "keychain read denied for service '\(service)'; cooling down")
+                return nil
+            } catch {
+                // Non-denial failure: keep the historical per-candidate fall-through so one broken
+                // source doesn't shadow the next one.
+                continue
             }
-            AppLog.debug(.keychain, "read miss service=\(service)")
         }
         return nil
     }

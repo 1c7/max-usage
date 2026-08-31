@@ -294,11 +294,21 @@ final class FakeKeychain: KeychainAccessing, @unchecked Sendable {
     func writeGenericPassword(service: String, value: String) throws {
         self.value = value
     }
+
+    func genericPasswordExists(service: String) -> Bool? {
+        value != nil
+    }
 }
 
 final class ServiceKeychain: KeychainAccessing, @unchecked Sendable {
     var values: [String: String]
     var currentUserValues: [String: String]
+    /// Services whose decrypting read is denied (throws `KeychainError.accessDenied`), modelling the
+    /// partition-list denial on Claude Code's keychain item.
+    var deniedServices: Set<String> = []
+    /// Decrypt attempts in call order, as "currentUser(<service>)" / "legacy(<service>)". The
+    /// promptless existence probe is NOT recorded — only attempts that can surface a dialog are.
+    private(set) var decryptAttempts: [String] = []
 
     init(values: [String: String] = [:], currentUserValues: [String: String] = [:]) {
         self.values = values
@@ -306,7 +316,9 @@ final class ServiceKeychain: KeychainAccessing, @unchecked Sendable {
     }
 
     func readGenericPassword(service: String) throws -> String? {
-        values[service]
+        decryptAttempts.append("legacy(\(service))")
+        if deniedServices.contains(service) { throw KeychainError.accessDenied("denied") }
+        return values[service]
     }
 
     func writeGenericPassword(service: String, value: String) throws {
@@ -314,11 +326,17 @@ final class ServiceKeychain: KeychainAccessing, @unchecked Sendable {
     }
 
     func readGenericPasswordForCurrentUser(service: String) throws -> String? {
-        currentUserValues[service]
+        decryptAttempts.append("currentUser(\(service))")
+        if deniedServices.contains(service) { throw KeychainError.accessDenied("denied") }
+        return currentUserValues[service]
     }
 
     func writeGenericPasswordForCurrentUser(service: String, value: String) throws {
         currentUserValues[service] = value
+    }
+
+    func genericPasswordExists(service: String) -> Bool? {
+        values[service] != nil || currentUserValues[service] != nil || deniedServices.contains(service)
     }
 }
 

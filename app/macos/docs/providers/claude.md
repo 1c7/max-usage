@@ -34,6 +34,11 @@ password dialog: MaxUsage first asks you to refresh manually, and choosing **Alw
 refreshes silent. If Desktop's short-lived token expires, open Claude Desktop so it can renew the login,
 then refresh MaxUsage.
 
+If macOS shows a password prompt for the Claude Code keychain entry and you deny it — or leave it
+unanswered — MaxUsage stays off that entry for 15 minutes and reads the other sources instead, rather
+than asking again on every refresh. It also checks whether an entry exists before reading it, so a
+missing login never triggers a prompt at all.
+
 A `CLAUDE_CODE_OAUTH_TOKEN` — usually a long-lived `claude setup-token` — can run the model but can't read your Session and Weekly limits, and it often lingers in your shell environment. So when a real keychain or file login is present, MaxUsage uses that login for the live meters and keeps the environment token only as a fallback; the Session/Weekly meters no longer go blank just because that token is set. If the environment token is your *only* credential (a headless setup), it's used on its own and the spend tiles still load from local logs.
 
 If one source holds an expired or "locked out" token, MaxUsage falls back to the others — so signing in again with `claude` outside the app is picked up on the next refresh, without restarting MaxUsage. Claude Code tokens are refreshed automatically; rotated tokens are written back only while the ordered login candidates still match the start of the refresh, so a newly added higher-priority login wins. Claude Desktop tokens are never refreshed or written by MaxUsage.
@@ -45,6 +50,8 @@ Today / Yesterday / Last 30 Days are computed **locally**: MaxUsage reads the Cl
 ## Troubleshooting
 
 - **"Not logged in"** — run `claude` and sign in, then refresh.
+- **"macOS keeps asking for my login keychain password"** — recent Claude Code versions write their keychain entry so that only Anthropic's own tools may read it (an upstream issue), so any app reading it — MaxUsage included — triggers a prompt. MaxUsage probes first and backs off after one denied prompt, but the one-time fix is to allow the system `security` tool to read it. Run this in Terminal and enter your Mac password when asked (repeat for any `Claude Code-credentials-…` variant if you use `CLAUDE_CONFIG_DIR`):
+  `security set-generic-password-partition-list -S apple-tool:,apple: -s "Claude Code-credentials" -a "$USER"`
 - **"Claude Desktop login found"** — refresh manually and choose **Always Allow** when macOS asks for access to `Claude Safe Storage`.
 - **"Claude Desktop login is stale"** — open Claude Desktop so it can renew the login, then refresh MaxUsage.
 - **"Re-login for live usage"** (an amber warning on the Claude header) — your saved login can authenticate for inference but can't read your subscription limits, because it lacks the `user:profile` access (this is what an inference-only token from `claude setup-token` carries). Run `claude` and sign in again with your Claude account, then refresh; the spend tiles keep working in the meantime.

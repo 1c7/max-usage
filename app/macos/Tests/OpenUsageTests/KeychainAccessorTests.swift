@@ -19,11 +19,27 @@ final class KeychainAccessorTests: XCTestCase {
         XCTAssertNil(try accessor.readGenericPassword(service: "Test"))
     }
 
-    func testNonItemNotFoundFailureThrowsReadFailed() {
-        // A non-44 non-zero exit (locked keychain / access denied / cancelled unlock) must throw, not
-        // collapse into the same nil as "no credential" — otherwise it gets mislabeled "not signed in".
+    func testDeniedInteractionThrowsAccessDenied() {
+        // Exit 51 (unlock/interaction family): a prompt was shown and not accepted. This must throw
+        // `accessDenied` — not collapse into the same nil as "no credential", and not be treated as
+        // a plain read failure either, because callers back off on denial instead of retrying into
+        // the next prompt.
         let accessor = SecurityKeychainAccessor(processRunner: StubRunner(
             result: ProcessResult(exitCode: 51, stdout: "", stderr: "User interaction is not allowed.")
+        ))
+        XCTAssertThrowsError(try accessor.readGenericPassword(service: "Test")) { error in
+            guard case KeychainError.accessDenied = error else {
+                return XCTFail("expected KeychainError.accessDenied, got \(error)")
+            }
+        }
+    }
+
+    func testNonItemNotFoundFailureThrowsReadFailed() {
+        // Any other non-44 non-zero exit (locked keychain, access denied after the fact) must throw
+        // `readFailed`, not collapse into the same nil as "no credential" — otherwise it gets
+        // mislabeled "not signed in".
+        let accessor = SecurityKeychainAccessor(processRunner: StubRunner(
+            result: ProcessResult(exitCode: 1, stdout: "", stderr: "keychain is locked")
         ))
         XCTAssertThrowsError(try accessor.readGenericPassword(service: "Test")) { error in
             guard case KeychainError.readFailed = error else {

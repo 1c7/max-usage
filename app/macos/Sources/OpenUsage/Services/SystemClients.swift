@@ -230,6 +230,13 @@ protocol KeychainAccessing: Sendable {
     /// item under a known account name (e.g. Antigravity's `agy` token under service `gemini`,
     /// account `antigravity`) rather than the current user.
     func readGenericPassword(service: String, account: String) throws -> String?
+    /// Whether an item exists for `service`, without reading its secret. `nil` means the probe
+    /// itself failed (locked keychain, denied) — the caller picks its own safe side, which is not
+    /// the same for every caller. A protocol requirement on purpose: as a plain extension method it
+    /// dispatched to the decrypting fallback for `any KeychainAccessing` values even when the
+    /// concrete type was `SecurityKeychainAccessor`, so the "existence check" performed the exact
+    /// secret read (and keychain prompt) the probe exists to avoid.
+    func genericPasswordExists(service: String) -> Bool?
 }
 
 extension KeychainAccessing {
@@ -247,18 +254,10 @@ extension KeychainAccessing {
         try readGenericPassword(service: service)
     }
 
-    /// Whether an item exists for `service`, without reading its secret. `nil` means the probe
-    /// itself failed (locked keychain, denied) — the caller picks its own safe side, which is not
-    /// the same for every caller. The default (for mocks) falls back to a read; the real
-    /// `SecurityKeychainAccessor` overrides this with an in-process attributes-only probe, safe for
-    /// the launch path — it can't trigger an unlock prompt and returns in microseconds.
-    func genericPasswordExists(service: String) -> Bool? {
-        do {
-            return try readGenericPassword(service: service) != nil
-        } catch {
-            return nil
-        }
-    }
+    /// Mock-only default: "unknown". Test doubles that model stored items override this from their
+    /// item tables; the production accessor satisfies the requirement with its promptless native
+    /// probe. Never falls back to a decrypting read — that is the bug this default replaces.
+    func genericPasswordExists(service: String) -> Bool? { nil }
 }
 
 struct SecurityKeychainAccessor: KeychainAccessing {
@@ -268,11 +267,13 @@ struct SecurityKeychainAccessor: KeychainAccessing {
         self.processRunner = processRunner
     }
 
-    // `security find-generic-password` exits 44 (errSecItemNotFound) when no item matches — the
-    // legitimate "no credential stored" case. Any OTHER non-zero exit means a real failure (keychain
-    // locked or access denied, a cancelled unlock prompt) that must not be silently rendered as
-    // "not signed in".
+    // `security find-generic-password` exit codes: 44 (errSecItemNotFound) is the legitimate "no
+    // credential stored" case. 45 (errSecAuthDenied — the user clicked Deny, or UI interaction was
+    // not allowed) and 51 (unlock/interaction family) mean a prompt was shown and NOT accepted; a
+    // retry just shows it again. Any other non-zero exit is a real failure (locked keychain, access
+    // denied after the fact) that must not be silently rendered as "not signed in".
     private static let itemNotFoundExitCode: Int32 = 44
+    private static let accessDeniedExitCodes: Set<Int32> = [45, 51]
 
     func readGenericPassword(service: String) throws -> String? {
         try readPassword(["find-generic-password", "-s", service, "-w"], service: service)
@@ -306,14 +307,25 @@ struct SecurityKeychainAccessor: KeychainAccessing {
     }
 
     private func readPassword(_ arguments: [String], service: String) throws -> String? {
-        let result = try processRunner.run(
-            executable: "/usr/bin/security",
-            arguments: arguments,
-            environment: [:],
-            timeout: 5
-        )
+        let result: ProcessResult
+        do {
+            result = try processRunner.run(
+                executable: "/usr/bin/security",
+                arguments: arguments,
+                environment: [:],
+                timeout: 5
+            )
+        } catch ProcessRunnerError.timedOut {
+            // Not a slow tool: the access prompt was up and went unanswered for the whole window.
+            // The user experience is identical to a denial, so classify it as one and let callers
+            // back off — an immediate retry would spawn the next prompt.
+            throw KeychainError.accessDenied("prompt unanswered (read timed out) for service '\(service)'")
+        }
         guard result.succeeded else {
             if result.exitCode == Self.itemNotFoundExitCode { return nil }
+            if Self.accessDeniedExitCodes.contains(result.exitCode) {
+                throw KeychainError.accessDenied(result.stderr)
+            }
             // Log loudly here so a locked/denied keychain is diagnosable even though current callers
             // `try?` this back to nil ("not signed in"). Surfacing a distinct user-facing "keychain
             // locked" message needs the auth-load chains to propagate the throw (folded into H1).
@@ -373,6 +385,11 @@ struct SecurityKeychainAccessor: KeychainAccessing {
 enum KeychainError: Error, LocalizedError {
     case writeFailed(String)
     case readFailed(String)
+    /// A prompt was shown and not accepted: the user clicked Deny, interaction was not allowed, or
+    /// the read timed out with the prompt still up. Distinct from `readFailed` because the right
+    /// response is to stop reading the keychain for a cooldown — an immediate retry re-fires the
+    /// prompt, and a loader that walks several service candidates stacks one dialog per attempt.
+    case accessDenied(String)
 
     var errorDescription: String? {
         switch self {
@@ -380,7 +397,38 @@ enum KeychainError: Error, LocalizedError {
             return message.isEmpty ? "Keychain write failed." : message
         case .readFailed(let message):
             return message.isEmpty ? "Keychain read failed." : message
+        case .accessDenied(let message):
+            return message.isEmpty ? "Keychain access denied." : message
         }
+    }
+}
+
+/// App-wide memory of the most recent denied/unanswered keychain read. Auth stores are short-lived
+/// structs recreated every refresh, so without shared state each refresh cycle would re-fire the
+/// prompt — Claude Code's keychain item currently carries a partition list that denies every reader
+/// but Anthropic's own (anthropics/claude-code #77697), making every decrypt attempt a fresh dialog.
+/// One denial suppresses further keychain reads for the cooldown window; successful reads never
+/// touch this state, so once the keychain is repaired the next refresh picks it up unprompted.
+final class KeychainReadBackoff: @unchecked Sendable {
+    static let shared = KeychainReadBackoff()
+    /// Long enough to outlast a burst of refreshes, short enough that a user who just repaired the
+    /// keychain sees usage return without restarting the app.
+    static let cooldown: TimeInterval = 15 * 60
+
+    private let lock = NSLock()
+    private var deniedAt: Date?
+
+    func recordDenial(now: Date) {
+        lock.lock()
+        deniedAt = now
+        lock.unlock()
+    }
+
+    func isActive(now: Date) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard let deniedAt else { return false }
+        return now.timeIntervalSince(deniedAt) < Self.cooldown
     }
 }
 
