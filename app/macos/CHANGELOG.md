@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.3
+
+### Bug Fixes
+- Fixed the stacked macOS keychain password prompts when reading Claude Code credentials: MaxUsage now probes the keychain without decrypting first, stops at the first denied read, and cools down for 15 minutes instead of re-prompting on every refresh cycle by @1c7
+- Fixed keychain existence checks silently performing full secret reads due to a Swift protocol dispatch gap, so the promptless probe is now actually used on launch paths by @1c7
+
+---
+
+**Full Changelog**: [v1.1.2...v1.1.3](https://github.com/1c7/max-usage/compare/v1.1.2...v1.1.3)
+
 ## v1.1.2
 
 ### Bug Fixes
