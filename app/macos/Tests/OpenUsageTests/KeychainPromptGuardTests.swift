@@ -6,7 +6,8 @@ import XCTest
 /// every decrypt attempt the auth store makes can surface a password dialog — and the loader used to
 /// make up to four attempts per refresh (two read variants × two service candidates), re-firing on
 /// every refresh cycle. The guard rails: probe before decrypting, abort the pass on the first
-/// denial, and cool down instead of re-prompting on the next cycle.
+/// denial, and suppress further reads — persisted across relaunches, cleared only by the manual
+/// Settings retry — instead of re-prompting on the next cycle.
 final class KeychainPromptGuardTests: XCTestCase {
     private static let credentialsJSON =
         #"{"claudeAiOauth":{"accessToken":"token-1","refreshToken":"refresh-1","expiresAt":4102444800000,"subscriptionType":"max","scopes":["user:profile"]}}"#
@@ -73,16 +74,17 @@ final class KeychainPromptGuardTests: XCTestCase {
         XCTAssertEqual(keychain.decryptAttempts, ["currentUser(\(base))"])
     }
 
-    func testDenialAbortsPassAndStartsCooldown() {
+    func testDenialAbortsPassAndSuppressesUntilReset() {
         let base = "Claude Code-credentials"
         let keychain = ServiceKeychain()
         keychain.deniedServices.insert(base)
         let clock = MutableClock(Date(timeIntervalSince1970: 1_000_000))
+        let backoff = KeychainReadBackoff(defaults: Self.isolatedDefaults())
         let store = ClaudeAuthStore(
             environment: FakeEnvironment(),
             files: FakeFiles(),
             keychain: keychain,
-            keychainBackoff: KeychainReadBackoff(),
+            keychainBackoff: backoff,
             now: { clock.now }
         )
 
@@ -91,16 +93,43 @@ final class KeychainPromptGuardTests: XCTestCase {
         XCTAssertTrue(store.loadCredentialCandidates().isEmpty)
         XCTAssertEqual(keychain.decryptAttempts, ["currentUser(\(base))"])
 
-        // Cooldown window: the next refresh cycle doesn't touch the keychain at all.
+        // Suppression is indefinite: every retry on the partition-list item is just another
+        // password dialog, so later refresh cycles never touch the keychain again — not after a
+        // minute, not after hours, not after a relaunch.
         clock.now = clock.now.addingTimeInterval(60)
         XCTAssertTrue(store.loadCredentialCandidates().isEmpty)
         XCTAssertEqual(keychain.decryptAttempts.count, 1)
+        clock.now = clock.now.addingTimeInterval(60 * 60 * 24)
+        XCTAssertTrue(store.loadCredentialCandidates().isEmpty)
+        XCTAssertEqual(keychain.decryptAttempts.count, 1)
 
-        // Window elapsed: the keychain is consulted again, so a repaired partition list (or an
-        // accepted prompt) is picked up without restarting the app.
-        clock.now = clock.now.addingTimeInterval(KeychainReadBackoff.cooldown)
+        // Reset (Settings → Advanced → "Retry Claude Code Keychain Read") is the only way back:
+        // the next pass consults the keychain again, so a repaired item is picked up.
+        backoff.reset()
         _ = store.loadCredentialCandidates()
         XCTAssertEqual(keychain.decryptAttempts.count, 2)
+    }
+
+    func testDenialPersistsAcrossRelaunch() {
+        // The denial must survive an app relaunch: a fresh backoff instance reading the same
+        // defaults suite stays suppressed, otherwise the first refresh after every launch would
+        // re-fire the very popup the suppression exists to prevent.
+        let defaults = UserDefaults(suiteName: "keychain-backoff-relaunch-\(UUID().uuidString)")!
+        let firstLaunch = KeychainReadBackoff(defaults: defaults)
+        XCTAssertFalse(firstLaunch.isActive(now: Date()))
+        firstLaunch.recordDenial(now: Date(timeIntervalSince1970: 1_000_000))
+
+        let secondLaunch = KeychainReadBackoff(defaults: defaults)
+        XCTAssertTrue(secondLaunch.isActive(now: Date(timeIntervalSince1970: 1_000_000 + 60)))
+
+        secondLaunch.reset()
+        XCTAssertFalse(secondLaunch.isActive(now: Date()))
+        XCTAssertFalse(firstLaunch.isActive(now: Date()))
+        XCTAssertNil(defaults.object(forKey: KeychainReadBackoff.persistedDenialKey))
+    }
+
+    private static func isolatedDefaults() -> UserDefaults {
+        UserDefaults(suiteName: "keychain-backoff-\(UUID().uuidString)")!
     }
 }
 

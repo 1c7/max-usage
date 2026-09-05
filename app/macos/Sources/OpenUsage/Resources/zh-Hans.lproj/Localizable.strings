@@ -60,6 +60,7 @@
 "Reset All Settings?" = "重置所有设置？";
 "Reset All Settings…" = "重置所有设置…";
 "Reset Times" = "重置时间";
+"Retry Claude Code Keychain Read" = "重试读取 Claude Code 钥匙串";
 "Resetting your usage…" = "正在重置用量…";
 "Restores every setting and customization to its default and turns providers back on for the tools you have installed. If iCloud sync is on, it turns off and this Mac's synced history is removed. This cannot be undone." = "将所有设置和自定义恢复为默认值，并重新开启已安装工具的服务商。如果 iCloud 同步已开启，会被关闭，此 Mac 上已同步的记录也会被移除。此操作无法撤销。";
 "Reveal in Finder" = "在访达中显示";
@@ -308,6 +309,7 @@
 "settingsScreen.customizeLink.subtitle" = "选择要显示的内容及其位置";
 "settingsScreen.customizeLink.title" = "自定义";
 "settingsScreen.globalShortcutTooltip" = "随时随地打开 MaxUsage";
+"settingsScreen.keychainRetryScheduled" = "下次刷新时将重新读取钥匙串——期间可能出现一次密码授权弹窗。";
 "settingsScreen.notificationsDenied" = "MaxUsage 的通知已关闭，请在系统设置中开启。";
 "settingsScreen.notificationsNeedsPermission" = "MaxUsage 需要权限才能发送提醒。";
 "settingsScreen.partyModePaused" = "派对模式已开启，因此暂停显示。";

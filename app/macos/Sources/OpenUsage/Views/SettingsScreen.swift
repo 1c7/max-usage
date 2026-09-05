@@ -38,6 +38,11 @@ struct SettingsScreen: View {
     /// KeyboardShortcuts store only on appear (the store isn't observable), so without a fresh
     /// identity the still-mounted Settings screen would keep showing the cleared shortcut.
     @State private var shortcutFieldGeneration = 0
+    /// Whether Claude Code keychain reads are suppressed after a denied/unanswered read. Surfaced
+    /// as an Advanced row with a manual retry, since the suppression persists across relaunches.
+    @State private var keychainSuppressed = false
+    /// Shown after the retry reset, so the user knows the read happens on the next refresh cycle.
+    @State private var keychainRetryNotice: String?
 
     /// Fills the region the dashboard's pinned footer leaves. Same scroller treatment as Customize:
     /// the overlay scroller stays (the scroll edge effect needs it) but is invisible.
@@ -71,7 +76,10 @@ struct SettingsScreen: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
-        .task { await refreshNotificationsAuth() }
+        .task {
+            await refreshNotificationsAuth()
+            keychainSuppressed = KeychainReadBackoff.shared.isActive(now: Date())
+        }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             commandLineTool.refreshStatus()
             Task { await refreshNotificationsAuth() }
@@ -426,6 +434,26 @@ struct SettingsScreen: View {
             }
             if let logActionError {
                 inlineNotice(logActionError)
+            }
+            // Claude Code's keychain item carries a partition list that denies every reader but
+            // Anthropic's own (anthropics/claude-code #77697), so each denied keychain read is a
+            // password dialog. After the first denial the read is suppressed for good (persisted
+            // across relaunches); this row is the manual retry for once the item has been repaired
+            // (e.g. a fresh `claude` login rewrote it). The retry happens on the next refresh
+            // cycle, and the password prompt may appear once — that's the point.
+            if keychainSuppressed {
+                logButton("Retry Claude Code Keychain Read") {
+                    KeychainReadBackoff.shared.reset()
+                    keychainSuppressed = false
+                    keychainRetryNotice = String(
+                        localized: "settingsScreen.keychainRetryScheduled",
+                        defaultValue: "The keychain will be read again on the next refresh — one password prompt may appear."
+                    )
+                    AppLog.info(.config, "Keychain read suppression cleared from Settings")
+                }
+                if let keychainRetryNotice {
+                    inlineNotice(keychainRetryNotice)
+                }
             }
             // The Settings-wide destructive reset (issue #602). Red label, confirmation alert;
             // confirming restores every preference to its default — the container-owned stores plus

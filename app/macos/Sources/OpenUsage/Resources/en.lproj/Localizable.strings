@@ -60,6 +60,7 @@
 "Reset All Settings?" = "Reset All Settings?";
 "Reset All Settings…" = "Reset All Settings…";
 "Reset Times" = "Reset Times";
+"Retry Claude Code Keychain Read" = "Retry Claude Code Keychain Read";
 "Resetting your usage…" = "Resetting your usage…";
 "Restores every setting and customization to its default and turns providers back on for the tools you have installed. If iCloud sync is on, it turns off and this Mac's synced history is removed. This cannot be undone." = "Restores every setting and customization to its default and turns providers back on for the tools you have installed. If iCloud sync is on, it turns off and this Mac's synced history is removed. This cannot be undone.";
 "Reveal in Finder" = "Reveal in Finder";
@@ -309,6 +310,7 @@
 "settingsScreen.customizeLink.subtitle" = "Choose what's visible and where";
 "settingsScreen.customizeLink.title" = "Customize";
 "settingsScreen.globalShortcutTooltip" = "Open MaxUsage from anywhere";
+"settingsScreen.keychainRetryScheduled" = "The keychain will be read again on the next refresh — one password prompt may appear.";
 "settingsScreen.notificationsDenied" = "Notifications are turned off for MaxUsage. Enable them in System Settings.";
 "settingsScreen.notificationsNeedsPermission" = "MaxUsage needs permission to send alerts.";
 "settingsScreen.partyModePaused" = "Party mode is on, so this stays paused.";

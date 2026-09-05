@@ -459,10 +459,12 @@ struct ClaudeAuthStore: Sendable {
         // every reader but Anthropic's own (anthropics/claude-code #77697), so each decrypt attempt
         // re-fires the prompt — and this loader used to walk up to two read variants per service
         // candidate per refresh, stacking dialogs while the refresh loop kept cycling. After a
-        // denial, stay off the keychain for the cooldown window: the file fallback still loads, and
-        // the next window picks the keychain back up (e.g. once the partition list is repaired).
+        // denial, stay off the keychain for good — the suppression persists across relaunches, so
+        // no refresh cycle or app start can silently turn into a popup. The file fallback still
+        // loads, and Settings → Advanced → "Retry Claude Code Keychain Read" re-enables the
+        // keychain once the item has actually been repaired (e.g. a fresh `claude` login).
         if keychainBackoff.isActive(now: now()) {
-            AppLog.debug(.keychain, "keychain skipped: denial cooldown active")
+            AppLog.debug(.keychain, "keychain skipped: read suppressed after denial")
             return nil
         }
         // The service name is safe to log; NEVER log the returned credential blob / OAuth tokens.
@@ -489,9 +491,9 @@ struct ClaudeAuthStore: Sendable {
                 AppLog.debug(.keychain, "read miss service=\(service)")
             } catch KeychainError.accessDenied {
                 // Denied or left unanswered: the next variant or service would just fire the next
-                // dialog. Record the cooldown and abort the whole keychain pass now.
+                // dialog. Record the denial and abort the whole keychain pass now.
                 keychainBackoff.recordDenial(now: now())
-                AppLog.warn(.keychain, "keychain read denied for service '\(service)'; cooling down")
+                AppLog.warn(.keychain, "keychain read denied for service '\(service)'; suppressing keychain reads until re-enabled")
                 return nil
             } catch {
                 // Non-denial failure: keep the historical per-candidate fall-through so one broken

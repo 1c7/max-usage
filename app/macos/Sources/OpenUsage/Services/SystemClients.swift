@@ -407,28 +407,53 @@ enum KeychainError: Error, LocalizedError {
 /// structs recreated every refresh, so without shared state each refresh cycle would re-fire the
 /// prompt — Claude Code's keychain item currently carries a partition list that denies every reader
 /// but Anthropic's own (anthropics/claude-code #77697), making every decrypt attempt a fresh dialog.
-/// One denial suppresses further keychain reads for the cooldown window; successful reads never
-/// touch this state, so once the keychain is repaired the next refresh picks it up unprompted.
+/// One denial suppresses further keychain reads indefinitely and the suppression is persisted, so
+/// neither the next refresh cycle nor an app relaunch re-fires the prompt; only `reset()` (Settings
+/// → Advanced, "Retry Claude Code Keychain Read") re-enables reads, for when the item has actually
+/// been repaired. Successful reads never touch this state.
 final class KeychainReadBackoff: @unchecked Sendable {
     static let shared = KeychainReadBackoff()
-    /// Long enough to outlast a burst of refreshes, short enough that a user who just repaired the
-    /// keychain sees usage return without restarting the app.
-    static let cooldown: TimeInterval = 15 * 60
+    static let persistedDenialKey = "openusage.keychain.deniedAt.v1"
 
+    private let defaults: UserDefaults
     private let lock = NSLock()
     private var deniedAt: Date?
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        if let interval = defaults.object(forKey: Self.persistedDenialKey) as? TimeInterval {
+            deniedAt = Date(timeIntervalSince1970: interval)
+        }
+    }
 
     func recordDenial(now: Date) {
         lock.lock()
         deniedAt = now
         lock.unlock()
+        defaults.set(now.timeIntervalSince1970, forKey: Self.persistedDenialKey)
     }
 
     func isActive(now: Date) -> Bool {
         lock.lock()
         defer { lock.unlock() }
-        guard let deniedAt else { return false }
-        return now.timeIntervalSince(deniedAt) < Self.cooldown
+        // Defaults are the source of truth; the in-memory date is just a cache. Syncing both ways
+        // keeps every instance in agreement (a `reset()` from one is visible to the others), which
+        // also covers a reset landing between refresh cycles.
+        if let interval = defaults.object(forKey: Self.persistedDenialKey) as? TimeInterval {
+            if deniedAt == nil {
+                deniedAt = Date(timeIntervalSince1970: interval)
+            }
+        } else {
+            deniedAt = nil
+        }
+        return deniedAt != nil
+    }
+
+    func reset() {
+        lock.lock()
+        deniedAt = nil
+        lock.unlock()
+        defaults.removeObject(forKey: Self.persistedDenialKey)
     }
 }
 
