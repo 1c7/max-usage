@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.4
+
+### Bug Fixes
+- Fixed the keychain password prompt firing again after every app relaunch or cooldown expiry: a denied Claude Code keychain read is now suppressed permanently and the suppression is persisted to disk, so neither the next refresh cycle nor an app restart can silently turn into a popup by @1c7
+- Added a manual "Retry Claude Code Keychain Read" action under Settings → Advanced as the only way to re-enable suppressed keychain reads (for when the credential item has been repaired, e.g. a fresh `claude` login), with full English and Simplified Chinese localization by @1c7
+
+---
+
+**Full Changelog**: [v1.1.3...v1.1.4](https://github.com/1c7/max-usage/compare/v1.1.3...v1.1.4)
+
 ## v1.1.3
 
 ### Bug Fixes
