@@ -237,6 +237,13 @@ protocol KeychainAccessing: Sendable {
     /// concrete type was `SecurityKeychainAccessor`, so the "existence check" performed the exact
     /// secret read (and keychain prompt) the probe exists to avoid.
     func genericPasswordExists(service: String) -> Bool?
+
+    /// Whether decrypting `service`'s secret would show an authorization prompt, checked in-process
+    /// without ever triggering that prompt. `true`/`false` are definite; `nil` means unknown (the
+    /// probe itself failed for a reason other than needing interaction). Callers use this to decide
+    /// whether a read that's about to happen — and that may still succeed if the user clicks Allow —
+    /// should count as "a dialog was shown" for backoff purposes.
+    func requiresPromptToRead(service: String) -> Bool?
 }
 
 extension KeychainAccessing {
@@ -258,6 +265,10 @@ extension KeychainAccessing {
     /// item tables; the production accessor satisfies the requirement with its promptless native
     /// probe. Never falls back to a decrypting read — that is the bug this default replaces.
     func genericPasswordExists(service: String) -> Bool? { nil }
+
+    /// Mock-only default: "unknown". The production accessor overrides this with its promptless
+    /// native probe.
+    func requiresPromptToRead(service: String) -> Bool? { nil }
 }
 
 struct SecurityKeychainAccessor: KeychainAccessing {
@@ -294,6 +305,25 @@ struct SecurityKeychainAccessor: KeychainAccessing {
         switch SecItemCopyMatching(query as CFDictionary, nil) {
         case errSecSuccess: return true
         case errSecItemNotFound: return false
+        default: return nil
+        }
+    }
+
+    /// Same in-process, no-subprocess, no-UI query as `genericPasswordExists`, but asking for the
+    /// secret data itself: an item can exist while still being freely readable (no prompt) or
+    /// requiring one, and only asking for the data surfaces that distinction. `errSecInteractionNotAllowed`
+    /// means decrypting it would need a prompt; `errSecSuccess`/`errSecItemNotFound` mean it would not.
+    func requiresPromptToRead(service: String) -> Bool? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecMatchLimit as String: kSecMatchLimitOne,
+            kSecReturnData as String: true,
+            kSecUseAuthenticationUI as String: kSecUseAuthenticationUIFail,
+        ]
+        switch SecItemCopyMatching(query as CFDictionary, nil) {
+        case errSecInteractionNotAllowed: return true
+        case errSecSuccess, errSecItemNotFound: return false
         default: return nil
         }
     }

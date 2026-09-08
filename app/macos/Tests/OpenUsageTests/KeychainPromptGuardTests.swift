@@ -110,6 +110,32 @@ final class KeychainPromptGuardTests: XCTestCase {
         XCTAssertEqual(keychain.decryptAttempts.count, 2)
     }
 
+    func testPromptedButAllowedReadStillSuppressesFutureReads() {
+        // The item's ACL gets reset the next time Claude Code rewrites it (a token refresh, a
+        // re-login), so a read that only succeeded because the user clicked Allow on a dialog is
+        // just as much a one-time grant as an explicit denial — the next refresh cycle must not
+        // touch the keychain again either, or the same dialog just comes back.
+        let base = "Claude Code-credentials"
+        let keychain = ServiceKeychain()
+        keychain.currentUserValues[base] = Self.credentialsJSON
+        keychain.promptRequiredServices.insert(base)
+        let backoff = KeychainReadBackoff(defaults: Self.isolatedDefaults())
+        let store = ClaudeAuthStore(
+            environment: FakeEnvironment(),
+            files: FakeFiles(),
+            keychain: keychain,
+            keychainBackoff: backoff
+        )
+
+        let first = store.loadCredentialCandidates()
+        XCTAssertEqual(first.first?.source.label, "keychainCurrentUser")
+        XCTAssertEqual(keychain.decryptAttempts, ["currentUser(\(base))"])
+        XCTAssertTrue(backoff.isActive(now: Date()))
+
+        _ = store.loadCredentialCandidates()
+        XCTAssertEqual(keychain.decryptAttempts.count, 1)
+    }
+
     func testDenialPersistsAcrossRelaunch() {
         // The denial must survive an app relaunch: a fresh backoff instance reading the same
         // defaults suite stays suppressed, otherwise the first refresh after every launch would

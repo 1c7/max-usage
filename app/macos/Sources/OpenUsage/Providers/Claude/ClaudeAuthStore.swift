@@ -475,17 +475,27 @@ struct ClaudeAuthStore: Sendable {
                 AppLog.debug(.keychain, "probe miss service=\(service)")
                 continue
             }
+            // A second promptless, in-process check — this one asks whether decrypting the secret
+            // itself (not just matching its attributes) would need a dialog. Clicking Allow on that
+            // dialog still gets the item read back below and used this cycle, but the item's ACL
+            // gets reset the next time Claude Code rewrites it (a token refresh, a re-login), so a
+            // "successful" read that only worked because of a dialog is just as much a one-time
+            // grant as a denial is. Suppress on it the same way, or every future refresh cycle would
+            // re-fire the same dialog regardless of what the user clicked.
+            let willPrompt = keychain.requiresPromptToRead(service: service) == true
             do {
                 if let state = credentialState(
                     from: try keychain.readGenericPasswordForCurrentUser(service: service),
                     service: service, source: .keychainCurrentUser(service: service)
                 ) {
+                    if willPrompt { suppressAfterPromptedRead(service: service) }
                     return state
                 }
                 if let state = credentialState(
                     from: try keychain.readGenericPassword(service: service),
                     service: service, source: .keychainLegacy(service: service)
                 ) {
+                    if willPrompt { suppressAfterPromptedRead(service: service) }
                     return state
                 }
                 AppLog.debug(.keychain, "read miss service=\(service)")
@@ -502,6 +512,11 @@ struct ClaudeAuthStore: Sendable {
             }
         }
         return nil
+    }
+
+    private func suppressAfterPromptedRead(service: String) {
+        keychainBackoff.recordDenial(now: now())
+        AppLog.info(.keychain, "keychain read for service '\(service)' succeeded via a prompt; suppressing keychain reads until re-enabled")
     }
 
     /// Parse one keychain hit into a credential state, or `nil` if it's absent / malformed / tokenless.

@@ -306,6 +306,9 @@ final class ServiceKeychain: KeychainAccessing, @unchecked Sendable {
     /// Services whose decrypting read is denied (throws `KeychainError.accessDenied`), modelling the
     /// partition-list denial on Claude Code's keychain item.
     var deniedServices: Set<String> = []
+    /// Services whose decrypting read would show a prompt (but still succeeds), modelling the user
+    /// clicking Allow on a dialog the partition-list denial would otherwise have forced.
+    var promptRequiredServices: Set<String> = []
     /// Decrypt attempts in call order, as "currentUser(<service>)" / "legacy(<service>)". The
     /// promptless existence probe is NOT recorded — only attempts that can surface a dialog are.
     private(set) var decryptAttempts: [String] = []
@@ -337,6 +340,10 @@ final class ServiceKeychain: KeychainAccessing, @unchecked Sendable {
 
     func genericPasswordExists(service: String) -> Bool? {
         values[service] != nil || currentUserValues[service] != nil || deniedServices.contains(service)
+    }
+
+    func requiresPromptToRead(service: String) -> Bool? {
+        promptRequiredServices.contains(service)
     }
 }
 
