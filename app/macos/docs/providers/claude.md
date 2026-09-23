@@ -34,10 +34,17 @@ password dialog: MaxUsage first asks you to refresh manually, and choosing **Alw
 refreshes silent. If Desktop's short-lived token expires, open Claude Desktop so it can renew the login,
 then refresh MaxUsage.
 
-If macOS shows a password prompt for the Claude Code keychain entry and you deny it — or leave it
-unanswered — MaxUsage stays off that entry for 15 minutes and reads the other sources instead, rather
-than asking again on every refresh. It also checks whether an entry exists before reading it, so a
-missing login never triggers a prompt at all.
+MaxUsage reads the Claude Code keychain entry as rarely as it can, because macOS may ask for your
+password each time (Claude Code resets the entry's permissions whenever it saves a new token). After
+one successful read, MaxUsage keeps that login in memory and keeps using it. It reads the entry again
+only when Claude Code has actually saved something new there **and** the login MaxUsage holds has
+stopped working (expired or rejected) — or when you refresh by hand. Checking whether the entry
+changed never needs your password, so ordinary background refreshes never show a prompt. A missing
+entry is never read at all.
+
+If you deny the prompt — or leave it unanswered — MaxUsage stops reading that entry, even after a
+restart, and keeps using the login it already has. Settings → Advanced → **Retry Claude Code Keychain
+Read** turns reading back on.
 
 A `CLAUDE_CODE_OAUTH_TOKEN` — usually a long-lived `claude setup-token` — can run the model but can't read your Session and Weekly limits, and it often lingers in your shell environment. So when a real keychain or file login is present, MaxUsage uses that login for the live meters and keeps the environment token only as a fallback; the Session/Weekly meters no longer go blank just because that token is set. If the environment token is your *only* credential (a headless setup), it's used on its own and the spend tiles still load from local logs.
 

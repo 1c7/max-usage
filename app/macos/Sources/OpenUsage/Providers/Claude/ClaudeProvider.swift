@@ -194,6 +194,7 @@ final class ClaudeProvider: ProviderRuntime {
                 )
             } catch let error as ClaudeAuthError where error.allowsAuthFallback {
                 AppLog.warn(LogTag.auth("claude"), "\(state.source.label) failed (\(error)); falling back to next source if any")
+                authStore.markRejected(state)
                 lastFallbackError = error
                 continue
             } catch {

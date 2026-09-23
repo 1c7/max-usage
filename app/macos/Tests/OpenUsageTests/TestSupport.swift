@@ -306,9 +306,9 @@ final class ServiceKeychain: KeychainAccessing, @unchecked Sendable {
     /// Services whose decrypting read is denied (throws `KeychainError.accessDenied`), modelling the
     /// partition-list denial on Claude Code's keychain item.
     var deniedServices: Set<String> = []
-    /// Services whose decrypting read would show a prompt (but still succeeds), modelling the user
-    /// clicking Allow on a dialog the partition-list denial would otherwise have forced.
-    var promptRequiredServices: Set<String> = []
+    /// Item modification dates returned by the attributes-only probe. Unset → `nil` ("unknown"),
+    /// which makes the Claude loader decrypt on every load exactly as it did before caching.
+    var modificationDates: [String: Date] = [:]
     /// Decrypt attempts in call order, as "currentUser(<service>)" / "legacy(<service>)". The
     /// promptless existence probe is NOT recorded — only attempts that can surface a dialog are.
     private(set) var decryptAttempts: [String] = []
@@ -342,8 +342,8 @@ final class ServiceKeychain: KeychainAccessing, @unchecked Sendable {
         values[service] != nil || currentUserValues[service] != nil || deniedServices.contains(service)
     }
 
-    func requiresPromptToRead(service: String) -> Bool? {
-        promptRequiredServices.contains(service)
+    func genericPasswordModificationDate(service: String) -> Date? {
+        modificationDates[service]
     }
 }
 

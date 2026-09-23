@@ -187,6 +187,9 @@ struct ClaudeAuthStore: Sendable {
     var keychain: KeychainAccessing
     /// Shared app-wide denial cooldown; inject a fresh instance in tests.
     var keychainBackoff: KeychainReadBackoff
+    /// Last decrypted Claude Code keychain login. A class, so every copy of this store (the provider
+    /// keeps one for its lifetime) shares it; a fresh store starts empty.
+    var keychainCache: ClaudeKeychainCredentialCache
     var desktop: ClaudeDesktopAuthStore
     var now: @Sendable () -> Date
 
@@ -195,6 +198,7 @@ struct ClaudeAuthStore: Sendable {
         files: TextFileAccessing = LocalTextFileAccessor(),
         keychain: KeychainAccessing = SecurityKeychainAccessor(),
         keychainBackoff: KeychainReadBackoff = .shared,
+        keychainCache: ClaudeKeychainCredentialCache = ClaudeKeychainCredentialCache(),
         desktop: ClaudeDesktopAuthStore? = nil,
         now: @escaping @Sendable () -> Date = Date.init
     ) {
@@ -202,6 +206,7 @@ struct ClaudeAuthStore: Sendable {
         self.files = files
         self.keychain = keychain
         self.keychainBackoff = keychainBackoff
+        self.keychainCache = keychainCache
         self.desktop = desktop ?? ClaudeDesktopAuthStore(files: files, now: now)
         self.now = now
     }
@@ -211,11 +216,15 @@ struct ClaudeAuthStore: Sendable {
     /// (`ClaudeAuthError.allowsAuthFallback`) — falls through to the next, so an external `claude`
     /// re-login is picked up no matter which source it lands in, even when a stale/locked-out token still
     /// sits in another. Re-read on every refresh; nothing is cached in memory.
+    ///
+    /// `allowInteraction` marks a user-initiated refresh: Desktop may ask for its Keychain item, and a
+    /// Claude Code keychain item that changed since it was last decrypted is re-read even while the
+    /// cached token is still valid (picking up a re-login right away instead of at expiry).
     func loadCredentialSet(
-        allowDesktopInteraction: Bool = false,
+        allowDesktopInteraction allowInteraction: Bool = false,
         forceDesktopFallback: Bool = false
     ) -> ClaudeCredentialLoad {
-        var stored = orderedStoredCandidates()
+        var stored = orderedStoredCandidates(preferFreshKeychain: allowInteraction)
         var desktopStatus: ClaudeDesktopCredentialStatus = .notChecked
         // A working CLI login remains the source of truth and avoids a second Keychain prompt. Desktop
         // is a fallback for people who only use the native app (or whose stored CLI login lacks profile
@@ -224,7 +233,7 @@ struct ClaudeAuthStore: Sendable {
             $0.hasUsableAccessToken && liveUsageAvailability($0) == .available
         }
         if forceDesktopFallback || !hasUsableCLILogin {
-            let result = desktop.load(allowInteraction: allowDesktopInteraction)
+            let result = desktop.load(allowInteraction: allowInteraction)
             desktopStatus = result.status
             if let oauth = result.oauth {
                 stored.insert(ClaudeCredentialState(
@@ -298,9 +307,15 @@ struct ClaudeAuthStore: Sendable {
         case .file:
             try files.writeText(credentialsPath(), text)
         case .keychainCurrentUser(let service):
+            // Cache first: if the write is refused, the rotation already invalidated the stored
+            // refresh token, so the rotated copy is the only one that still works.
+            keychainCache.store(service: service, modifiedAt: nil, state: state)
             try keychain.writeGenericPasswordForCurrentUser(service: service, value: text)
+            keychainCache.store(service: service, modifiedAt: keychain.genericPasswordModificationDate(service: service), state: state)
         case .keychainLegacy(let service):
+            keychainCache.store(service: service, modifiedAt: nil, state: state)
             try keychain.writeGenericPassword(service: service, value: text)
+            keychainCache.store(service: service, modifiedAt: keychain.genericPasswordModificationDate(service: service), state: state)
         case .desktop:
             return false
         case .environment:
@@ -426,9 +441,21 @@ struct ClaudeAuthStore: Sendable {
     /// up (#687) WITHOUT letting a stale file outrank the live keychain just because its token carries a
     /// later expiry (the #738 regression from ranking purely by expiry). The source kind (never the
     /// token) is logged so a "locked out" report can be diagnosed from which source was chosen.
-    private func orderedStoredCandidates() -> [ClaudeCredentialState] {
+    /// The usage endpoint rejected `state`'s token and it couldn't be refreshed. If it came from the
+    /// keychain cache, the next load re-reads the item — but only once Claude Code has rewritten it,
+    /// since re-decrypting an unchanged item returns the same dead token (and maybe a dialog).
+    func markRejected(_ state: ClaudeCredentialState) {
+        switch state.source {
+        case .keychainCurrentUser(let service), .keychainLegacy(let service):
+            keychainCache.markRejected(service: service)
+        case .file, .desktop, .environment:
+            break
+        }
+    }
+
+    private func orderedStoredCandidates(preferFreshKeychain: Bool) -> [ClaudeCredentialState] {
         var candidates: [ClaudeCredentialState] = []
-        if let keychain = loadKeychainCredentials() { candidates.append(keychain) }
+        if let keychain = loadKeychainCredentials(preferFresh: preferFreshKeychain) { candidates.append(keychain) }
         if let file = loadFileCredentials() { candidates.append(file) }
 
         if candidates.count > 1 {
@@ -453,49 +480,48 @@ struct ClaudeAuthStore: Sendable {
         return ClaudeCredentialState(oauth: oauth, source: .file, fullData: parsed, inferenceOnly: false)
     }
 
-    private func loadKeychainCredentials() -> ClaudeCredentialState? {
-        // One denied/unanswered keychain read is one password dialog the user saw (or is still
-        // staring at). Claude Code's keychain item currently carries a partition list that denies
-        // every reader but Anthropic's own (anthropics/claude-code #77697), so each decrypt attempt
-        // re-fires the prompt — and this loader used to walk up to two read variants per service
-        // candidate per refresh, stacking dialogs while the refresh loop kept cycling. After a
-        // denial, stay off the keychain for good — the suppression persists across relaunches, so
-        // no refresh cycle or app start can silently turn into a popup. The file fallback still
-        // loads, and Settings → Advanced → "Retry Claude Code Keychain Read" re-enables the
-        // keychain once the item has actually been repaired (e.g. a fresh `claude` login).
-        if keychainBackoff.isActive(now: now()) {
-            AppLog.debug(.keychain, "keychain skipped: read suppressed after denial")
-            return nil
-        }
-        // The service name is safe to log; NEVER log the returned credential blob / OAuth tokens.
+    private func loadKeychainCredentials(preferFresh: Bool) -> ClaudeCredentialState? {
+        // Every decrypt of Claude Code's item is run by `/usr/bin/security`, and whether it shows a
+        // password dialog depends on the item's ACL/partition list — which Claude Code resets each
+        // time it rewrites the item (token refresh, re-login; anthropics/claude-code #77697). So the
+        // only reliable way to avoid dialogs is to decrypt rarely: keep the last login in memory and
+        // decrypt again only when the item has actually changed AND the cached token is no longer
+        // good (or the user refreshed by hand). The change check reads attributes only, never the
+        // secret, so it can't prompt. Steady state is zero decrypts per refresh cycle.
+        //
+        // A denied or unanswered dialog still suppresses decrypts for good (persisted across
+        // relaunches) until Settings → Advanced → "Retry Claude Code Keychain Read"; a cached login
+        // keeps serving meanwhile. The service name is safe to log; NEVER log the credential blob.
+        let suppressed = keychainBackoff.isActive(now: now())
         for service in keychainServiceCandidates() {
-            // Promptless attributes-only probe first: for a service with no item it costs zero
-            // prompts instead of the two decrypt attempts below (each of which can prompt).
             if keychain.genericPasswordExists(service: service) == false {
                 AppLog.debug(.keychain, "probe miss service=\(service)")
+                keychainCache.remove(service: service)
                 continue
             }
-            // A second promptless, in-process check — this one asks whether decrypting the secret
-            // itself (not just matching its attributes) would need a dialog. Clicking Allow on that
-            // dialog still gets the item read back below and used this cycle, but the item's ACL
-            // gets reset the next time Claude Code rewrites it (a token refresh, a re-login), so a
-            // "successful" read that only worked because of a dialog is just as much a one-time
-            // grant as a denial is. Suppress on it the same way, or every future refresh cycle would
-            // re-fire the same dialog regardless of what the user clicked.
-            let willPrompt = keychain.requiresPromptToRead(service: service) == true
+            let modifiedAt = keychain.genericPasswordModificationDate(service: service)
+            if let cached = keychainCache.entry(service: service),
+               suppressed || !needsDecrypt(cached, modifiedAt: modifiedAt, preferFresh: preferFresh)
+            {
+                return cached.state
+            }
+            if suppressed {
+                AppLog.debug(.keychain, "keychain skipped: read suppressed after denial")
+                return nil
+            }
             do {
-                if let state = credentialState(
+                var state = credentialState(
                     from: try keychain.readGenericPasswordForCurrentUser(service: service),
                     service: service, source: .keychainCurrentUser(service: service)
-                ) {
-                    if willPrompt { suppressAfterPromptedRead(service: service) }
-                    return state
+                )
+                if state == nil {
+                    state = credentialState(
+                        from: try keychain.readGenericPassword(service: service),
+                        service: service, source: .keychainLegacy(service: service)
+                    )
                 }
-                if let state = credentialState(
-                    from: try keychain.readGenericPassword(service: service),
-                    service: service, source: .keychainLegacy(service: service)
-                ) {
-                    if willPrompt { suppressAfterPromptedRead(service: service) }
+                if let state {
+                    keychainCache.store(service: service, modifiedAt: modifiedAt, state: state)
                     return state
                 }
                 AppLog.debug(.keychain, "read miss service=\(service)")
@@ -504,7 +530,7 @@ struct ClaudeAuthStore: Sendable {
                 // dialog. Record the denial and abort the whole keychain pass now.
                 keychainBackoff.recordDenial(now: now())
                 AppLog.warn(.keychain, "keychain read denied for service '\(service)'; suppressing keychain reads until re-enabled")
-                return nil
+                return keychainCache.entry(service: service)?.state
             } catch {
                 // Non-denial failure: keep the historical per-candidate fall-through so one broken
                 // source doesn't shadow the next one.
@@ -514,9 +540,18 @@ struct ClaudeAuthStore: Sendable {
         return nil
     }
 
-    private func suppressAfterPromptedRead(service: String) {
-        keychainBackoff.recordDenial(now: now())
-        AppLog.info(.keychain, "keychain read for service '\(service)' succeeded via a prompt; suppressing keychain reads until re-enabled")
+    /// Whether a cached keychain login must be replaced by decrypting the item again. Without a
+    /// modification date (mock accessors, a failed attributes probe) nothing can be told apart, so
+    /// every load decrypts, as before caching existed. An unchanged item never needs a decrypt: it
+    /// holds exactly what is cached (an expiring token is refreshed from the cache instead).
+    private func needsDecrypt(
+        _ cached: ClaudeKeychainCredentialCache.Entry,
+        modifiedAt: Date?,
+        preferFresh: Bool
+    ) -> Bool {
+        guard let modifiedAt, let cachedAt = cached.modifiedAt else { return true }
+        guard modifiedAt != cachedAt else { return false }
+        return preferFresh || cached.rejected || needsRefresh(cached.state.oauth)
     }
 
     /// Parse one keychain hit into a credential state, or `nil` if it's absent / malformed / tokenless.
@@ -560,5 +595,43 @@ struct ClaudeAuthStore: Sendable {
         let normalized = value.precomposedStringWithCanonicalMapping
         let digest = SHA256.hash(data: Data(normalized.utf8))
         return String(digest.map { String(format: "%02x", $0) }.joined().prefix(8))
+    }
+}
+
+/// The last Claude Code keychain login this store decrypted, per service, with the item's modification
+/// date at that moment. See `ClaudeAuthStore.loadKeychainCredentials` for why it exists.
+final class ClaudeKeychainCredentialCache: @unchecked Sendable {
+    struct Entry: Sendable {
+        var modifiedAt: Date?
+        var state: ClaudeCredentialState
+        /// The usage endpoint rejected this token and refreshing it failed.
+        var rejected = false
+    }
+
+    private let lock = NSLock()
+    private var entries: [String: Entry] = [:]
+
+    func entry(service: String) -> Entry? {
+        lock.lock()
+        defer { lock.unlock() }
+        return entries[service]
+    }
+
+    func store(service: String, modifiedAt: Date?, state: ClaudeCredentialState) {
+        lock.lock()
+        entries[service] = Entry(modifiedAt: modifiedAt ?? entries[service]?.modifiedAt, state: state)
+        lock.unlock()
+    }
+
+    func markRejected(service: String) {
+        lock.lock()
+        entries[service]?.rejected = true
+        lock.unlock()
+    }
+
+    func remove(service: String) {
+        lock.lock()
+        entries[service] = nil
+        lock.unlock()
     }
 }

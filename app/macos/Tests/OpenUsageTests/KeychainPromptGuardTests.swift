@@ -110,30 +110,105 @@ final class KeychainPromptGuardTests: XCTestCase {
         XCTAssertEqual(keychain.decryptAttempts.count, 2)
     }
 
-    func testPromptedButAllowedReadStillSuppressesFutureReads() {
-        // The item's ACL gets reset the next time Claude Code rewrites it (a token refresh, a
-        // re-login), so a read that only succeeded because the user clicked Allow on a dialog is
-        // just as much a one-time grant as an explicit denial — the next refresh cycle must not
-        // touch the keychain again either, or the same dialog just comes back.
+    func testUnchangedItemIsDecryptedOnceAndNeverSuppressed() {
+        // Regression: a probe that asked whether MaxUsage itself (not `/usr/bin/security`, which does
+        // the read) could decrypt the item fired on every read, so one silent, successful read
+        // suppressed the keychain forever and the Claude card froze on stale data. A successful read
+        // must never suppress; instead the login is cached, and an unchanged item is not decrypted
+        // again — so no refresh cycle can pop a dialog.
         let base = "Claude Code-credentials"
         let keychain = ServiceKeychain()
         keychain.currentUserValues[base] = Self.credentialsJSON
-        keychain.promptRequiredServices.insert(base)
+        keychain.modificationDates[base] = Date(timeIntervalSince1970: 100)
         let backoff = KeychainReadBackoff(defaults: Self.isolatedDefaults())
-        let store = ClaudeAuthStore(
-            environment: FakeEnvironment(),
-            files: FakeFiles(),
-            keychain: keychain,
-            keychainBackoff: backoff
-        )
+        let store = Self.store(keychain: keychain, backoff: backoff)
 
-        let first = store.loadCredentialCandidates()
-        XCTAssertEqual(first.first?.source.label, "keychainCurrentUser")
+        for _ in 0..<3 {
+            XCTAssertEqual(store.loadCredentialCandidates().first?.oauth.accessToken, "token-1")
+        }
         XCTAssertEqual(keychain.decryptAttempts, ["currentUser(\(base))"])
-        XCTAssertTrue(backoff.isActive(now: Date()))
+        XCTAssertFalse(backoff.isActive(now: Date()))
+    }
 
+    func testRewrittenItemIsRereadOnlyWhenCachedLoginIsNoLongerGood() {
+        let base = "Claude Code-credentials"
+        let keychain = ServiceKeychain()
+        keychain.currentUserValues[base] = Self.credentialsJSON
+        keychain.modificationDates[base] = Date(timeIntervalSince1970: 100)
+        let store = Self.store(keychain: keychain, backoff: KeychainReadBackoff(defaults: Self.isolatedDefaults()))
+        _ = store.loadCredentialCandidates()
+
+        // Claude Code rewrote the item (which also resets its ACL, so a decrypt may prompt). The
+        // cached token is still valid, so background refreshes keep using it without a decrypt.
+        keychain.currentUserValues[base] = Self.credentialsJSON.replacingOccurrences(of: "token-1", with: "token-2")
+        keychain.modificationDates[base] = Date(timeIntervalSince1970: 200)
+        XCTAssertEqual(store.loadCredentialCandidates().first?.oauth.accessToken, "token-1")
+        XCTAssertEqual(keychain.decryptAttempts.count, 1)
+
+        // Once the usage endpoint rejects the cached token, the rewritten item is read once.
+        let cached = store.loadCredentialCandidates()[0]
+        store.markRejected(cached)
+        XCTAssertEqual(store.loadCredentialCandidates().first?.oauth.accessToken, "token-2")
+        XCTAssertEqual(store.loadCredentialCandidates().first?.oauth.accessToken, "token-2")
+        XCTAssertEqual(keychain.decryptAttempts.count, 2)
+    }
+
+    func testRejectedLoginIsNotRereadFromAnUnchangedItem() {
+        // Decrypting an item Claude Code hasn't rewritten returns the same dead token — only a
+        // pointless chance to prompt. Wait for the item to change instead.
+        let base = "Claude Code-credentials"
+        let keychain = ServiceKeychain()
+        keychain.currentUserValues[base] = Self.credentialsJSON
+        keychain.modificationDates[base] = Date(timeIntervalSince1970: 100)
+        let store = Self.store(keychain: keychain, backoff: KeychainReadBackoff(defaults: Self.isolatedDefaults()))
+
+        store.markRejected(store.loadCredentialCandidates()[0])
         _ = store.loadCredentialCandidates()
         XCTAssertEqual(keychain.decryptAttempts.count, 1)
+    }
+
+    func testManualRefreshPicksUpARewrittenItemImmediately() {
+        let base = "Claude Code-credentials"
+        let keychain = ServiceKeychain()
+        keychain.currentUserValues[base] = Self.credentialsJSON
+        keychain.modificationDates[base] = Date(timeIntervalSince1970: 100)
+        let store = Self.store(keychain: keychain, backoff: KeychainReadBackoff(defaults: Self.isolatedDefaults()))
+        _ = store.loadCredentialCandidates()
+
+        keychain.currentUserValues[base] = Self.credentialsJSON.replacingOccurrences(of: "token-1", with: "token-2")
+        keychain.modificationDates[base] = Date(timeIntervalSince1970: 200)
+        let manual = store.loadCredentialSet(allowDesktopInteraction: true).candidates
+        XCTAssertEqual(manual.first?.oauth.accessToken, "token-2")
+        XCTAssertEqual(keychain.decryptAttempts.count, 2)
+    }
+
+    func testDeniedRereadKeepsServingTheCachedLogin() {
+        let base = "Claude Code-credentials"
+        let keychain = ServiceKeychain()
+        keychain.currentUserValues[base] = Self.credentialsJSON
+        keychain.modificationDates[base] = Date(timeIntervalSince1970: 100)
+        let backoff = KeychainReadBackoff(defaults: Self.isolatedDefaults())
+        let store = Self.store(keychain: keychain, backoff: backoff)
+        store.markRejected(store.loadCredentialCandidates()[0])
+
+        keychain.modificationDates[base] = Date(timeIntervalSince1970: 200)
+        keychain.deniedServices.insert(base)
+        XCTAssertEqual(store.loadCredentialCandidates().first?.oauth.accessToken, "token-1")
+        XCTAssertTrue(backoff.isActive(now: Date()))
+
+        keychain.modificationDates[base] = Date(timeIntervalSince1970: 300)
+        XCTAssertEqual(store.loadCredentialCandidates().first?.oauth.accessToken, "token-1")
+        XCTAssertEqual(keychain.decryptAttempts.count, 2)
+    }
+
+    func testLegacyDenialFlagIsDroppedOnce() {
+        // v1 denial flags were mostly false positives from the broken prompt probe; every install
+        // gets one honest retry.
+        let defaults = Self.isolatedDefaults()
+        defaults.set(1_000_000.0, forKey: "openusage.keychain.deniedAt.v1")
+        let backoff = KeychainReadBackoff(defaults: defaults)
+        XCTAssertFalse(backoff.isActive(now: Date()))
+        XCTAssertNil(defaults.object(forKey: "openusage.keychain.deniedAt.v1"))
     }
 
     func testDenialPersistsAcrossRelaunch() {
@@ -152,6 +227,10 @@ final class KeychainPromptGuardTests: XCTestCase {
         XCTAssertFalse(secondLaunch.isActive(now: Date()))
         XCTAssertFalse(firstLaunch.isActive(now: Date()))
         XCTAssertNil(defaults.object(forKey: KeychainReadBackoff.persistedDenialKey))
+    }
+
+    private static func store(keychain: ServiceKeychain, backoff: KeychainReadBackoff) -> ClaudeAuthStore {
+        ClaudeAuthStore(environment: FakeEnvironment(), files: FakeFiles(), keychain: keychain, keychainBackoff: backoff)
     }
 
     private static func isolatedDefaults() -> UserDefaults {

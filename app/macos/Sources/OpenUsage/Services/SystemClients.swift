@@ -238,12 +238,11 @@ protocol KeychainAccessing: Sendable {
     /// secret read (and keychain prompt) the probe exists to avoid.
     func genericPasswordExists(service: String) -> Bool?
 
-    /// Whether decrypting `service`'s secret would show an authorization prompt, checked in-process
-    /// without ever triggering that prompt. `true`/`false` are definite; `nil` means unknown (the
-    /// probe itself failed for a reason other than needing interaction). Callers use this to decide
-    /// whether a read that's about to happen — and that may still succeed if the user clicks Allow —
-    /// should count as "a dialog was shown" for backoff purposes.
-    func requiresPromptToRead(service: String) -> Bool?
+    /// When `service`'s item was last written, read from its attributes only (no secret, no UI), so
+    /// callers can tell whether another app rewrote the item since they last decrypted it without
+    /// paying for another decrypt — each of which can surface an authorization dialog. `nil` means
+    /// unknown (no item, or the probe itself failed).
+    func genericPasswordModificationDate(service: String) -> Date?
 }
 
 extension KeychainAccessing {
@@ -266,9 +265,8 @@ extension KeychainAccessing {
     /// probe. Never falls back to a decrypting read — that is the bug this default replaces.
     func genericPasswordExists(service: String) -> Bool? { nil }
 
-    /// Mock-only default: "unknown". The production accessor overrides this with its promptless
-    /// native probe.
-    func requiresPromptToRead(service: String) -> Bool? { nil }
+    /// Mock-only default: "unknown", which makes callers fall back to decrypting on every load.
+    func genericPasswordModificationDate(service: String) -> Date? { nil }
 }
 
 struct SecurityKeychainAccessor: KeychainAccessing {
@@ -309,23 +307,23 @@ struct SecurityKeychainAccessor: KeychainAccessing {
         }
     }
 
-    /// Same in-process, no-subprocess, no-UI query as `genericPasswordExists`, but asking for the
-    /// secret data itself: an item can exist while still being freely readable (no prompt) or
-    /// requiring one, and only asking for the data surfaces that distinction. `errSecInteractionNotAllowed`
-    /// means decrypting it would need a prompt; `errSecSuccess`/`errSecItemNotFound` mean it would not.
-    func requiresPromptToRead(service: String) -> Bool? {
+    /// Same in-process, attributes-only, no-UI query as `genericPasswordExists`, returning the
+    /// item's modification date. Attributes never require the secret's ACL, so this can't prompt.
+    func genericPasswordModificationDate(service: String) -> Date? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecMatchLimit as String: kSecMatchLimitOne,
-            kSecReturnData as String: true,
+            kSecReturnAttributes as String: true,
             kSecUseAuthenticationUI as String: kSecUseAuthenticationUIFail,
         ]
-        switch SecItemCopyMatching(query as CFDictionary, nil) {
-        case errSecInteractionNotAllowed: return true
-        case errSecSuccess, errSecItemNotFound: return false
-        default: return nil
+        var result: CFTypeRef?
+        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
+              let attributes = result as? [String: Any]
+        else {
+            return nil
         }
+        return attributes[kSecAttrModificationDate as String] as? Date
     }
 
     func readGenericPasswordForCurrentUser(service: String) throws -> String? {
@@ -443,7 +441,12 @@ enum KeychainError: Error, LocalizedError {
 /// been repaired. Successful reads never touch this state.
 final class KeychainReadBackoff: @unchecked Sendable {
     static let shared = KeychainReadBackoff()
-    static let persistedDenialKey = "openusage.keychain.deniedAt.v1"
+    // v2: v1 flags were also set by a broken "would this read prompt?" probe that asked about
+    // MaxUsage's own access instead of `/usr/bin/security`'s (the process that actually reads), so
+    // it fired on every read, silent ones included. Those flags are dropped once so each install gets
+    // one honest retry.
+    static let persistedDenialKey = "openusage.keychain.deniedAt.v2"
+    private static let legacyDenialKeys = ["openusage.keychain.deniedAt.v1"]
 
     private let defaults: UserDefaults
     private let lock = NSLock()
@@ -451,6 +454,7 @@ final class KeychainReadBackoff: @unchecked Sendable {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        Self.legacyDenialKeys.forEach(defaults.removeObject(forKey:))
         if let interval = defaults.object(forKey: Self.persistedDenialKey) as? TimeInterval {
             deniedAt = Date(timeIntervalSince1970: interval)
         }
