@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.1.5
+
+### Bug Fixes
+- Fixed Claude usage freezing on stale numbers: a check meant to predict keychain password prompts looked at the wrong process, so every successful Claude Code keychain read — even a silent one — switched keychain reading off for good, and every Claude refresh after that failed while the card kept showing old data. MaxUsage now keeps the Claude Code login in memory and reads the keychain again only when Claude Code has saved a new login and the one it holds stopped working (or when you refresh manually), so background refreshes never trigger a prompt. Installs affected by the bug get one fresh keychain read after updating by @1c7
+
+---
+
+**Full Changelog**: [v1.1.4...v1.1.5](https://github.com/1c7/max-usage/compare/v1.1.4...v1.1.5)
+
 ## v1.1.4
 
 ### Bug Fixes
